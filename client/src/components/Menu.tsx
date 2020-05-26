@@ -32,63 +32,63 @@ let appPages: AppPage[] = [
   {
     header: 'Getting Started',
     title: 'Welcome to Midland Trust!',
-    url: '/page/Inbox',
+    url: '/page/Welcome',
     iosIcon: mailOutline,
     mdIcon: mailSharp
   },
   {
     header: 'Getting Started',
     title: 'Disclosures',
-    url: '/page/Outbox',
+    url: '/page/Disclosures',
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp
   },
   {
     header: 'Open Account',
     title: 'Owner Information',
-    url: '/page/Favorites',
+    url: '/page/OwnerInformation',
     iosIcon: heartOutline,
     mdIcon: heartSharp
   },
   {
     header: 'Open Account',
     title: 'Beneficiaries',
-    url: '/page/Archived',
+    url: '/page/Beneficiaries',
     iosIcon: archiveOutline,
     mdIcon: archiveSharp
   },
   {
     header: 'Open Account',
     title: 'Fee Arrangement',
-    url: '/page/Trash',
+    url: '/page/FeeArrangement',
     iosIcon: trashOutline,
     mdIcon: trashSharp
   },
   {
     header: 'Open Account',
     title: 'Account Notifications',
-    url: '/page/Spam',
+    url: '/page/AccountNotifications',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   },
   {
     header: 'Make Investment',
     title: 'Investment Details',
-    url: '/page/Spam',
+    url: '/page/InvestmentDetails',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   },
   {
     header: 'Finishing Up',
     title: 'Payment Information',
-    url: '/page/Spam',
+    url: '/page/PaymentInformation',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   },
   {
     header: 'Finishing Up',
     title: 'Review and Sign',
-    url: '/page/Spam',
+    url: '/page/ReviewAndSign',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   }
