@@ -8,6 +8,7 @@ import {
   IonMenu,
   IonMenuToggle,
   IonNote,
+  IonImg,
 } from '@ionic/react';
 
 import React from 'react';
@@ -138,6 +139,7 @@ const Menu: React.FC = () => {
             )
           })}
         </IonList>
+        <IonImg src="../../assets/icon/midlandSideBar.PNG"></IonImg>
       </IonContent>
     </IonMenu>
   );
