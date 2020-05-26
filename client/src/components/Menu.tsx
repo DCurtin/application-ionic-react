@@ -16,68 +16,102 @@ import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp
 import './Menu.css';
 
 interface AppPage {
+  header?: string;
   url: string;
   iosIcon: string;
   mdIcon: string;
   title: string;
 }
 
+interface AppSection {
+  header: string;
+  pages: AppPage[]
+}
+
 const appPages: AppPage[] = [
   {
+    header: 'Getting Started',
     title: 'Welcome to Midland Trust!',
     url: '/page/Inbox',
     iosIcon: mailOutline,
     mdIcon: mailSharp
   },
   {
+    header: 'Getting Started',
     title: 'Disclosures',
     url: '/page/Outbox',
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp
   },
   {
+    header: 'Open Account',
     title: 'Owner Information',
     url: '/page/Favorites',
     iosIcon: heartOutline,
     mdIcon: heartSharp
   },
   {
+    header: 'Open Account',
     title: 'Beneficiaries',
     url: '/page/Archived',
     iosIcon: archiveOutline,
     mdIcon: archiveSharp
   },
   {
+    header: 'Open Account',
     title: 'Fee Arrangement',
     url: '/page/Trash',
     iosIcon: trashOutline,
     mdIcon: trashSharp
   },
   {
+    header: 'Open Account',
     title: 'Account Notifications',
     url: '/page/Spam',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   },
   {
+    header: 'Make Investment',
     title: 'Investment Details',
     url: '/page/Spam',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   },
   {
+    header: 'Finishing Up',
     title: 'Payment Information',
     url: '/page/Spam',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   },
   {
+    header: 'Finishing Up',
     title: 'Review and Sign',
     url: '/page/Spam',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   }
 ];
+
+const appSections : AppSection[] = [
+  {
+    header: 'Getting Started',
+    pages: [...appPages.filter(page => page.header === 'Getting Started')]
+  },
+  {
+    header: 'Open Account',
+    pages: [...appPages.filter(page => page.header === 'Open Account')]
+  },
+  {
+    header: 'Make Investment', 
+    pages: [...appPages.filter(page => page.header === 'Make Investment')]
+  },
+  {
+    header: 'Finishing Up',
+    pages: [...appPages.filter(page => page.header === 'Finishing Up')]
+  }
+]
 
 const Menu: React.FC = () => {
   const location = useLocation();
@@ -86,17 +120,22 @@ const Menu: React.FC = () => {
     <IonMenu contentId="main" type="overlay">
       <IonContent>
         <IonList id="inbox-list">
-          <IonListHeader>Inbox</IonListHeader>
-          <IonNote>hi@ionicframework.com</IonNote>
-          {appPages.map((appPage, index) => {
+          {appSections.map((appSection, index) => {
             return (
-              <IonMenuToggle key={index} autoHide={false}>
-                <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
-                  <IonIcon slot="start" icon={appPage.iosIcon} />
-                  <IonLabel>{appPage.title}</IonLabel>
-                </IonItem>
-              </IonMenuToggle>
-            );
+              <React.Fragment key={index}>
+                <IonListHeader>{appSection.header}</IonListHeader>
+                 {appSection.pages.map((appPage, index) => {
+                    return (
+                      <IonMenuToggle key={index} autoHide={false}>
+                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
+                          <IonIcon slot="start" icon={appPage.iosIcon} />
+                          <IonLabel>{appPage.title}</IonLabel>
+                        </IonItem>
+                      </IonMenuToggle>
+                    );
+                 })}
+              </React.Fragment>         
+            )
           })}
         </IonList>
       </IonContent>
