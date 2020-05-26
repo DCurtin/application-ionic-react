@@ -24,44 +24,60 @@ interface AppPage {
 
 const appPages: AppPage[] = [
   {
-    title: 'Inbox',
+    title: 'Welcome to Midland Trust!',
     url: '/page/Inbox',
     iosIcon: mailOutline,
     mdIcon: mailSharp
   },
   {
-    title: 'Outbox',
+    title: 'Disclosures',
     url: '/page/Outbox',
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp
   },
   {
-    title: 'Favorites',
+    title: 'Owner Information',
     url: '/page/Favorites',
     iosIcon: heartOutline,
     mdIcon: heartSharp
   },
   {
-    title: 'Archived',
+    title: 'Beneficiaries',
     url: '/page/Archived',
     iosIcon: archiveOutline,
     mdIcon: archiveSharp
   },
   {
-    title: 'Trash',
+    title: 'Fee Arrangement',
     url: '/page/Trash',
     iosIcon: trashOutline,
     mdIcon: trashSharp
   },
   {
-    title: 'Spam',
+    title: 'Account Notifications',
+    url: '/page/Spam',
+    iosIcon: warningOutline,
+    mdIcon: warningSharp
+  },
+  {
+    title: 'Investment Details',
+    url: '/page/Spam',
+    iosIcon: warningOutline,
+    mdIcon: warningSharp
+  },
+  {
+    title: 'Payment Information',
+    url: '/page/Spam',
+    iosIcon: warningOutline,
+    mdIcon: warningSharp
+  },
+  {
+    title: 'Review and Sign',
     url: '/page/Spam',
     iosIcon: warningOutline,
     mdIcon: warningSharp
   }
 ];
-
-const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
 const Menu: React.FC = () => {
   const location = useLocation();
@@ -82,16 +98,6 @@ const Menu: React.FC = () => {
               </IonMenuToggle>
             );
           })}
-        </IonList>
-
-        <IonList id="labels-list">
-          <IonListHeader>Labels</IonListHeader>
-          {labels.map((label, index) => (
-            <IonItem lines="none" key={index}>
-              <IonIcon slot="start" icon={bookmarkOutline} />
-              <IonLabel>{label}</IonLabel>
-            </IonItem>
-          ))}
         </IonList>
       </IonContent>
     </IonMenu>
