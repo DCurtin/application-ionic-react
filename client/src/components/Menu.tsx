@@ -9,6 +9,8 @@ import {
   IonMenuToggle,
   IonNote,
   IonImg,
+  IonToolbar,
+  IonTitle,
 } from '@ionic/react';
 
 import React from 'react';
@@ -140,6 +142,12 @@ const Menu: React.FC = () => {
           })}
         </IonList>
         <IonImg src="../../assets/icon/midlandSideBar.PNG"></IonImg>
+        <IonToolbar color="primary">
+            <IonTitle>FAQs</IonTitle>
+        </IonToolbar>
+        <IonToolbar color="primary">
+          <IonTitle> Contact Us </IonTitle>
+        </IonToolbar>
       </IonContent>
     </IonMenu>
   );
