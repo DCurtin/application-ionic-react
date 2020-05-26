@@ -28,7 +28,7 @@ interface AppSection {
   pages: AppPage[]
 }
 
-const appPages: AppPage[] = [
+let appPages: AppPage[] = [
   {
     header: 'Getting Started',
     title: 'Welcome to Midland Trust!',
