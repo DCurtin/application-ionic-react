@@ -7,7 +7,6 @@ import {
   IonListHeader,
   IonMenu,
   IonMenuToggle,
-  IonNote,
   IonImg,
   IonToolbar,
   IonTitle,
@@ -121,7 +120,7 @@ const Menu: React.FC = () => {
 
   return (
     <IonMenu contentId="main" type="overlay">
-      <IonContent>
+      <IonContent scrollY={false}>
         <IonList id="inbox-list">
           {appSections.map((appSection, index) => {
             return (

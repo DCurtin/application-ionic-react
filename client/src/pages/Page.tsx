@@ -16,7 +16,7 @@ const Page: React.FC = () => {
             <IonMenuButton />
           </IonButtons>
           <IonThumbnail slot="start">
-            <IonImg src="../../assets/icon/midlandtrust.PNG"/>
+            <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
           <IonTitle>{name}</IonTitle>
         </IonToolbar>
