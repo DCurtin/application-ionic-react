@@ -1,8 +1,6 @@
 import { IonContent, IonPage, IonList, IonItem, IonButton, IonListHeader, IonLabel, IonSelect, IonSelectOption, IonInput, IonCard } from '@ionic/react';
 import React, {useState, useEffect, Component} from 'react';
-import sessionHandler from '../helpers/sessionHandler';
 import { useHistory } from 'react-router-dom';
-import styles from './Home.module.css';
 
 interface SessionApp {
     sessionId : String,
