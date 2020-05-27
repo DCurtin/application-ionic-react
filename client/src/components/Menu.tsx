@@ -120,7 +120,7 @@ const Menu: React.FC = () => {
 
   return (
     <IonMenu contentId="main" type="overlay">
-      <IonContent scrollY={false}>
+      <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
           {appSections.map((appSection, index) => {
             return (

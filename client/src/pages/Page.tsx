@@ -1,4 +1,4 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonBackButton } from '@ionic/react';
 import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
@@ -43,6 +43,9 @@ const Page: React.FC = () => {
             <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
           <IonTitle>{displayPageTitle(name)}</IonTitle>
+          <IonButtons slot="end">
+            <IonBackButton></IonBackButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 
