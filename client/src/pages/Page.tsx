@@ -9,7 +9,7 @@ import './Page.css';
 const Page: React.FC = () => {
 
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
-  const [sessionId, setSessionId] = useState(undefined);
+  const [sessionId, setSessionId] = useState('');
 
   const { name } = useParams<{ name: string; }>();
 
@@ -17,7 +17,7 @@ const Page: React.FC = () => {
     setSelectedAccountType(selectedValue);
   }
 
-  const displayPage = (pageName:string) => {
+  const displayPage = (pageName:string, sessionId:String, setSessionId:Function) => {
     switch (pageName) {
       case 'Welcome': 
         return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType}/>;
@@ -49,7 +49,7 @@ const Page: React.FC = () => {
             <IonTitle size="large" color="primary">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        {displayPage(name)}
+        {displayPage(name, sessionId, setSessionId)}
       </IonContent>
     </IonPage>
   );
