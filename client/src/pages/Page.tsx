@@ -1,12 +1,27 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail } from '@ionic/react';
-import React from 'react';
+import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
+import Welcome from '../components/Welcome';
 import './Page.css';
 
 const Page: React.FC = () => {
 
+  const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
   const { name } = useParams<{ name: string; }>();
+
+  const handleAccountTypeSelected = (selectedValue: string) => {
+    setSelectedAccountType(selectedValue);
+  }
+
+  const displayPage = (pageName:string) => {
+    switch (pageName) {
+      case 'Welcome': 
+        return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType}/>;
+      default:
+        return <ExploreContainer name={pageName}/>
+    }
+  }
 
   return (
     <IonPage>
@@ -28,7 +43,7 @@ const Page: React.FC = () => {
             <IonTitle size="large" color="primary">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name={name} />
+        {displayPage(name)}
       </IonContent>
     </IonPage>
   );
