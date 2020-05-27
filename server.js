@@ -8,7 +8,6 @@ var {
   Client
 } = require('pg');
 var jsforce = require('jsforce');
-
 var serverConn = new jsforce.Connection({
   oauth2 : {
     // you can change loginUrl to connect to sandbox or prerelease env.
@@ -19,7 +18,6 @@ var serverConn = new jsforce.Connection({
     redirectUri : process.env.SF_Redirect
   }
 });
-
 serverConn.login(process.env.UserId, process.env.UserPw + process.env.UserToken, function(err, userInfo) {
   console.log('token: ' + serverConn.accessToken)
   if (err) {
@@ -28,6 +26,10 @@ serverConn.login(process.env.UserId, process.env.UserPw + process.env.UserToken,
   }
 })
 
+var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost/salesforce';
+console.log('query url: ' +  connectionString)
+var client = new pg.Client(connectionString);
+client.connect();
 
 var app = express();
 app.use(session({
