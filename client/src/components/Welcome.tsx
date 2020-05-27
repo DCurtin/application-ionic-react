@@ -1,5 +1,6 @@
 import React from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup } from '@ionic/react';
+import './Welcome.css';
 
 const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (accountType: string) => void}> = props => {
     const accountTypes = [
@@ -18,8 +19,16 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
         <IonContent className="ion-padding">
             <IonGrid>
                 <IonRow>
+                    <IonCol color="primary">
+                        <strong>
+                            MIDLAND ONLINE APPLICATION:
+                        </strong>
+                        This online application will take about 10-15 minutes to complete. Before you start, we recommend having a credit card, photo ID, beneficiary information, and a current retirement plan statement on hand.
+                    </IonCol>
+                </IonRow>
+                <IonRow>
                     <IonCol>
-                        <IonLabel>
+                        <IonLabel color="primary">
                             What type of account would you like to open?
                         </IonLabel>
                        <IonSelect value={props.selectedAccountType} onIonChange={handleAccountTypeSelected}>

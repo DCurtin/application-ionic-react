@@ -14,6 +14,15 @@ const Page: React.FC = () => {
     setSelectedAccountType(selectedValue);
   }
 
+  const displayPageTitle = (pageName:string) => {
+    switch(pageName){
+      case 'Welcome':
+        return 'Welcome to Midland Trust!'
+      default:
+        return pageName;
+    }
+  }
+
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
@@ -33,7 +42,7 @@ const Page: React.FC = () => {
           <IonThumbnail slot="start">
             <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
-          <IonTitle>{name}</IonTitle>
+          <IonTitle>{displayPageTitle(name)}</IonTitle>
         </IonToolbar>
       </IonHeader>
 
