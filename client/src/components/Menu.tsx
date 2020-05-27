@@ -48,7 +48,7 @@ let appPages: AppPage[] = [
   {
     header: 'Open Account',
     title: 'Owner Information',
-    url: '/page/OwnerInformation',
+    url: '/page/IdInfo',
     iosIcon: heartOutline,
     mdIcon: heartSharp
   },

@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
+import ApplicationIdentity from '../components/ApplicationIdentity'
 import './Page.css';
 
 const Page: React.FC = () => {
@@ -15,9 +16,13 @@ const Page: React.FC = () => {
   }
 
   const displayPage = (pageName:string) => {
+    const [sessionId, setSessionId] = useState(undefined);
     switch (pageName) {
       case 'Welcome': 
         return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType}/>;
+      
+      case 'IdInfo':
+        return <ApplicationIdentity sessionId={sessionId} setSessionId={setSessionId} />
       default:
         return <ExploreContainer name={pageName}/>
     }
