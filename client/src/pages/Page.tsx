@@ -9,6 +9,8 @@ import './Page.css';
 const Page: React.FC = () => {
 
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
+  const [sessionId, setSessionId] = useState(undefined);
+
   const { name } = useParams<{ name: string; }>();
 
   const handleAccountTypeSelected = (selectedValue: string) => {
@@ -16,7 +18,6 @@ const Page: React.FC = () => {
   }
 
   const displayPage = (pageName:string) => {
-    const [sessionId, setSessionId] = useState(undefined);
     switch (pageName) {
       case 'Welcome': 
         return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType}/>;
