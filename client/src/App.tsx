@@ -1,4 +1,4 @@
-import Menu from './components/Menu';
+import {Menu} from './components/Menu';
 import Page from './pages/Page';
 import React from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';

@@ -1,16 +1,43 @@
+import { IonContent, IonList, IonItem, IonButton, IonListHeader, IonLabel} from '@ionic/react';
 import React from 'react';
 import './ExploreContainer.css';
 
-interface ContainerProps {
-  name: string;
+interface AppPage {
+  header?: string;
+  url: string;
+  iosIcon: string;
+  mdIcon: string;
+  title: string;
 }
 
-const ExploreContainer: React.FC<ContainerProps> = ({ name }) => {
+interface userState{
+  prevPage?: AppPage,
+  currentPage: AppPage,
+  nextPage?: AppPage
+}
+
+interface ContainerProps {
+  name: string,
+  currentState: userState
+}
+
+const ExploreContainer: React.FC<ContainerProps> = ({ name, currentState }) => {
   return (
-    <div className="container">
-      <strong>{name}</strong>
-      <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-    </div>
+    <IonContent>
+      <IonList>
+        <IonListHeader>
+        <IonLabel>
+            {name}
+        </IonLabel>
+        </IonListHeader>
+        <IonItem>
+              <IonButton routerLink={currentState.nextPage?.url} >Next</IonButton>
+        </IonItem>
+        <IonItem>
+              <IonButton  routerLink={currentState.prevPage?.url}>Prev</IonButton>
+        </IonItem>
+      </IonList>
+    </IonContent>
   );
 };
 

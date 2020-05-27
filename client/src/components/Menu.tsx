@@ -48,7 +48,7 @@ let appPages: AppPage[] = [
   {
     header: 'Open Account',
     title: 'Owner Information',
-    url: '/page/IdInfo',
+    url: '/page/OwnerInformation',
     iosIcon: heartOutline,
     mdIcon: heartSharp
   },
@@ -152,4 +152,6 @@ const Menu: React.FC = () => {
   );
 };
 
-export default Menu;
+
+
+export {Menu, appPages};

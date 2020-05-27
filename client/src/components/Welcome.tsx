@@ -1,7 +1,13 @@
 import React from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption } from '@ionic/react';
 
-const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (accountType: string) => void}> = props => {
+interface SessionApp {
+    currentState: any
+    selectedAccountType: string; 
+    onAccountTypeSelected: (accountType: string) => void;
+}
+
+const Welcome: React.FC<SessionApp> = props => {
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 

@@ -2,12 +2,27 @@ import { IonContent, IonPage, IonList, IonItem, IonButton, IonListHeader, IonLab
 import React, {useState, useEffect, Component} from 'react';
 import { useHistory } from 'react-router-dom';
 
+interface AppPage {
+    header?: string;
+    url: string;
+    iosIcon: string;
+    mdIcon: string;
+    title: string;
+  }
+  
+  interface userState{
+    prevPage?: AppPage,
+    currentPage: AppPage,
+    nextPage?: AppPage
+  }
+
 interface SessionApp {
     sessionId : String,
-    setSessionId : Function
+    setSessionId : Function,
+    currentState: userState
 }
 
-const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, currentState}) => {
     //const sessionId = props?.location?.state?.sessionId;
     console.log('sessionId ' + sessionId);
     const [formData, setFormData] = useState({First_Name__c:'', Last_Name__c:'', SSN__c: '', Email__c: '', DOB__c: ''});
@@ -43,7 +58,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId}) =>
     },[sessionId])
     
     return (
-        <IonPage>
         <IonContent>
         <IonList>
           <IonListHeader>
@@ -54,7 +68,7 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId}) =>
 
           <IonItem>
           <IonCard>
-                <IonLabel>Beneficiary</IonLabel>
+                <IonLabel>User Info</IonLabel>
                 <IonInput class='item-input' name="First_Name__c" value={formData.First_Name__c} placeholder="First Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
                 <IonInput class='item-input' name="Last_Name__c" value={formData.Last_Name__c} placeholder="Last Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
                 <IonInput class='item-input' name="SSN__c" value={formData.SSN__c} placeholder="Social" onIonChange={e => updateForm(e!)} clearInput></IonInput>
@@ -63,20 +77,19 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId}) =>
             </IonCard>
           </IonItem>
           <IonItem>
-              <IonButton onClick={()=>{nextState(formData, history, setSessionId, sessionId)}}>Next</IonButton>
+              <IonButton onClick={()=>{nextState(formData, history, setSessionId, sessionId, currentState.nextPage?.url)}}>Next</IonButton>
           </IonItem>
           <IonItem>
-              <IonButton onClick={()=>{prevState(history)}}>Prev</IonButton>
+              <IonButton onClick={()=>{prevState(history, currentState.prevPage?.url)}}>Prev</IonButton>
           </IonItem>
           <IonItem>
               <IonButton onClick={()=>{saveAndReturn(formData, history)}}>Save And Return</IonButton>
           </IonItem>
           </IonList>
-        </IonContent>
-    </IonPage>)
+        </IonContent>)
 }
 
-function nextState(formData:any, history: any, setSessionId: Function, sessionId: String){
+function nextState(formData:any, history: any, setSessionId: Function, sessionId: String, nextUrl?:String){
     // {'formData':JSON.stringify(formData)}
     //save data to postGres
     //get session id
@@ -107,12 +120,12 @@ function nextState(formData:any, history: any, setSessionId: Function, sessionId
         if(sessionId === undefined){
             setSessionId(response.body.sessionId);
         }
-        history.push('/AppBene', {'sessionId': sessionId});
+        history.push(nextUrl);
     })
 }
 
-function prevState(history: any){
-    history.goBack();
+function prevState(history: any, prevUrl?:String){
+    history.push(prevUrl);
 }
 
 function saveAndReturn(formData: any, history: any){

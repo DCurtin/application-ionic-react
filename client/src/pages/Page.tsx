@@ -1,15 +1,37 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonItem, IonButton } from '@ionic/react';
+import {appPages} from '../components/Menu';
 import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
 import ApplicationIdentity from '../components/ApplicationIdentity'
+import ApplicationBene from '../components/ApplicationBene'
 import './Page.css';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
+
+interface AppPage {
+  header?: string;
+  url: string;
+  iosIcon: string;
+  mdIcon: string;
+  title: string;
+}
+
+interface userState{
+  prevPage?: AppPage,
+  currentPage: AppPage,
+  nextPage?: AppPage
+}
 
 const Page: React.FC = () => {
 
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
   const [sessionId, setSessionId] = useState('');
+  const [currentState, setCurrentState] = useState<userState>({
+    prevPage: undefined,
+    currentPage: appPages[0],
+    nextPage: appPages[1]
+  })
 
   const { name } = useParams<{ name: string; }>();
 
@@ -18,14 +40,24 @@ const Page: React.FC = () => {
   }
 
   const displayPage = (pageName:string, sessionId:String, setSessionId:Function) => {
+    
+  if(!currentState.currentPage.url.includes(pageName)){
+    console.log(pageName)
+    console.log(currentState.currentPage.url)
+    console.log(currentState.currentPage.url.includes(pageName));
+    var updatedState = getPageStateFromPage(pageName);
+    setCurrentState(updatedState);
+  }
+
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType}/>;
-      
-      case 'IdInfo':
-        return <ApplicationIdentity sessionId={sessionId} setSessionId={setSessionId} />
+        return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType} currentState={currentState}/>;
+      case 'OwnerInformation':
+        return <ApplicationIdentity sessionId={sessionId} setSessionId={setSessionId} currentState={currentState} />
+      case 'Beneficiaries':
+        return <ApplicationBene sessionId={sessionId} currentState={currentState}/>
       default:
-        return <ExploreContainer name={pageName}/>
+        return <ExploreContainer name={pageName} currentState={currentState}/>
     }
   }
 
@@ -50,9 +82,57 @@ const Page: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         {displayPage(name, sessionId, setSessionId)}
+
       </IonContent>
     </IonPage>
   );
 };
+
+function getPageStateFromPage(page:string){
+  var returnIndex = 0;
+  var foundUrl = appPages.some((item, index, arr) => {
+      returnIndex = index;
+      if(item.url.includes(page))
+      {
+        return item.url.includes(page)
+      }
+  });
+
+  if(foundUrl){
+    
+      if(returnIndex === 0)
+      {
+        return {
+          prevPage: undefined,
+          currentPage: appPages[0],
+          nextPage: appPages[1]
+        };
+      }
+
+      if(returnIndex >= appPages.length)
+      {
+        var finalIndex = (appPages.length - 1);
+          return{
+          prevPage: appPages[finalIndex -1],
+          currentPage: appPages[finalIndex],
+          nextPage: undefined
+        }
+    }
+    //else
+    return{
+      prevPage: appPages[returnIndex -1],
+      currentPage: appPages[returnIndex],
+      nextPage: appPages[returnIndex + 1]
+    }
+
+  }
+
+  return {
+    prevPage: undefined,
+    currentPage: appPages[0],
+    nextPage: appPages[1]
+  };
+}
+
 
 export default Page;
