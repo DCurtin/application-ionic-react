@@ -17,7 +17,7 @@ interface AppPage {
   title: string;
 }
 
-interface userState{
+export interface userState{
   prevPage?: AppPage,
   currentPage: AppPage,
   nextPage?: AppPage
