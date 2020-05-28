@@ -96,7 +96,7 @@ function updateDataBase(onlineAppData, res)
     console.log(response);
     console.log("err");
     console.log(err);
-    res.json({'sessionId': token});
+    res.json({'sessionId': onlineAppData['token__c']});
   });
 }
 
