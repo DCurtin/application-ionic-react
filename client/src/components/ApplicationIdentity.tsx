@@ -45,7 +45,14 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
         }
        
         return function cleanup() {
-            var url = '';
+            console.log('cleaning up sess id')
+          }
+    },[sessionId])
+
+    useEffect(()=>{
+      console.log('in use effect')
+      return function cleanup(){
+        var url = '';
             if(sessionId === '')
             {
               url = '/startApplication'
@@ -72,9 +79,9 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
                   setSessionId(data.sessionId);
                 })
               });
-          }
-    },[sessionId])
-    
+      }
+    },[formData])
+    console.log(formData);
     return (
         <IonContent>
         <IonList>
