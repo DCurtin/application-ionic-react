@@ -26,7 +26,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
         console.log(data);
         console.log(data.first_name__c);
         console.log(data['first_name__c']);
-        console.log(data.get('first_name__c'));
         var importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c']}
         console.log('importedForm');
         console.log(importedForm);
