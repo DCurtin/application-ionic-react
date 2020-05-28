@@ -125,9 +125,16 @@ app.post('/saveApplication', function(req, res){
 app.post('/getPageFields', function(req, res){
   var session = req.body.session;
 
+  let applicationQuery = {
+    text : 'SELECT * FROM salesforce.application__c WHERE token__c = $1',
+    values : [session.sessionId]
+  }
+client.query(applicationQuery).then( function(result){
   //get data from database
   //load into response
-  res.send('ok');
+  res.json(result);
+  //res.send('ok');
+  })
 })
 
 function insertApplication(onlineApp){
