@@ -1,20 +1,8 @@
 import { IonContent, IonPage, IonList, IonItem, IonButton, IonListHeader, IonLabel, IonSelect, IonSelectOption, IonInput, IonCard } from '@ionic/react';
 import React, {useState, useEffect, Component} from 'react';
 import { useHistory } from 'react-router-dom';
-
-interface AppPage {
-    header?: string;
-    url: string;
-    iosIcon: string;
-    mdIcon: string;
-    title: string;
-  }
-  
-  interface userState{
-    prevPage?: AppPage,
-    currentPage: AppPage,
-    nextPage?: AppPage
-  }
+import { userState } from '../pages/Page'
+import { constructOutline } from 'ionicons/icons';
 
 interface SessionApp {
     sessionId : String,
@@ -27,7 +15,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
     console.log('sessionId ' + sessionId);
     const [formData, setFormData] = useState({First_Name__c:'', Last_Name__c:'', SSN__c: '', Email__c: '', DOB__c: ''});
     const history = useHistory();
-    //const [sessionId, setSessionId] = useState(props?.location?.state?.sessionId)
     const updateForm = function(e : any){
         setFormData({
         ...formData,
@@ -36,27 +23,65 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
     }
 
     useEffect(()=>{
-        if(sessionId === undefined)
+        if(sessionId !== '')
         {
-            return;
+           //query fields
+          console.log('sessionId in useEffect ' + sessionId);
+          var url = '/getPageFields'
+          var body ={
+            session:{sessionId: sessionId, page: 'appId'}
+          }
+          var options = {
+            method : 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+          }
+          fetch(url, options).then(function(response: any){
+            response.json().then(function(data: any){
+              console.log(data);
+              setFormData(data);
+            })
+          })
         }
-        //query fields
-        console.log('sessionId in useEffect ' + sessionId);
-
+       
         return function cleanup() {
-            var url = 'https://ionic-reach-test-midland.herokuapp.com/appHome/googleplex'
-            var options ={
+            console.log('cleaning up sess id')
+          }
+    },[sessionId])
+
+    useEffect(()=>{
+      console.log('in use effect')
+      return function cleanup(){
+        var url = '';
+            if(sessionId === '')
+            {
+              url = '/startApplication'
+            }else{
+              url = '/saveState'
+            }
+
+            console.log('saving data appId data')
+            console.log(formData)
+              var body = {
+                session:{sessionId: sessionId, page: 'appId'},
+                data: formData
+              }
+              var options = {
                 method : 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                }
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
               }
               fetch(url, options).then(function(response: any){
-                  console.log('cleaning up');
+                console.log('cleaning up');
+                console.log(response);
+                response.json().then(function(data: any){
+                  console.log(data);
+                  setSessionId(data.sessionId);
+                })
               });
-            }
-    },[sessionId])
-    
+      }
+    },[formData])
+    console.log(formData);
     return (
         <IonContent>
         <IonList>
@@ -83,7 +108,7 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
               <IonButton onClick={()=>{prevState(history, currentState.prevPage?.url)}}>Prev</IonButton>
           </IonItem>
           <IonItem>
-              <IonButton onClick={()=>{saveAndReturn(formData, history)}}>Save And Return</IonButton>
+              <IonButton onClick={()=>{saveAndReturn(formData, history, sessionId)}}>Save And Return</IonButton>
           </IonItem>
           </IonList>
         </IonContent>)
@@ -94,7 +119,7 @@ function nextState(formData:any, history: any, setSessionId: Function, sessionId
     //save data to postGres
     //get session id
     //enage loading here
-    var url;
+    /*var url;
     var body = {'formData': formData,
                 'page': 'AppId',
                 'sessionId': sessionId}
@@ -120,16 +145,30 @@ function nextState(formData:any, history: any, setSessionId: Function, sessionId
         if(sessionId === undefined){
             setSessionId(response.body.sessionId);
         }
-        history.push(nextUrl);
-    })
-}
+      })*/
+      history.push(nextUrl);
+    }
 
 function prevState(history: any, prevUrl?:String){
     history.push(prevUrl);
 }
 
-function saveAndReturn(formData: any, history: any){
+function saveAndReturn(formData: any, history: any, sessionId: String){
     //history.push('/AppId', {'AccountType':accountType});
+    console.log('saving data appId data')
+            var url = '/saveApplication'
+            var body = {
+              session:{sessionId: sessionId, page: 'appId'},
+              data: formData
+            }
+            var options = {
+              method : 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(body)
+            }
+            fetch(url, options).then(function(response: any){
+                  console.log('cleaning up');
+            });
 }
 
 export default ApplicationIdentity;

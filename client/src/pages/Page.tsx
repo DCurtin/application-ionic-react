@@ -26,7 +26,7 @@ export interface userState{
 const Page: React.FC = () => {
 
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
-  const [sessionId, setSessionId] = useState('');
+  const [sessionId, setSessionId] = useState<string>('');
   const [currentState, setCurrentState] = useState<userState>({
     prevPage: undefined,
     currentPage: appPages[0],
