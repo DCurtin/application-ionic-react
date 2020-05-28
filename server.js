@@ -78,7 +78,7 @@ app.post('/startApplication', function(req, res){
   }
   //figure out what page they're on
   const hash = require('crypto').createHash('sha256');
-  var token = hash.update(JSON.stringify(onlineAppData) + Math.random.toString()).digest('hex');
+  var token = hash.update(JSON.stringify(onlineAppData) + Math.random().toString()).digest('hex');
 
   onlineAppData['dedicated_rep__c'] = '0050M00000Dv1h5QAB';
   onlineAppData['token__c'] = token;
