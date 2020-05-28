@@ -38,8 +38,8 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
           }
           fetch(url, options).then(function(response: any){
             response.json().then(function(data: any){
-              console.log(data);
-              setFormData(data);
+              console.log(data[0]);
+              setFormData(data[0]);
             })
           })
         }
