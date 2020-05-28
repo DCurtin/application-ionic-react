@@ -78,12 +78,6 @@ const ApplicationBene: React.FC<SessionApp> = ({sessionId, currentState}) => {
             </IonCard>
           </IonItem>
           <IonItem>
-              <IonButton onClick={()=>{nextState(formData, history, currentState.nextPage?.url)}}>Next</IonButton>
-          </IonItem>
-          <IonItem>
-              <IonButton onClick={()=>{prevState(history, currentState.prevPage?.url)}}>Prev</IonButton>
-          </IonItem>
-          <IonItem>
               <IonButton onClick={()=>{saveAndReturn(formData, history)}}>Save And Return</IonButton>
           </IonItem>
           </IonList>

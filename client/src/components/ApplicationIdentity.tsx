@@ -102,15 +102,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
                 <IonInput type='date' class='item-input' name="DOB__c" value={formData.DOB__c} placeholder="Date of Birth" onIonChange={e => updateForm(e!)} clearInput></IonInput>
             </IonCard>
           </IonItem>
-          <IonItem>
-              <IonButton onClick={()=>{nextState(formData, history, setSessionId, sessionId, currentState.nextPage?.url)}}>Next</IonButton>
-          </IonItem>
-          <IonItem>
-              <IonButton onClick={()=>{prevState(history, currentState.prevPage?.url)}}>Prev</IonButton>
-          </IonItem>
-          <IonItem>
-              <IonButton onClick={()=>{saveAndReturn(formData, history, sessionId)}}>Save And Return</IonButton>
-          </IonItem>
           </IonList>
         </IonContent>)
 }

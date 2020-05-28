@@ -129,7 +129,7 @@ app.post('/getPageFields', function(req, res){
     text : 'SELECT * FROM salesforce.application__c WHERE token__c = $1',
     values : [session.sessionId]
   }
-client.query(applicationQuery).then( function(result){
+  client.query(applicationQuery).then( function(result){
   //get data from database
   //load into response
   res.json(result);

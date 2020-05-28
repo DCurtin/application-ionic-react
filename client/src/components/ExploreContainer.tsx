@@ -17,12 +17,6 @@ const ExploreContainer: React.FC<ContainerProps> = ({ name, currentState }) => {
             {name}
         </IonLabel>
         </IonListHeader>
-        <IonItem>
-              <IonButton routerLink={currentState.nextPage?.url} >Next</IonButton>
-        </IonItem>
-        <IonItem>
-              <IonButton  routerLink={currentState.prevPage?.url}>Prev</IonButton>
-        </IonItem>
       </IonList>
     </IonContent>
   );

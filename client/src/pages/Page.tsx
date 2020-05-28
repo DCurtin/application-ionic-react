@@ -1,4 +1,4 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonItem, IonButton } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonItem, IonButton, IonList } from '@ionic/react';
 import {appPages, AppPage} from '../components/Menu';
 import React, {useState} from 'react';
 import { useParams } from 'react-router';
@@ -81,8 +81,15 @@ const Page: React.FC = () => {
             <IonTitle size="large" color="primary">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
+        <IonList>
+        <IonItem>
+              <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
+          </IonItem>
+          <IonItem>
+              <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
+          </IonItem>
+          </IonList>
         {displayPage(name, sessionId, setSessionId)}
-
       </IonContent>
     </IonPage>
   );
