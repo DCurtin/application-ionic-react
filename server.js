@@ -80,11 +80,11 @@ app.post('/startApplication', function(req, res){
   const hash = require('crypto').createHash('sha256');
   var token = hash.update(JSON.stringify(onlineAppData) + Math.random.toString()).digest('hex');
 
-  onlineAppData['Dedicated_Rep__c'] = '0050M00000Dv1h5QAB';
-  onlineAppData['Token__c'] = token;
+  onlineAppData['dedicated_rep__c'] = '0050M00000Dv1h5QAB';
+  onlineAppData['token__c'] = token;
   const insertAppQuery = {
     text: 'INSERT INTO salesforce.application__c(first_name__c, last_name__c, email__c, token__c) VALUES($1, $2, $3, $4)',
-    values: [onlineAppData['first_Name__c'], onlineAppData['last_Name__c'], onlineAppData['email__c'], token],
+    values: [onlineAppData['first_name__c'], onlineAppData['last_name__c'], onlineAppData['email__c'], token],
   }
   client.query(insertAppQuery, function(err, response){
     console.log("response");
