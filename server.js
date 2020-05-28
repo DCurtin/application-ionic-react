@@ -68,7 +68,7 @@ app.post('/startApplication', function(req, res){
   var page = session.page;
   var sessionId = session.sessionId;
 
-  if(sessionId !== undefined){
+  if(sessionId !== ''){
     console.log('application must be started first, a step was skipped or the session was lost');
     console.log(sessionId);
     res.status(500).send('SessionId not set');
@@ -101,7 +101,7 @@ app.post('/saveState', function(req, res){
   var page = session.page;
   var sessionId = session.sessionId;
 
-  if(sessionId === undefined){
+  if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
     console.log(sessionId);
     res.status(500).send('SessionId not set');

@@ -23,7 +23,7 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
     }
 
     useEffect(()=>{
-        if(sessionId !== undefined)
+        if(sessionId !== '')
         {
            //query fields
           console.log('sessionId in useEffect ' + sessionId);
