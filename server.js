@@ -132,7 +132,7 @@ app.post('/getPageFields', function(req, res){
   client.query(applicationQuery).then( function(result){
   //get data from database
   //load into response
-  res.json(result);
+  res.json(result['rows']);
   //res.send('ok');
   })
 })
