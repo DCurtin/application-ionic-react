@@ -1,20 +1,7 @@
 import { IonContent, IonList, IonItem, IonButton, IonListHeader, IonLabel} from '@ionic/react';
+import {userState} from '../pages/Page'
 import React from 'react';
 import './ExploreContainer.css';
-
-interface AppPage {
-  header?: string;
-  url: string;
-  iosIcon: string;
-  mdIcon: string;
-  title: string;
-}
-
-interface userState{
-  prevPage?: AppPage,
-  currentPage: AppPage,
-  nextPage?: AppPage
-}
 
 interface ContainerProps {
   name: string,

@@ -1,5 +1,5 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonItem, IonButton } from '@ionic/react';
-import {appPages} from '../components/Menu';
+import {appPages, AppPage} from '../components/Menu';
 import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
@@ -9,15 +9,15 @@ import ApplicationBene from '../components/ApplicationBene'
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 
-interface AppPage {
+/*interface AppPage {
   header?: string;
   url: string;
   iosIcon: string;
   mdIcon: string;
   title: string;
-}
+}*/
 
-interface userState{
+export interface userState{
   prevPage?: AppPage,
   currentPage: AppPage,
   nextPage?: AppPage
