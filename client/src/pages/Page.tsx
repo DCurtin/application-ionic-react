@@ -42,9 +42,6 @@ const Page: React.FC = () => {
   const displayPage = (pageName:string, sessionId:String, setSessionId:Function) => {
     
   if(!currentState.currentPage.url.includes(pageName)){
-    console.log(pageName)
-    console.log(currentState.currentPage.url)
-    console.log(currentState.currentPage.url.includes(pageName));
     var updatedState = getPageStateFromPage(pageName);
     setCurrentState(updatedState);
   }

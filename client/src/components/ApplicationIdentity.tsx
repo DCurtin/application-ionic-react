@@ -50,7 +50,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
     },[sessionId])
 
     useEffect(()=>{
-      console.log('in use effect')
       return history.listen(()=>{
         var url = '';
             if(sessionId === '')
@@ -82,7 +81,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
       })
     },[formData])
 
-    console.log(formData);
     return (
         <IonContent>
         <IonList>
