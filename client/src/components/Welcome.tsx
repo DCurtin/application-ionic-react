@@ -11,10 +11,14 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
         'Inherited IRA - Roth'
     ]
 
-    const initialInvestmentTypes = [`I'm Not Sure`, `Futures/Forex`, ``];
+    const initialInvestmentTypes = [`I'm Not Sure`, `Futures/Forex`, `Closely-Held LLC`, `Private Placement`, `Promissory Note (Unsecured)`, `Promissory Note (Secured by Real Estate)`, `Promissory Note (Secured by Other)`, `Precious Metals`, `Real Estate`, `Other`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
         props.onAccountTypeSelected(event.detail.value);
+    }
+
+    const handleInitialInvestmentChange = (event: CustomEvent) => {
+        props.onInitialInvestmentSelected(event.detail.value);
     }
 
     const getFundingOptions = (accountType: string) => {
@@ -111,6 +115,11 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
+                        <IonSelect value={props.initialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                    {initialInvestmentTypes.map((investmentType, index) => (
+                    <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                    ))}
+                        </IonSelect>
                     </IonCol>
                 </IonRow>
             </IonGrid>
