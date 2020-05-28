@@ -2,7 +2,7 @@ import React from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox } from '@ionic/react';
 import './Welcome.css';
 
-const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (accountType: string) => void}> = props => {
+const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (accountType: string) => void; initialInvestment: string; onInitialInvestmentSelected: (initialInvestment:string) => void;}> = props => {
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 
@@ -10,6 +10,8 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
         'Inherited IRA - Traditional',
         'Inherited IRA - Roth'
     ]
+
+    const initialInvestmentTypes = [`I'm Not Sure`, `Futures/Forex`, ``];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
         props.onAccountTypeSelected(event.detail.value);
@@ -24,6 +26,10 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
             return [...fundingOptions];
         }
         return [...fundingOptions, 'Rollover from an employer plan', 'Make a new cash contribution'];
+    }
+
+    const handleChecked = (event: CustomEvent) => {
+        console.log(event.detail.value);
     }
 
     return (
@@ -90,12 +96,21 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
                             getFundingOptions(props.selectedAccountType).map((fundingType, index) => {
                                 return (
                                 <IonItem key={index}>
-                                    <IonCheckbox color="primary" slot="start" value={fundingType}></IonCheckbox>
+                                    <IonCheckbox color="primary" slot="start" value={fundingType} onIonChange={handleChecked}></IonCheckbox>
                                 <IonLabel>{fundingType}</IonLabel>
                                 </IonItem>
                                 )
                             })
                         }
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            <strong>
+                                Do you have an initial investment in mind?
+                            </strong>
+                        </IonLabel>
                     </IonCol>
                 </IonRow>
             </IonGrid>
