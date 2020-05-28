@@ -51,7 +51,7 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
 
     useEffect(()=>{
       console.log('in use effect')
-      return function cleanup(){
+      return history.listen(()=>{
         var url = '';
             if(sessionId === '')
             {
@@ -79,8 +79,9 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
                   setSessionId(data.sessionId);
                 })
               });
-      }
+      })
     },[formData])
+
     console.log(formData);
     return (
         <IonContent>
