@@ -79,18 +79,17 @@ app.post('/startApplication', function(req, res){
   //figure out what page they're on
   const hash = require('crypto').createHash('sha256');
   var token = hash.update(JSON.stringify(onlineAppData) + Math.random().toString()).digest('hex');
-
+  onlineAppData['dedicated_rep__c'] = '0050M00000Dv1h5QAB';
+  onlineAppData['token__c'] = token;
   updateDataBase(onlineAppData, res);
 });
 
 
 function updateDataBase(onlineAppData, res)
 {
-  onlineAppData['dedicated_rep__c'] = '0050M00000Dv1h5QAB';
-  onlineAppData['token__c'] = token;
   const insertAppQuery = {
     text: 'INSERT INTO salesforce.application__c(first_name__c, last_name__c, email__c, ssn__c, dob__c, dedicated_rep__c, token__c) VALUES($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (token__c) DO UPDATE SET first_name__c = EXCLUDED.first_name__c, last_name__c = EXCLUDED.last_name__c, email__c = EXCLUDED.email__c, ssn__c = EXCLUDED.ssn__c, dob__c = EXCLUDED.dob__c, dedicated_rep__c = EXCLUDED.dedicated_rep__c',
-    values: [onlineAppData['first_name__c'], onlineAppData['last_name__c'], onlineAppData['email__c'], onlineAppData['ssn__c'], onlineAppData['dob__c'], onlineAppData['dedicated_rep__c'], token],
+    values: [onlineAppData['first_name__c'], onlineAppData['last_name__c'], onlineAppData['email__c'], onlineAppData['ssn__c'], onlineAppData['dob__c'], onlineAppData['dedicated_rep__c'], onlineAppData['token__c']],
   }
   client.query(insertAppQuery, function(err, response){
     console.log("response");
