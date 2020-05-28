@@ -117,6 +117,8 @@ app.post('/saveState', function(req, res){
     res.status(500).send('SessionId not set');
     return;
   }
+
+  updateDataBase(onlineAppData, res);
   //figure out what page the user is on, upsert data
 
 });
