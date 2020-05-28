@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
 import Disclosures from '../components/Disclosures';
+import OwnerInformation from '../components/OwnerInformation';
 import './Page.css';
 import {appPages, AppPage} from '../components/Menu';
 
@@ -94,6 +95,8 @@ const Page: React.FC = () => {
         return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType} initialInvestment={initialInvestment} onInitialInvestmentSelected={handleInitialInvestmentSelected}/>;
       case 'Disclosures':
         return <Disclosures selectedAccountType={selectedAccountType}/>;
+      case 'OwnerInformation':
+        return <OwnerInformation/>;
       default:
         return <ExploreContainer name={pageName}/>
     }
