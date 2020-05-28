@@ -4,9 +4,9 @@ var express = require('express');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
-var {
-  Client
-} = require('pg');
+var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost/salesforce';
+var pg = require('pg');
+var client = new pg.Client(connectionString);
 var jsforce = require('jsforce');
 var serverConn = new jsforce.Connection({
   oauth2 : {
@@ -26,9 +26,7 @@ serverConn.login(process.env.UserId, process.env.UserPw + process.env.UserToken,
   }
 })
 
-var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost/salesforce';
 console.log('query url: ' +  connectionString)
-var client = new pg.Client(connectionString);
 client.connect();
 
 var app = express();
