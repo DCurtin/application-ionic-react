@@ -46,13 +46,13 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
        
         return function cleanup() {
             var url = '';
-            if(sessionId === undefined)
+            if(sessionId === '')
             {
               url = '/startApplication'
             }else{
               url = '/saveState'
             }
-            
+
             console.log('saving data appId data')
               var body = {
                 session:{sessionId: sessionId, page: 'appId'},
