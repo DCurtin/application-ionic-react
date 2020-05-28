@@ -22,6 +22,12 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
         });
     }
 
+    function ImportForm(data : any){
+        var importedForm = {First_Name__c: data['First_Name__c'], Last_Name__c: data['Last_Name__c'], SSN__c: data['SSN__c'], Email__c: data['Email__c'], DOB__c: data['DOB__c']}
+
+        setFormData(importedForm);
+    }
+
     useEffect(()=>{
         if(sessionId !== '')
         {
@@ -39,7 +45,8 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
           fetch(url, options).then(function(response: any){
             response.json().then(function(data: any){
               console.log(data[0]);
-              setFormData(data[0]);
+              //setFormData(data[0]);
+              ImportForm(data[0]);
             })
           })
         }
