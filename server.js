@@ -64,9 +64,11 @@ app.post('/startApplication', function(req, res){
   //return sessionId
 
   var onlineAppData = req.body.data;
-  var session = req.body.session;
+  console.log(onlineAppData);
   var page = session.page;
   var sessionId = session.sessionId;
+
+  console.log(session);
 
   if(sessionId !== ''){
     console.log('application must be started first, a step was skipped or the session was lost');

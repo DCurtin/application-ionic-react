@@ -54,6 +54,8 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
             }
 
             console.log('saving data appId data')
+            console.log(formData)
+              var body = {
               var body = {
                 session:{sessionId: sessionId, page: 'appId'},
                 data: formData
