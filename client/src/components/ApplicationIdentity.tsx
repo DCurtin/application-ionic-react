@@ -66,8 +66,12 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
             if(sessionId === '')
             {
               url = '/startApplication'
+              setSessionId('test12345');
+              return;
             }else{
-              url = '/saveState'
+                url = '/saveState'
+                setSessionId('test12345');
+                return;
             }
 
             console.log('saving data appId data')
@@ -116,37 +120,6 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
 }
 
 function nextState(formData:any, history: any, setSessionId: Function, sessionId: String, nextUrl?:String){
-    // {'formData':JSON.stringify(formData)}
-    //save data to postGres
-    //get session id
-    //enage loading here
-    /*var url;
-    var body = {'formData': formData,
-                'page': 'AppId',
-                'sessionId': sessionId}
-    var options ={
-        method : 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        'body': JSON.stringify(body)
-      }
-
-    if(sessionId === undefined){
-        url = '/startApplication'
-    }else{
-        url = '/saveState'
-    }
-
-    fetch(url, options).then(function(response :any){
-
-        if(!response.ok){
-            console.log('failed to save state');
-        }
-        if(sessionId === undefined){
-            setSessionId(response.body.sessionId);
-        }
-      })*/
       history.push(nextUrl);
     }
 

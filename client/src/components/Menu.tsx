@@ -12,7 +12,7 @@ import {
   IonTitle,
 } from '@ionic/react';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import './Menu.css';
@@ -115,8 +115,13 @@ const appSections : AppSection[] = [
   }
 ]
 
-const Menu: React.FC = () => {
+interface session{
+  sessionId: string
+}
+
+const Menu: React.FC<session> = ({sessionId}) => {
   const location = useLocation();
+  console.log('menu ' + sessionId);
 
   return (
     <IonMenu contentId="main" type="overlay">
@@ -129,7 +134,7 @@ const Menu: React.FC = () => {
                  {appSection.pages.map((appPage, index) => {
                     return (
                       <IonMenuToggle key={index} autoHide={false}>
-                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
+                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink(location.search, appPage.url, sessionId)} routerDirection="none" lines="none" detail={false}>
                           <IonIcon slot="start" icon={appPage.iosIcon} />
                           <IonLabel>{appPage.title}</IonLabel>
                         </IonItem>
@@ -152,6 +157,26 @@ const Menu: React.FC = () => {
   );
 };
 
+function getLink(location:string, url:string, sessionId:string){
+  console.log(location);
+  if(location.includes('id'))
+  {
+    var parameters = location.replace('?','').split('&');
+    var id = parameters.find(e=>{return e.includes('id')});
+    if(id === undefined){
+      return url
+    }else{
+      return url + '?' + id;
+    }
+  }
 
+  if(sessionId !== '')
+  {
+    return url +'?id=' +sessionId
+  }
+
+  return url;
+  //appPage.url
+}
 
 export {Menu, appPages};

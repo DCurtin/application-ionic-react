@@ -23,10 +23,16 @@ export interface userState{
   nextPage?: AppPage
 }
 
-const Page: React.FC = () => {
+export interface session{
+  sessionId: string,
+  setSessionId: Function
+}
+
+const Page: React.FC<session> = ({sessionId, setSessionId}) => {
+  //console.log(setSessionId);
 
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
-  const [sessionId, setSessionId] = useState<string>('');
+  //const [sessionId, setSessionId] = useState<string>('');
   const [currentState, setCurrentState] = useState<userState>({
     prevPage: undefined,
     currentPage: appPages[0],
@@ -83,7 +89,7 @@ const Page: React.FC = () => {
               <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
           </IonItem>
           <IonItem>
-              <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
+              <IonButton routerLink={currentState.prevPage?.url + '?'}>Prev</IonButton>
           </IonItem>
           </IonList>
         {displayPage(name, sessionId, setSessionId)}
