@@ -1,5 +1,5 @@
 import React from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 
 const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (accountType: string) => void; initialInvestment: string; onInitialInvestmentSelected: (initialInvestment:string) => void;}> = props => {
@@ -12,6 +12,8 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
     ]
 
     const initialInvestmentTypes = [`I'm Not Sure`, `Futures/Forex`, `Closely-Held LLC`, `Private Placement`, `Promissory Note (Unsecured)`, `Promissory Note (Secured by Real Estate)`, `Promissory Note (Secured by Other)`, `Precious Metals`, `Real Estate`, `Other`];
+
+    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
         props.onAccountTypeSelected(event.detail.value);
@@ -122,6 +124,50 @@ const Welcome: React.FC<{selectedAccountType: string; onAccountTypeSelected: (ac
                         </IonSelect>
                     </IonCol>
                 </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            <strong>
+                                Have you been working with a Midland rep?
+                            </strong>
+                        </IonLabel>
+                        <IonSelect>
+                            {midlandReps.map((rep, index) => (
+                                <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
+                            ))}
+                        </IonSelect>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            <strong> 
+                                How did you hear about us?
+                            </strong>
+                        </IonLabel>
+                        <IonInput>
+
+                        </IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            <strong>
+                                Referral / Group Code
+                            </strong>
+                        </IonLabel>
+                        <IonInput></IonInput>
+                        <IonButton color="primary">Apply Code</IonButton>
+                    </IonCol>
+                </IonRow>
+               <IonRow className="well">
+                   <IonCol>
+                       <p>
+                       When you're ready to continue, please press the "Next" button at the top of the screen!
+                       </p>
+                   </IonCol>
+               </IonRow>
             </IonGrid>
         </IonContent>
     );

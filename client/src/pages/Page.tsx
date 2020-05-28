@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
+import Disclosures from '../components/Disclosures';
 import './Page.css';
 import {appPages, AppPage} from '../components/Menu';
 
@@ -65,6 +66,18 @@ const Page: React.FC = () => {
     switch(pageName){
       case 'Welcome':
         return 'Welcome to Midland Trust!'
+      case 'OwnerInformation':
+        return 'Owner Information';
+      case 'FeeArrangement':
+        return 'Fee Arrangement';
+      case 'AccountNotifications':
+        return 'Account Notifications';
+      case 'InvestmentDetails':
+        return 'Investment Details';
+      case 'PaymentInformation':
+        return 'Payment Information';
+      case 'ReviewAndSign':
+        return 'Review And Sign';
       default:
         return pageName;
     }
@@ -79,6 +92,8 @@ const Page: React.FC = () => {
     switch (pageName) {
       case 'Welcome': 
         return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType} initialInvestment={initialInvestment} onInitialInvestmentSelected={handleInitialInvestmentSelected}/>;
+      case 'Disclosures':
+        return <Disclosures selectedAccountType={selectedAccountType}/>;
       default:
         return <ExploreContainer name={pageName}/>
     }
