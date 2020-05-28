@@ -13,7 +13,7 @@ interface SessionApp {
 const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, currentState}) => {
     //const sessionId = props?.location?.state?.sessionId;
     console.log('sessionId ' + sessionId);
-    const [formData, setFormData] = useState({First_Name__c:'', Last_Name__c:'', SSN__c: '', Email__c: '', DOB__c: ''});
+    const [formData, setFormData] = useState({first_name__c:'', last_name__c:'', ssn__c: '', email__c: '', dob__c: ''});
     const history = useHistory();
     const updateForm = function(e : any){
         setFormData({
@@ -27,7 +27,7 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
         console.log(data.first_name__c);
         console.log(data['first_name__c']);
         console.log(data.get('first_name__c'));
-        var importedForm = {First_Name__c: data['First_Name__c'], Last_Name__c: data['Last_Name__c'], SSN__c: data['SSN__c'], Email__c: data['Email__c'], DOB__c: data['DOB__c']}
+        var importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c']}
         console.log('importedForm');
         console.log(importedForm);
         setFormData(importedForm);
@@ -105,11 +105,11 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
           <IonItem>
           <IonCard>
                 <IonLabel>User Info</IonLabel>
-                <IonInput class='item-input' name="First_Name__c" value={formData.First_Name__c} placeholder="First Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
-                <IonInput class='item-input' name="Last_Name__c" value={formData.Last_Name__c} placeholder="Last Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
-                <IonInput class='item-input' name="SSN__c" value={formData.SSN__c} placeholder="Social" onIonChange={e => updateForm(e!)} clearInput></IonInput>
-                <IonInput type='email' class='item-input' name="Email__c" value={formData.Email__c} placeholder="Email" onIonChange={e => updateForm(e!)} clearInput></IonInput>
-                <IonInput type='date' class='item-input' name="DOB__c" value={formData.DOB__c} placeholder="Date of Birth" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                <IonInput class='item-input' name="first_name__c" value={formData.first_name__c} placeholder="First Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                <IonInput class='item-input' name="last_name__c" value={formData.last_name__c} placeholder="Last Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                <IonInput class='item-input' name="ssn__c" value={formData.ssn__c} placeholder="Social" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                <IonInput type='email' class='item-input' name="email__c" value={formData.email__c} placeholder="Email" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                <IonInput type='date' class='item-input' name="dob__c" value={formData.dob__c} placeholder="Date of Birth" onIonChange={e => updateForm(e!)} clearInput></IonInput>
             </IonCard>
           </IonItem>
           </IonList>

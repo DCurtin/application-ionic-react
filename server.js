@@ -84,7 +84,7 @@ app.post('/startApplication', function(req, res){
   onlineAppData['Token__c'] = token;
   const insertAppQuery = {
     text: 'INSERT INTO salesforce.application__c(first_name__c, last_name__c, email__c, token__c) VALUES($1, $2, $3, $4)',
-    values: [onlineAppData['First_Name__c'], onlineAppData['Last_Name__c'], onlineAppData['Email__c'], token],
+    values: [onlineAppData['first_Name__c'], onlineAppData['last_Name__c'], onlineAppData['email__c'], token],
   }
   client.query(insertAppQuery, function(err, response){
     console.log("response");
