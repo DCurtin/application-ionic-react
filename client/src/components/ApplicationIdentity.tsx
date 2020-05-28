@@ -66,6 +66,10 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
               fetch(url, options).then(function(response: any){
                 console.log('cleaning up');
                 console.log(response);
+                response.json().then(function(data: any){
+                  console.log(data);
+                  setSessionId(data.sessionId);
+                })
               });
           }
     },[sessionId])
