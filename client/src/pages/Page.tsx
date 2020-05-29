@@ -18,14 +18,6 @@ export interface userState {
   nextPage?: AppPage
 }
 
-/*interface AppPage {
-  header?: string;
-  url: string;
-  iosIcon: string;
-  mdIcon: string;
-  title: string;
-}*/
-
 export interface userState{
   prevPage?: AppPage,
   currentPage: AppPage,

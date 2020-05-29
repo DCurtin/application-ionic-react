@@ -10,8 +10,7 @@ interface SessionApp {
 
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         //const sessionId = props?.location?.state?.sessionId;
-        console.log('sessionId ' + sessionId);
-        const [formData, setFormData] = useState({first_name__c:'', last_name__c:'', ssn__c: '', email__c: '', dob__c: ''});
+        const [formData, setFormData] = useState({first_name__c:'', last_name__c:'', ssn__c: '', email__c: '', dob__c: '', salutation__c: ''});
         const history = useHistory();
         const updateForm = function(e : any){
             setFormData({
@@ -21,12 +20,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     
         function ImportForm(data : any){
-            console.log(data);
-            console.log(data.first_name__c);
-            console.log(data['first_name__c']);
-            var importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c']}
-            console.log('importedForm');
-            console.log(importedForm);
+            var importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: data['salutation__c']}
             setFormData(importedForm);
         }
     
@@ -34,7 +28,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             if(sessionId !== '')
             {
                //query fields
-              console.log('sessionId in useEffect ' + sessionId);
               var url = '/getPageFields'
               var body ={
                 session:{sessionId: sessionId, page: 'appId'}
@@ -46,7 +39,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
               }
               fetch(url, options).then(function(response: any){
                 response.json().then(function(data: any){
-                  console.log(data[0]);
                   //setFormData(data[0]);
                   ImportForm(data[0]);
                 })
@@ -71,9 +63,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     //setSessionId('test12345');
                     //return;
                 }
-    
-                console.log('saving data appId data')
-                console.log(formData)
                   var body = {
                     session:{sessionId: sessionId, page: 'appId'},
                     data: formData
@@ -84,10 +73,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     body: JSON.stringify(body)
                   }
                   fetch(url, options).then(function(response: any){
-                    console.log('cleaning up');
-                    console.log(response);
                     response.json().then(function(data: any){
-                      console.log(data);
                       setSessionId(data.sessionId);
                     })
                   });
@@ -112,7 +98,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Salutation *
                         </IonLabel>
-                        <IonSelect>
+                        <IonSelect name="salutation__c" value={formData.salutation__c} onIonChange={e => updateForm(e!)}>
                             <IonSelectOption value="Mr.">Mr.</IonSelectOption>
                             <IonSelectOption value="Ms.">Ms.</IonSelectOption>
                             <IonSelectOption value="Mrs.">Mrs.</IonSelectOption>
@@ -123,7 +109,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             First Name *
                         </IonLabel>
-                        <IonInput class='item-input' name="first_name__c" value={formData.first_name__c} onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                        <IonInput class='item-input' name="first_name__c" value={formData.first_name__c} placeholder="First Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
@@ -144,6 +130,14 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             Date of Birth *
                         </IonLabel>
                         <IonInput type='date' class='item-input' name="dob__c" value={formData.dob__c} placeholder="Date of Birth" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            Email *
+                        </IonLabel>
+                        <IonInput class='item-input' name="email__c" value={formData.email__c} placeholder="Email" onIonChange={e => updateForm(e!)} required clearInput></IonInput>
                     </IonCol>
                 </IonRow>
 
