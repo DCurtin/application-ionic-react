@@ -4,7 +4,7 @@ import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelec
 const OwnerInformation: React.FC = () => {
 
     return (
-        <IonContent>
+        <IonContent className="ion-padding">
             <IonGrid>
                 <IonRow className="well">
                     <IonCol>
@@ -41,7 +41,21 @@ const OwnerInformation: React.FC = () => {
                         <IonInput></IonInput>
                     </IonCol>
                 </IonRow>
-                
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            Social Security Number *
+                        </IonLabel>
+                        <IonInput required></IonInput>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>
+                            Date of Birth *
+                        </IonLabel>
+                        <IonInput required></IonInput>
+                    </IonCol>
+                </IonRow>
+
             </IonGrid>
         </IonContent>
     )
