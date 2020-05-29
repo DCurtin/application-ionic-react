@@ -20,7 +20,14 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     
         function ImportForm(data : any){
-            var importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: data['salutation__c']}
+            let importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: data['salutation__c']}
+
+            console.log('data');
+            console.log(data);
+
+            console.log('importedForm');
+            console.log(importedForm);
+
             setFormData(importedForm);
         }
     
@@ -29,11 +36,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             if(sessionId !== '')
             {
                //query fields
-              var url = '/getPageFields'
-              var body ={
+              let url = '/getPageFields'
+              let body ={
                 session:{sessionId: sessionId, page: 'appId'}
               }
-              var options = {
+              let options = {
                 method : 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(body)
@@ -42,8 +49,8 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 response.json().then(function(data: any){
                   //setFormData(data[0]);
                   ImportForm(data[0]);
-                  console.log(data[0])
-                  console.log(formData)
+                  //console.log(data[0])
+                  //console.log(formData)
                 })
               })
             }
@@ -55,31 +62,32 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     
         useEffect(()=>{
           return history.listen(()=>{
-            var url = '';
-                if(sessionId === '')
-                {
-                  url = '/startApplication'
-                  //setSessionId('test12345');
-                  //return;
-                }else{
-                    url = '/saveState'
-                    //setSessionId('test12345');
-                    //return;
-                }
-                  var body = {
-                    session:{sessionId: sessionId, page: 'appId'},
-                    data: formData
-                  }
-                  var options = {
-                    method : 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                  }
-                  fetch(url, options).then(function(response: any){
-                    response.json().then(function(data: any){
-                      setSessionId(data.sessionId);
-                    })
-                  });
+            let url = '';
+            if(sessionId === '')
+            {
+                url = '/startApplication'
+                //setSessionId('test12345');
+                //return;
+            }else{
+                url = '/saveState'
+                //setSessionId('test12345');
+                //return;
+            }
+
+            let body = {
+            session:{sessionId: sessionId, page: 'appId'},
+            data: formData
+            }
+            let options = {
+            method : 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+            }
+            fetch(url, options).then(function(response: any){
+            response.json().then(function(data: any){
+                setSessionId(data.sessionId);
+            })
+            });
           })
         },[formData])
 
