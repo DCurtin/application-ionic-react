@@ -8,6 +8,15 @@ import ApplicationIdentity from '../components/ApplicationIdentity'
 import ApplicationBene from '../components/ApplicationBene'
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
+import Disclosures from '../components/Disclosures';
+import OwnerInformation from '../components/OwnerInformation';
+import './Page.css';
+
+export interface userState {
+  prevPage?:AppPage, 
+  currentPage: AppPage, 
+  nextPage?: AppPage
+}
 
 /*interface AppPage {
   header?: string;
@@ -38,6 +47,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
     currentPage: appPages[0],
     nextPage: appPages[1]
   })
+  const [initialInvestment, setInitialInvestment] = useState<string>('');
 
   const { name } = useParams<{ name: string; }>();
 
@@ -52,13 +62,52 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
     setCurrentState(updatedState);
   }
 
+  const handleInitialInvestmentSelected = (initialInvestment : string) => {
+    setInitialInvestment(initialInvestment);
+  }
+
+  const getPageStateFromPage = (currentPageName:string) => {
+    console.log(appPages);
+    const appPagesArr = [...appPages];
+    let currentPageIndex = appPagesArr.findIndex(page => page.url.includes(currentPageName));
+
+    if (currentPageIndex <= 0) {
+      return {
+        prevPage: undefined,
+        currentPage: appPages[0], 
+        nextPage: appPages[1]
+      }
+    }
+
+    if (currentPageIndex >= appPages.length) {
+      var finalIndex = appPages.length - 1;
+      return {
+        prevPage: appPages[finalIndex - 1], 
+        currentPage: appPages[finalIndex], 
+        nextPage: undefined
+      }
+    }
+
+    return {
+      prevPage: appPages[currentPageIndex -1], 
+      currentPage: appPages[currentPageIndex],
+      nextPage: appPages[currentPageIndex+1]
+    }
+  }
+
+  const displayPage = (pageName:string) => {
+    if (!currentState.currentPage.url.includes(pageName)) {
+      let updatedState = getPageStateFromPage(pageName);
+      setCurrentState(updatedState);
+    }
+
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType} currentState={currentState}/>;
+        return <Welcome onAccountTypeSelected={handleAccountTypeSelected} selectedAccountType={selectedAccountType} initialInvestment={initialInvestment} onInitialInvestmentSelected={handleInitialInvestmentSelected}/>;
+      case 'Disclosures':
+        return <Disclosures selectedAccountType={selectedAccountType}/>;
       case 'OwnerInformation':
-        return <ApplicationIdentity sessionId={sessionId} setSessionId={setSessionId} currentState={currentState} />
-      case 'Beneficiaries':
-        return <ApplicationBene sessionId={sessionId} currentState={currentState}/>
+        return <OwnerInformation/>;
       default:
         return <ExploreContainer name={pageName} currentState={currentState}/>
     }
@@ -74,8 +123,12 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
           <IonThumbnail slot="start">
             <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
-          <IonTitle>{name}</IonTitle>
+          <IonTitle>{currentState.currentPage.title}</IonTitle>
         </IonToolbar>
+        <IonButtons>
+            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
+            <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
+        </IonButtons>
       </IonHeader>
 
       <IonContent>
@@ -84,15 +137,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
             <IonTitle size="large" color="primary">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonList>
-        <IonItem>
-              <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
-          </IonItem>
-          <IonItem>
-              <IonButton routerLink={currentState.prevPage?.url + '?'}>Prev</IonButton>
-          </IonItem>
-          </IonList>
-        {displayPage(name, sessionId, setSessionId)}
+        {displayPage(name)}
       </IonContent>
     </IonPage>
   );

@@ -96,7 +96,7 @@ let appPages: AppPage[] = [
   }
 ];
 
-const appSections : AppSection[] = [
+let appSections : AppSection[] = [
   {
     header: 'Getting Started',
     pages: [...appPages.filter(page => page.header === 'Getting Started')]
@@ -125,7 +125,7 @@ const Menu: React.FC<session> = ({sessionId}) => {
 
   return (
     <IonMenu contentId="main" type="overlay">
-      <IonContent scrollY={false}>
+      <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
           {appSections.map((appSection, index) => {
             return (
