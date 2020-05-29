@@ -116,10 +116,11 @@ let appSections : AppSection[] = [
 ]
 
 interface session{
-  sessionId: string
+  sessionId: string,
+  menuSections: AppSection[]
 }
 
-const Menu: React.FC<session> = ({sessionId}) => {
+const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
   console.log('menu ' + sessionId);
 
@@ -127,7 +128,7 @@ const Menu: React.FC<session> = ({sessionId}) => {
     <IonMenu contentId="main" type="overlay">
       <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
-          {appSections.map((appSection, index) => {
+          {menuSections.map((appSection, index) => {
             return (
               <React.Fragment key={index}>
                 <IonListHeader>{appSection.header}</IonListHeader>

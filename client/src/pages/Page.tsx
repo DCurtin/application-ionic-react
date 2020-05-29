@@ -1,5 +1,5 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonItem, IonButton, IonList } from '@ionic/react';
-import {appPages, AppPage} from '../components/Menu';
+import {AppPage} from '../components/Menu';
 import React, {useState} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
@@ -11,6 +11,7 @@ import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import './Page.css';
+import {AppSection} from '../helpers/MenuGenerator'
 
 export interface userState {
   prevPage?:AppPage, 
@@ -26,12 +27,21 @@ export interface userState{
 
 export interface session{
   sessionId: string,
-  setSessionId: Function
+  setSessionId: Function,
+  menuSections?: AppSection[]
 }
 
-const Page: React.FC<session> = ({sessionId, setSessionId}) => {
-  //console.log(setSessionId);
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections}) => {
+  let appPages = menuSections?.flatMap(e=>{
+    return e.pages
+  })
 
+  if(appPages === undefined){
+    return;
+  }
+
+  console.log(appPages);
+  //console.log(setSessionId);
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA');
   //const [sessionId, setSessionId] = useState<string>('');
   const [currentState, setCurrentState] = useState<userState>({

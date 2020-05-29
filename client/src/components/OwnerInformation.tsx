@@ -66,12 +66,8 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             if(sessionId === '')
             {
                 url = '/startApplication'
-                //setSessionId('test12345');
-                //return;
             }else{
                 url = '/saveState'
-                //setSessionId('test12345');
-                //return;
             }
 
             let body = {
