@@ -66,12 +66,12 @@ const ApplicationIdentity: React.FC<SessionApp> = ({sessionId, setSessionId, cur
             if(sessionId === '')
             {
               url = '/startApplication'
-              setSessionId('test12345');
-              return;
+              //setSessionId('test12345');
+              //return;
             }else{
                 url = '/saveState'
-                setSessionId('test12345');
-                return;
+                //setSessionId('test12345');
+                //return;
             }
 
             console.log('saving data appId data')
