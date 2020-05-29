@@ -20,7 +20,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     
         function ImportForm(data : any){
-            let importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: data['salutation__c']}
+            let importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: ''}
 
             console.log('data');
             console.log(data);
