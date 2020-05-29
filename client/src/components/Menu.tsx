@@ -158,7 +158,7 @@ const Menu: React.FC<session> = ({sessionId}) => {
 };
 
 function getLink(location:string, url:string, sessionId:string){
-  console.log(location);
+  /*console.log(location);
   if(location.includes('id'))
   {
     var parameters = location.replace('?','').split('&');
@@ -173,7 +173,7 @@ function getLink(location:string, url:string, sessionId:string){
   if(sessionId !== '')
   {
     return url +'?id=' +sessionId
-  }
+  }*/
 
   return url;
   //appPage.url
