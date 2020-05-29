@@ -55,17 +55,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
     setSelectedAccountType(selectedValue);
   }
 
-  const displayPage = (pageName:string, sessionId:String, setSessionId:Function) => {
-    
-  if(!currentState.currentPage.url.includes(pageName)){
-    var updatedState = getPageStateFromPage(pageName);
-    setCurrentState(updatedState);
-  }
-
-  const handleInitialInvestmentSelected = (initialInvestment : string) => {
-    setInitialInvestment(initialInvestment);
-  }
-
   const getPageStateFromPage = (currentPageName:string) => {
     console.log(appPages);
     const appPagesArr = [...appPages];
@@ -95,6 +84,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
     }
   }
 
+  const handleInitialInvestmentSelected = (initialInvestment : string) => {
+    setInitialInvestment(initialInvestment);
+  }
+
+
   const displayPage = (pageName:string) => {
     if (!currentState.currentPage.url.includes(pageName)) {
       let updatedState = getPageStateFromPage(pageName);
@@ -107,7 +101,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
       case 'Disclosures':
         return <Disclosures selectedAccountType={selectedAccountType}/>;
       case 'OwnerInformation':
-        return <OwnerInformation/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
       default:
         return <ExploreContainer name={pageName} currentState={currentState}/>
     }
@@ -142,52 +136,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId}) => {
     </IonPage>
   );
 };
-
-function getPageStateFromPage(page:string){
-  var returnIndex = 0;
-  var foundUrl = appPages.some((item, index, arr) => {
-      returnIndex = index;
-      if(item.url.includes(page))
-      {
-        return item.url.includes(page)
-      }
-  });
-
-  if(foundUrl){
-    
-      if(returnIndex === 0)
-      {
-        return {
-          prevPage: undefined,
-          currentPage: appPages[0],
-          nextPage: appPages[1]
-        };
-      }
-
-      if(returnIndex >= appPages.length)
-      {
-        var finalIndex = (appPages.length - 1);
-          return{
-          prevPage: appPages[finalIndex -1],
-          currentPage: appPages[finalIndex],
-          nextPage: undefined
-        }
-    }
-    //else
-    return{
-      prevPage: appPages[returnIndex -1],
-      currentPage: appPages[returnIndex],
-      nextPage: appPages[returnIndex + 1]
-    }
-
-  }
-
-  return {
-    prevPage: undefined,
-    currentPage: appPages[0],
-    nextPage: appPages[1]
-  };
-}
 
 
 export default Page;
