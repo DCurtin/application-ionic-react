@@ -25,6 +25,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     
         useEffect(()=>{
+            console.log('sessionId ' + sessionId );
             if(sessionId !== '')
             {
                //query fields
@@ -41,6 +42,8 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 response.json().then(function(data: any){
                   //setFormData(data[0]);
                   ImportForm(data[0]);
+                  console.log(data[0])
+                  console.log(formData)
                 })
               })
             }
