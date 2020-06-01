@@ -37,6 +37,13 @@ let appPages: AppPage[] = [
     },
     {
       header: 'Open Account',
+      title: 'Plan Information',
+      url: '/page/PlanInformation',
+      iosIcon: archiveOutline,
+      mdIcon: archiveSharp
+    },
+    {
+      header: 'Open Account',
       title: 'Beneficiaries',
       url: '/page/Beneficiaries',
       iosIcon: archiveOutline,
@@ -230,8 +237,10 @@ let appPages: AppPage[] = [
 
   function generateOpenAccountSection(includePlanInfo : Boolean){
     if(includePlanInfo){
+      console.log('plan info')
         var pages:AppPage[] = [...appPages.filter(page => page.header === 'Open Account')]
     }else{
+      console.log('no plan info')
         var pages:AppPage[] = [...appPages.filter(page => page.header === 'Open Account' && page.title !== 'Plan Information')]
     }
     

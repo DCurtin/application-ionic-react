@@ -3,10 +3,37 @@ import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOpti
 import './Welcome.css';
 
 interface SessionApp {
-    selectedAccountType: string; 
-    onAccountTypeSelected: (accountType: string) => void;
-    initialInvestment: string;
-    onInitialInvestmentSelected: (initialInvestment:string) => void;
+    InitialValues: AppInitializeInfo
+}
+//selectedAccountType: string; 
+//onAccountTypeSelected: (accountType: string) => void;
+//initialInvestment: string;
+//onInitialInvestmentSelected: (initialInvestment:string) => void;
+
+interface AppInitializeInfo {
+    AccountType: string,
+    SetAccountType: Function,
+    
+    TransferIra: boolean,
+    SetTransferIra: Function,
+
+    RolloverEmployer: boolean,
+    SetRolloverEmployer: Function,
+
+    CashContribution: boolean,
+    SetCashContribution: Function,
+
+    InitialInvestment: string,
+    SetInitialInvestment: Function,
+
+    SalesRep: string,
+    SetSalesRep: Function,
+
+    SpecifiedSource: string,
+    SetSpecifiedSource: Function,
+
+    ReferralCode: string,
+    SetReferralCode: Function
 }
 
 const Welcome: React.FC<SessionApp> = props => {
@@ -17,32 +44,44 @@ const Welcome: React.FC<SessionApp> = props => {
         'Inherited IRA - Traditional',
         'Inherited IRA - Roth'
     ]
-
     const initialInvestmentTypes = [`I'm Not Sure`, `Futures/Forex`, `Closely-Held LLC`, `Private Placement`, `Promissory Note (Unsecured)`, `Promissory Note (Secured by Real Estate)`, `Promissory Note (Secured by Other)`, `Precious Metals`, `Real Estate`, `Other`];
 
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        props.onAccountTypeSelected(event.detail.value);
+        props.InitialValues.SetAccountType(event.detail.value);
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        props.onInitialInvestmentSelected(event.detail.value);
+        props.InitialValues.SetInitialInvestment(event.detail.value);
     }
 
     const getFundingOptions = (accountType: string) => {
-        let fundingOptions = [
-            'Transfer from another IRA'
-        ]
+       let fundingOptions = {
+            'IRA_Transfer':'Transfer from another IRA'
+        }
 
         if (accountType.includes('Inherited')) {
-            return [...fundingOptions];
+            //return {...fundingOptions};
+            return Object.entries({...fundingOptions});
         }
-        return [...fundingOptions, 'Rollover from an employer plan', 'Make a new cash contribution'];
+        return Object.entries({...fundingOptions, 'Employer_Plan':'Rollover from an employer plan', 'Cash_Contribution':'Make a new cash contribution'});
     }
 
     const handleChecked = (event: CustomEvent) => {
         console.log(event.detail.value);
+        console.log(event.detail.checked);
+        if(event.detail.value === 'IRA_Transfer'){
+            props.InitialValues.SetTransferIra(event.detail.checked)
+        }
+
+        if(event.detail.value === 'Employer_Plan'){
+            props.InitialValues.SetRolloverEmployer(event.detail.checked)
+        }
+
+        if(event.detail.value === 'Cash_Contribution'){
+            props.InitialValues.SetCashContribution(event.detail.checked)
+        }
     }
 
     return (
@@ -77,7 +116,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect value={props.selectedAccountType} onIonChange={handleAccountTypeSelected}>
+                       <IonSelect value={props.InitialValues.AccountType} onIonChange={handleAccountTypeSelected}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}
@@ -106,11 +145,11 @@ const Welcome: React.FC<SessionApp> = props => {
                         </IonLabel>
                         <p>Check all that apply.</p>
                         {
-                            getFundingOptions(props.selectedAccountType).map((fundingType, index) => {
+                            getFundingOptions(props.InitialValues.AccountType).map((fundingType, index) => {
                                 return (
                                 <IonItem key={index}>
-                                    <IonCheckbox color="primary" slot="start" value={fundingType} onIonChange={handleChecked}></IonCheckbox>
-                                <IonLabel>{fundingType}</IonLabel>
+                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked}></IonCheckbox>
+                                <IonLabel>{fundingType[1]}</IonLabel>
                                 </IonItem>
                                 )
                             })
@@ -124,7 +163,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.initialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                        <IonSelect value={props.InitialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
                     {initialInvestmentTypes.map((investmentType, index) => (
                     <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                     ))}

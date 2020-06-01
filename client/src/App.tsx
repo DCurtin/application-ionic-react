@@ -30,18 +30,20 @@ import './theme/variables.css';
 const App: React.FC = () => {
 
   const [sessionId, setSessionId] = useState('');
-  const [appSections, setAppSections] = useState<AppSection[]>();
-  let menuParams:MenuParamters = {
-    planInfo: true,
-    transferForm: true,
-    rolloverForm: true,
-    newContribution: true,
-    initialInvestment: true
-  }
+  const [appSections, setAppSections] = useState<AppSection[]>([]);
+
+  const[menuParams, setMenuParams] = useState<MenuParamters>({
+    planInfo: false,
+    transferForm: false,
+    rolloverForm: false,
+    newContribution: false,
+    initialInvestment: false
+  })
+
   useEffect(()=>{
     let appSections:AppSection[] = generateAppPages(menuParams)
     setAppSections(appSections);
-  },[])
+  },[menuParams])
 
   return (
     <IonApp>
@@ -49,7 +51,7 @@ const App: React.FC = () => {
         <IonSplitPane contentId="main">
           <Menu sessionId={sessionId} menuSections={appSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={appSections} />} /> 
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={appSections}  setMenuParams={setMenuParams}/>} /> 
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>
