@@ -7,84 +7,7 @@ export interface AppPage {
     mdIcon: string;
     title: string;
   }
-  
-export  interface AppSection {
-    header: string;
-    pages: AppPage[]
-  }
 
-let appPages: AppPage[] = [
-    {
-      header: 'Getting Started',
-      title: 'Welcome to Midland Trust!',
-      url: '/page/Welcome',
-      iosIcon: mailOutline,
-      mdIcon: mailSharp
-    },
-    {
-      header: 'Getting Started',
-      title: 'Disclosures',
-      url: '/page/Disclosures',
-      iosIcon: paperPlaneOutline,
-      mdIcon: paperPlaneSharp
-    },
-    {
-      header: 'Open Account',
-      title: 'Owner Information',
-      url: '/page/OwnerInformation',
-      iosIcon: heartOutline,
-      mdIcon: heartSharp
-    },
-    {
-      header: 'Open Account',
-      title: 'Plan Information',
-      url: '/page/PlanInformation',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
-    },
-    {
-      header: 'Open Account',
-      title: 'Beneficiaries',
-      url: '/page/Beneficiaries',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
-    },
-    {
-      header: 'Open Account',
-      title: 'Fee Arrangement',
-      url: '/page/FeeArrangement',
-      iosIcon: trashOutline,
-      mdIcon: trashSharp
-    },
-    {
-      header: 'Open Account',
-      title: 'Account Notifications',
-      url: '/page/AccountNotifications',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
-    },
-    {
-      header: 'Make Investment',
-      title: 'Investment Details',
-      url: '/page/InvestmentDetails',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
-    },
-    {
-      header: 'Finishing Up',
-      title: 'Payment Information',
-      url: '/page/PaymentInformation',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
-    },
-    {
-      header: 'Finishing Up',
-      title: 'Review and Sign',
-      url: '/page/ReviewAndSign',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
-    }
-  ];
 
   var appPagesMap: {[key :string]: AppPage} = {
     'Welcome':{
@@ -180,31 +103,22 @@ let appPages: AppPage[] = [
       mdIcon: warningSharp
     }
 };
+
+let appPages: AppPage[] = Object.values(appPagesMap);
   
-  let appSections : AppSection[] = [
-    {
-      header: 'Getting Started',
-      pages: [...appPages.filter(page => page.header === 'Getting Started')]
-    },
-    {
-      header: 'Open Account',
-      pages: [...appPages.filter(page => page.header === 'Open Account')]
-    },
-    {
-      header: 'Make Investment', 
-      pages: [...appPages.filter(page => page.header === 'Make Investment')]
-    },
-    {
-      header: 'Finishing Up',
-      pages: [...appPages.filter(page => page.header === 'Finishing Up')]
-    }
-  ]
+
   export interface MenuParamters{
     planInfo: Boolean,
     transferForm: Boolean,
     rolloverForm: Boolean,
     newContribution: Boolean,
     initialInvestment: Boolean
+  }
+
+    
+export  interface AppSection {
+    header: string;
+    pages: AppPage[]
   }
 
   function generateAppPages(menuParams:MenuParamters){
