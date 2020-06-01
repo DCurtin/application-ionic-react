@@ -138,6 +138,8 @@ export  interface AppSection {
         appSections.push(generateInvestmentDetailsSection());
     }
 
+    appSections.push(generateFinishingUpSection());
+
     return appSections;
 
   }
@@ -188,5 +190,12 @@ export  interface AppSection {
         pages: [...appPages.filter(page => page.header === 'Make Investment')]
       }
   }
+
+  function generateFinishingUpSection(){
+    return {
+      header: 'Finishing Up', 
+      pages: [...appPages.filter(page => page.header === 'Finishing Up')]
+    }
+}
 
   export default generateAppPages

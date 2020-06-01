@@ -36,6 +36,19 @@ interface AppInitializeInfo {
     SetReferralCode: Function
 }
 
+const IsChecked: Function =  (key: string, initValues: AppInitializeInfo) =>{
+    switch (key) {
+        case 'TransferIra': 
+          return initValues['TransferIra']
+        case 'RolloverEmployer':
+          return initValues['RolloverEmployer']
+        case 'CashContribution':
+          return initValues['CashContribution']
+        default:
+          return false;
+      }
+}
+
 const Welcome: React.FC<SessionApp> = props => {
     const accountTypes = [
         'Traditional IRA', 
@@ -58,28 +71,28 @@ const Welcome: React.FC<SessionApp> = props => {
 
     const getFundingOptions = (accountType: string) => {
        let fundingOptions = {
-            'IRA_Transfer':'Transfer from another IRA'
+            'TransferIra':'Transfer from another IRA'
         }
 
         if (accountType.includes('Inherited')) {
             //return {...fundingOptions};
             return Object.entries({...fundingOptions});
         }
-        return Object.entries({...fundingOptions, 'Employer_Plan':'Rollover from an employer plan', 'Cash_Contribution':'Make a new cash contribution'});
+        return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
     }
 
     const handleChecked = (event: CustomEvent) => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
-        if(event.detail.value === 'IRA_Transfer'){
+        if(event.detail.value === 'TransferIra'){
             props.InitialValues.SetTransferIra(event.detail.checked)
         }
 
-        if(event.detail.value === 'Employer_Plan'){
+        if(event.detail.value === 'RolloverEmployer'){
             props.InitialValues.SetRolloverEmployer(event.detail.checked)
         }
 
-        if(event.detail.value === 'Cash_Contribution'){
+        if(event.detail.value === 'CashContribution'){
             props.InitialValues.SetCashContribution(event.detail.checked)
         }
     }
@@ -148,7 +161,7 @@ const Welcome: React.FC<SessionApp> = props => {
                             getFundingOptions(props.InitialValues.AccountType).map((fundingType, index) => {
                                 return (
                                 <IonItem key={index}>
-                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked}></IonCheckbox>
+                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked} checked={IsChecked(fundingType[0],  props.InitialValues)}></IonCheckbox>
                                 <IonLabel>{fundingType[1]}</IonLabel>
                                 </IonItem>
                                 )
