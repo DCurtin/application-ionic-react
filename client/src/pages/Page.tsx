@@ -3,7 +3,7 @@ import {AppPage} from '../components/Menu';
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
-import Welcome from '../components/Welcome';
+import Welcome, {WelcomePageInterface} from '../components/Welcome';
 import ApplicationIdentity from '../components/ApplicationIdentity'
 import ApplicationBene from '../components/ApplicationBene'
 import './Page.css';
@@ -12,6 +12,8 @@ import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import './Page.css';
 import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
+
+import {useHistory} from 'react-router-dom';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -34,6 +36,7 @@ export interface session{
 }
 
 const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuParams}) => {
+  const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
   })
@@ -42,6 +45,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   //console.log(setSessionId);
   const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA'); 
   
+
+
+
+  const [welcomePageFields, setWelcomePageFields] = useState<WelcomePageInterface>();
+
   const [TransferIra, SetTransferIra] = useState(false);
   const [RolloverEmployer, SetRolloverEmployer] = useState(false);
   const [CashContribution, SetCashContribution] = useState(false);
@@ -67,7 +75,21 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     formParams.newContribution = CashContribution;
     
     setMenuParams(formParams);
-  },[TransferIra, RolloverEmployer, CashContribution])
+
+    return history.listen(()=>{
+      console.log('saving session and init paramters');
+      console.log(TransferIra);
+      console.log(RolloverEmployer);
+      console.log(CashContribution);
+      console.log(sessionId);
+    })
+  },[TransferIra, RolloverEmployer, CashContribution, sessionId])
+  
+  useEffect(function(){
+    //get paramters
+    //
+  },[sessionId])
+
 
   //const [sessionId, setSessionId] = useState<string>('');
   const [currentState, setCurrentState] = useState<userState>({

@@ -1,14 +1,6 @@
-import React from 'react'; 
+import React, { useEffect } from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
-
-interface SessionApp {
-    InitialValues: AppInitializeInfo
-}
-//selectedAccountType: string; 
-//onAccountTypeSelected: (accountType: string) => void;
-//initialInvestment: string;
-//onInitialInvestmentSelected: (initialInvestment:string) => void;
 
 interface AppInitializeInfo {
     AccountType: string,
@@ -36,6 +28,22 @@ interface AppInitializeInfo {
     SetReferralCode: Function
 }
 
+export interface WelcomePageParamters {
+    AccountType: string,    
+    TransferIra: boolean,
+    RolloverEmployer: boolean,
+    CashContribution: boolean,
+    InitialInvestment: string,
+    SalesRep: string,
+    SpecifiedSource: string,
+    ReferralCode: string,
+}
+
+interface SessionApp {
+    InitialValues: WelcomePageParamters,
+    SetInitialValues: Function
+}
+
 const IsChecked: Function =  (key: string, initValues: AppInitializeInfo) =>{
     switch (key) {
         case 'TransferIra': 
@@ -50,6 +58,10 @@ const IsChecked: Function =  (key: string, initValues: AppInitializeInfo) =>{
 }
 
 const Welcome: React.FC<SessionApp> = props => {
+
+    useEffect(()=>{
+
+    })
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 
