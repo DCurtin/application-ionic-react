@@ -79,11 +79,21 @@ app.post('/startApplication', function(req, res){
   //figure out what page they're on
   const hash = require('crypto').createHash('sha256');
   var token = hash.update(JSON.stringify(onlineAppData) + Math.random().toString()).digest('hex');
-  onlineAppData['dedicated_rep__c'] = '0050M00000Dv1h5QAB';
+  //onlineAppData['dedicated_rep__c'] = '0050M00000Dv1h5QAB';
   onlineAppData['token__c'] = token;
-  updateDataBase(onlineAppData, res, token);
+  //updateDataBase(onlineAppData, res, token);
+  initializeApplication(onlineAppData, res, token);
 });
 
+function initializeApplication(onlineAppData, res, token){
+  const insertAppDataQuery = {
+    text: 'INSERT INTO salesforce.initial_app_data(account_type, transfer_ira, rollover_employer, cash_contribution, initial_investment, sales_rep, specified_source, referral_code, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    values: [onlineAppData['AccountType'], onlineAppData['TransferIra'], onlineAppData['RolloverEmployer'], onlineAppData['CashContribution'], onlineAppData['InitialInvestment'], onlineAppData['SalesRep'], onlineAppData['SpecifiedSource'], onlineAppData['ReferralCode'], token],
+  }
+  client.query(insertAppDataQuery, function(err, response){
+    res.json({'sessionId': token});
+  });
+}
 
 function updateDataBase(onlineAppData, res, token)
 {
