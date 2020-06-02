@@ -115,7 +115,7 @@ app.get('/getPenSignDoc', (req, res) => {
 
 
 app.get('/getPenSignDocv2', (req, res) => {
-    console.log(serverConn);
+    console.log(serverConn.accessToken);
     let accountNumber = '1234567';
     let url = 'https://cs37.salesforce.com/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
     let options = {
