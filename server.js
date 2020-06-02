@@ -116,9 +116,42 @@ app.get('/getPenSignDoc', (req, res) => {
 
 app.get('/getPenSignDocv2', (req, res) => {
   var accountNumber = '1234567';
-  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'Content-Type':'application/pdf'}}).then(function(err, response){
-    response.pipe(res);
+    serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'Content-Type':'application/pdf'}}, function(err, response) { 
+    if (err) {
+      console.log("error: ", err);
+      console.log("response: ", response);
+      console.log("errorMsg: ", err.data);
+      res.send({err});
+    } 
+    else {
+      //console.log(response);
+      console.log(response.slice(0,100));
+      console.log(response.headers);
+      //console.log(response.body);
+      //console.log(Object.keys(response));
+      //res.send(new Buffer(response));
+      //var fileSystem = require('fs');
+      //var readStream = fileSystem.createReadStream(response);
+      //readStream.pipe(res);
+      response.pipe(res);
+      /*fs.writeFile('penSignDoc.pdf', response, function (err) {
+      //fs.writeFile('penSignDoc.pdf', 'Hello Node', function (err) {
+        if (err) throw err;
+        console.log('It\'s saved!');
+      });*/
+      //console.log('')
+      /*const fileOut = fs.createWriteStream('./penSignDoc.pdf');
+      console.log('fileout ' + fileOut);
+      console.log('response: ' + response);
+      */
+      /*response.pipe();
+      let blob = new Blob([response], { type:"application/pdf" });
+      blob.pipe(fileOut);*/
+      //console.log("done downloading");
+      //res.send({eSignUrl: data.eSignUrl}); 
+    }    //{return console.error(err); }
   })
+  
 });
 
 
