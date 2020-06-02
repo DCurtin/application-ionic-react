@@ -52,6 +52,13 @@ app.use(bodyParser.json());
 //   }
 // });
 // client.connect();
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Authorization, Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+  next();
+});
 
 app.use(router);
 
@@ -69,9 +76,9 @@ app.get('/getPenSignDocuments', (req, res) => {
     } 
     else {
       //console.log(response);
-      console.log(response.data);
+      console.log(response[0]);
       //console.log(response.body);
-      console.log(Object.keys(response));
+      //console.log(Object.keys(response));
       res.send(response);
       /*fs.writeFile('penSignDoc.pdf', response, function (err) {
       //fs.writeFile('penSignDoc.pdf', 'Hello Node', function (err) {
