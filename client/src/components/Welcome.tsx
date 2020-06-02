@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 
+import {useHistory} from 'react-router-dom';
+
 export interface WelcomePageParamters {
     AccountType: string,    
     TransferIra: boolean,
@@ -19,6 +21,15 @@ interface SessionApp {
 }
 
 const Welcome: React.FC<SessionApp> = props => {
+    const history = useHistory();
+    useEffect(()=>{
+        return history.listen(()=>{
+            //save initial data
+            //return session id
+            console.log('cleaning up welcome')
+        })
+    })
+
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 
@@ -74,7 +85,7 @@ const Welcome: React.FC<SessionApp> = props => {
               return false;
           }
     }
-    
+
     const handleChecked = (event: CustomEvent) => {
         console.log(event.detail.value);
         console.log(event.detail.checked);

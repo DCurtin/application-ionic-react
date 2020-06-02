@@ -69,10 +69,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     
     setMenuParams(formParams);
 
-    return history.listen(()=>{
-      console.log('saving session and init paramters');
-      console.log(sessionId);
-    })
+    return function(){
+      console.log('test cleanup');
+    }
   },[welcomePageFields, sessionId])
   
   useEffect(function(){
