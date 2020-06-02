@@ -67,7 +67,7 @@ app.get('/getPenSignDocuments', (req, res) => {
   console.log('Get Pen Sign Documens on server');
 
   var accountNumber = '1234567';
-  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'content-type':'application/pdf'}}, function(err, response) { 
+  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'Content-Type':'application/pdf'}}, function(err, response) { 
     if (err) {
       console.log("error: ", err);
       console.log("response: ", response);
