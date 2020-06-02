@@ -23,6 +23,25 @@ interface SessionApp {
 }
 
 const Welcome: React.FC<SessionApp> = props => {
+
+    const downloadFile = ()=>{
+        var xhr = new XMLHttpRequest();
+        //var decoder = new TextDecoder('iso-8859-1');
+        //var encoder = new TextEncoder('iso-8859-1', {NONSTANDARD_allowLegacyEncoding: true});
+        //var decoder = new TextDecoder();
+        xhr.open('GET', '/getPenSignDocuments', true);
+        //xhr.responseType = 'arraybuffer';
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function () {
+          if (this.status === 200) {
+              var blob = new Blob([xhr.response], {type: "application/pdf"});
+              var objectUrl = URL.createObjectURL(blob);
+              window.open(objectUrl);
+          }
+        };
+        xhr.send();
+    }
     const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
@@ -258,7 +277,7 @@ const Welcome: React.FC<SessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonInput></IonInput>
-                        <IonButton color="primary">Apply Code</IonButton>
+                        <IonButton color="primary" onClick={downloadFile}>Apply Code</IonButton>
                     </IonCol>
                 </IonRow>
                <IonRow className="well">
