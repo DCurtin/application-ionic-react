@@ -18,7 +18,7 @@ export interface WelcomePageParamters {
 interface SessionApp {
     InitialValues: WelcomePageParamters,
     SetInitialValues: Function,
-    SessionId: 'string',
+    SessionId: string,
     SetSessionId: Function
 }
 

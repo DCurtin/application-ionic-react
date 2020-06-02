@@ -66,16 +66,14 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
     formParams.initialInvestment = (welcomePageFields.InitialInvestment !== "I'm Not Sure" && welcomePageFields.InitialInvestment !== '')
     
-    
     setMenuParams(formParams);
-
-    return function(){
-      console.log('test cleanup');
-    }
-  },[welcomePageFields, sessionId])
+  },[welcomePageFields])
   
   useEffect(function(){
+    let url = '/getPageFields'
+    let options = 
     //get paramters
+    //setWelcomePageFields()
     
   },[sessionId])
 
@@ -119,7 +117,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome InitialValues={welcomePageFields} SetInitialValues={setWelcomePageFields} />;
+        return <Welcome InitialValues={welcomePageFields} SetInitialValues={setWelcomePageFields} SessionId={sessionId} SetSessionId={setSessionId}/>;
       case 'Disclosures':
         return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
       case 'OwnerInformation':
