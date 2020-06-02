@@ -71,7 +71,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   
   useEffect(function(){
     let url = '/getPageFields'
-    let options = 
     //get paramters
     //setWelcomePageFields()
     
