@@ -116,7 +116,9 @@ app.get('/getPenSignDoc', (req, res) => {
 
 app.get('/getPenSignDocv2', (req, res) => {
   var accountNumber = '1234567';
-  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'Content-Type':'application/pdf'}}).pipe(res);
+  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'Content-Type':'application/pdf'}}).then(function(err, response){
+    response.pipe(res);
+  })
 });
 
 
