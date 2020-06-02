@@ -59,7 +59,7 @@ app.use(router);
 app.get('/getPenSignDocuments', (req, res) => {
   console.log('Get Pen Sign Documens on server');
 
-  var accountNumber = '1714927';
+  var accountNumber = '1234567';
   serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents', function(err, response) { 
     if (err) {
       console.log("error: ", err);
