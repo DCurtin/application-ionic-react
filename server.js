@@ -120,13 +120,10 @@ app.get('/getPenSignDocv2', (req, res) => {
     let url = 'https://cs37.salesforce.com/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
     let options = {
       uri: url,
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'Authorization': req.get('Authorization'),
-        'Content-Type':  'application/octet-stream',
-        'firstPubId': '001g000002HVCgbAAH',
-        'name:': 'Q1 Sales Brochure.png',
-        'type': 'png'
+        'Authorization': serverConn.accessToken,
+        'Content-Type':  'application/pdf',
       },
       body: data
     }
