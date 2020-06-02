@@ -122,7 +122,7 @@ app.get('/getPenSignDocv2', (req, res) => {
       uri: url,
       method: 'GET',
       headers: {
-        'Authorization': serverConn.accessToken,
+        'Authorization': 'Bearer ' + serverConn.accessToken,
         'Content-Type':  'application/pdf',
       }
     }
