@@ -76,7 +76,7 @@ app.get('/getPenSignDocuments', (req, res) => {
     } 
     else {
       //console.log(response);
-      console.log(response[0]);
+      console.log(response.slice(0,100));
       //console.log(response.body);
       //console.log(Object.keys(response));
       res.send(new Buffer(response));
