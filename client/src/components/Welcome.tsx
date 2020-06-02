@@ -17,19 +17,13 @@ export interface WelcomePageParamters {
 
 interface SessionApp {
     InitialValues: WelcomePageParamters,
-    SetInitialValues: Function
+    SetInitialValues: Function,
+    SessionId: 'string',
+    SetSessionId: Function
 }
 
 const Welcome: React.FC<SessionApp> = props => {
     const history = useHistory();
-    useEffect(()=>{
-        return history.listen(()=>{
-            //save initial data
-            //return session id
-            console.log('cleaning up welcome')
-        })
-    })
-
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 
@@ -118,6 +112,31 @@ const Welcome: React.FC<SessionApp> = props => {
             )
         }
     }
+
+    useEffect(()=>{
+        return history.listen(()=>{
+            //save initial data
+            //return session id
+            console.log('saving welcome page');
+            let url = '/startApplication'
+            let body ={
+                session: {SessionId: props.SessionId, page: 'welcomePage'},
+                data: props.InitialValues
+            }
+            let options = {
+                method : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            }
+
+            fetch(url, options).then((response)=>{
+                response.json().then(function(data: any){
+                    console.log(data);
+                    props.SetSessionId(data.SessionId);
+                  })
+            })
+        })
+    },[props.InitialValues])
 
     return (
         <IonContent className="ion-padding">
