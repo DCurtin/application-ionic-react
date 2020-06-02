@@ -138,9 +138,10 @@ app.get('/getPenSignDocv2', (req, res) => {
         //console.log(response.body);
         //console.log(Object.keys(response));
         //res.send(new Buffer(response));
-        var fileSystem = require('fs');
+        response.pipe(res);
+        /*var fileSystem = require('fs');
         var readStream = fileSystem.createWriteStream(response);
-        readStream.pipe(res);
+        readStream.pipe(res);*/
 }})});
 
 app.get("*", function (req, res) {
