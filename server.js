@@ -120,7 +120,6 @@ app.get('/getPenSignDocv2', (req, res) => {
     var _request = {
       url: '/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents',
       method: 'POST',
-      body: {"inputs": [{}]},
       headers: {
         'Content-Type':'application/pdf'
       }
