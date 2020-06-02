@@ -13,12 +13,12 @@ var serverConn = new jsforce.Connection({
     // you can change loginUrl to connect to sandbox or prerelease env.
     loginUrl : 'https://test.salesforce.com',
     //loginUrl : 'https://dcurtin-iraonline.cs17.force.com/client',
-    clientId : process.env.SFServer_Id,
-    clientSecret : process.env.SFServer_Sec,
-    redirectUri : process.env.SF_Redirect
+    clientId : process.env.QAServer_id,
+    clientSecret : process.env.QAServer_sec,
+    redirectUri : process.env.QAServer_url
   }
 });
-serverConn.login(process.env.UserId, process.env.UserPw + process.env.UserToken, function(err, userInfo) {
+serverConn.login(process.env.qaUserId, process.env.qaUserPw + process.env.UserToken, function(err, userInfo) {
   console.log('token: ' + serverConn.accessToken)
   if (err) {
     console.log(err);
@@ -91,7 +91,7 @@ function initializeApplication(onlineAppData, res, token){
     values: [onlineAppData['AccountType'], onlineAppData['TransferIra'], onlineAppData['RolloverEmployer'], onlineAppData['CashContribution'], onlineAppData['InitialInvestment'], onlineAppData['SalesRep'], onlineAppData['SpecifiedSource'], onlineAppData['ReferralCode'], token],
   }
   client.query(insertAppDataQuery, function(err, response){
-    res.json({'sessionId': token});
+    res.json({'SessionId': token});
   });
 }
 
