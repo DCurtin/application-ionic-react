@@ -179,7 +179,7 @@ app.get('/getPenSignDocuments', (req, res) => {
   console.log('Get Pen Sign Documens on server');
 
   var accountNumber = '1714927';
-  conn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents', function(err, response) { 
+  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents', function(err, response) { 
     if (err) {
       console.log("error: ", err);
       console.log("response: ", response);
@@ -187,11 +187,14 @@ app.get('/getPenSignDocuments', (req, res) => {
       res.send({err});
     } 
     else {
-      fs.writeFile('penSignDoc.pdf', response, function (err) {
+      console.log(response.body);
+      res.send(response.body);
+      /*fs.writeFile('penSignDoc.pdf', response, function (err) {
       //fs.writeFile('penSignDoc.pdf', 'Hello Node', function (err) {
         if (err) throw err;
         console.log('It\'s saved!');
-      });
+      });*/
+      console.log('')
       /*const fileOut = fs.createWriteStream('./penSignDoc.pdf');
       console.log('fileout ' + fileOut);
       console.log('response: ' + response);
