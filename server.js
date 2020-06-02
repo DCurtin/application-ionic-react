@@ -18,7 +18,8 @@ var serverConn = new jsforce.Connection({
     redirectUri : process.env.QAServer_url
   }
 });
-serverConn.login(process.env.qaUserId, process.env.qaUserPw + process.env.UserToken, function(err, userInfo) {
+//+ process.env.UserToken
+serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err, userInfo) {
   console.log('token: ' + serverConn.accessToken)
   if (err) {
     console.log(err);
