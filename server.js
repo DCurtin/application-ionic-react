@@ -130,7 +130,9 @@ app.get('/getPenSignDocv2', (req, res) => {
     rp(options).then(function(response){
       //response.pipe(res);
       //console.log(response);
+      res.header = {'Content-Type': 'application/pdf'}
       res.write(response);
+      res.end();
     })
 
 });
