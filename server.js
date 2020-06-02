@@ -128,7 +128,9 @@ app.get('/getPenSignDocv2', (req, res) => {
     }
     let rp  = require('request-promise');
     rp(options).then(function(response){
-      response.pipe(res);
+      //response.pipe(res);
+      console.log(response);
+      req.pipe(response)
     })
 
 });
