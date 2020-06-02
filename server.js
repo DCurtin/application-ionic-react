@@ -81,8 +81,8 @@ app.get('/getPenSignDocuments', (req, res) => {
       //console.log(response.body);
       //console.log(Object.keys(response));
       //res.send(new Buffer(response));
-      var fileSystem = require('fs');
-      var readStream = fileSystem.createReadStream(response);
+        var fileSystem = require('fs');
+        var readStream = fileSystem.createReadStream(response);
       readStream.pipe(res);
 
       /*fs.writeFile('penSignDoc.pdf', response, function (err) {
