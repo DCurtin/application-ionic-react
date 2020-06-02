@@ -77,15 +77,18 @@ app.get('/getPenSignDocuments', (req, res) => {
     else {
       //console.log(response);
       console.log(response.slice(0,100));
+      console.log(response.headers);
       //console.log(response.body);
       //console.log(Object.keys(response));
       res.send(new Buffer(response));
+
+
       /*fs.writeFile('penSignDoc.pdf', response, function (err) {
       //fs.writeFile('penSignDoc.pdf', 'Hello Node', function (err) {
         if (err) throw err;
         console.log('It\'s saved!');
       });*/
-      console.log('')
+      //console.log('')
       /*const fileOut = fs.createWriteStream('./penSignDoc.pdf');
       console.log('fileout ' + fileOut);
       console.log('response: ' + response);
@@ -93,10 +96,23 @@ app.get('/getPenSignDocuments', (req, res) => {
       /*response.pipe();
       let blob = new Blob([response], { type:"application/pdf" });
       blob.pipe(fileOut);*/
-      console.log("done downloading");
+      //console.log("done downloading");
       //res.send({eSignUrl: data.eSignUrl}); 
     }    //{return console.error(err); }
   })
+  
+});
+
+
+app.get('/getPenSignDoc', (req, res) => {
+  console.log('Get Pen Sign Documens on server');
+  fs = require("fs")
+  fileOut = fs.createWriteStream('./test.pdf');
+  serverConn.sobject('Attachment').record('00P2i000000RXGOEA4').blob('Body').pipe(res);
+  
+
+  
+  
 });
 
 
