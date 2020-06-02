@@ -114,6 +114,12 @@ app.get('/getPenSignDoc', (req, res) => {
 });
 
 
+app.get('/getPenSignDocv2', (req, res) => {
+  var accountNumber = '1234567';
+  serverConn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents',{'headers':{'Content-Type':'application/pdf'}}).pipe(res);
+});
+
+
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
