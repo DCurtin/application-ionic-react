@@ -3,14 +3,12 @@ import {AppPage} from '../components/Menu';
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
-import Welcome, {WelcomePageInterface} from '../components/Welcome';
-import ApplicationIdentity from '../components/ApplicationIdentity'
-import ApplicationBene from '../components/ApplicationBene'
+import Welcome, {WelcomePageParamters} from '../components/Welcome';
+import './Page.css';
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import './Page.css';
 import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
 
 import {useHistory} from 'react-router-dom';
@@ -21,17 +19,10 @@ export interface userState {
   nextPage?: AppPage
 }
 
-export interface userState{
-  prevPage?: AppPage,
-  currentPage: AppPage,
-  nextPage?: AppPage
-}
-
 export interface session{
   sessionId: string,
   setSessionId: Function,
   menuSections: AppSection[],
-
   setMenuParams: Function
 }
 
@@ -40,24 +31,23 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   let appPages = menuSections.flatMap(e=>{
     return e.pages
   })
-
-  console.log(appPages);
-  //console.log(setSessionId);
-  const [selectedAccountType, setSelectedAccountType] = useState<string>('Traditional IRA'); 
   
+  const [welcomePageFields, setWelcomePageFields] = useState<WelcomePageParamters>({
+    AccountType: '',
+    CashContribution: false,
+    InitialInvestment: '',
+    ReferralCode: '',
+    RolloverEmployer: false,
+    SalesRep: '',
+    SpecifiedSource: '',
+    TransferIra: false
+  });
 
-
-
-  const [welcomePageFields, setWelcomePageFields] = useState<WelcomePageInterface>();
-
-  const [TransferIra, SetTransferIra] = useState(false);
-  const [RolloverEmployer, SetRolloverEmployer] = useState(false);
-  const [CashContribution, SetCashContribution] = useState(false);
-
-  const [InitialInvestment, setInitialInvestment] = useState<string>('');
-  const [SalesRep, SetSalesRep] = useState<string>('');
-  const [SpecifiedSource, SetSpecifiedSource] = useState<string>('');
-  const [ReferralCode, SetReferralCode] = useState<string>('');
+  const [currentState, setCurrentState] = useState<userState>({
+    prevPage: undefined,
+    currentPage: appPages[0],
+    nextPage: appPages[1]
+  });
 
   useEffect(function(){
     let formParams : MenuParamters = {
@@ -68,35 +58,27 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       transferForm : false
     }
     console.log('use effect on page');
-    console.log(TransferIra);
     
-    formParams.transferForm = TransferIra;
-    formParams.rolloverForm = RolloverEmployer;
-    formParams.newContribution = CashContribution;
+    formParams.transferForm = welcomePageFields.TransferIra;
+    formParams.rolloverForm = welcomePageFields.RolloverEmployer;
+    formParams.newContribution = welcomePageFields.CashContribution;
+    formParams.planInfo = welcomePageFields.AccountType.includes('SEP');
+
+    formParams.initialInvestment = (welcomePageFields.InitialInvestment !== "I'm Not Sure" && welcomePageFields.InitialInvestment !== '')
+    
     
     setMenuParams(formParams);
 
     return history.listen(()=>{
       console.log('saving session and init paramters');
-      console.log(TransferIra);
-      console.log(RolloverEmployer);
-      console.log(CashContribution);
       console.log(sessionId);
     })
-  },[TransferIra, RolloverEmployer, CashContribution, sessionId])
+  },[welcomePageFields, sessionId])
   
   useEffect(function(){
     //get paramters
     
   },[sessionId])
-
-
-  //const [sessionId, setSessionId] = useState<string>('');
-  const [currentState, setCurrentState] = useState<userState>({
-    prevPage: undefined,
-    currentPage: appPages[0],
-    nextPage: appPages[1]
-  })
 
   const { name } = useParams<{ name: string; }>();
 
@@ -130,67 +112,17 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const displayPage = (pageName:string) => {
+
     if (!currentState.currentPage.url.includes(pageName)) {
       let updatedState = getPageStateFromPage(pageName);
       setCurrentState(updatedState);
     }
 
-    interface AppInitializeInfo {
-      AccountType: string,
-      SetAccountType: Function,
-      
-      TransferIra: boolean,
-      SetTransferIra: Function,
-  
-      RolloverEmployer: boolean,
-      SetRolloverEmployer: Function,
-  
-      CashContribution: boolean,
-      SetCashContribution: Function,
-  
-      InitialInvestment: string,
-      SetInitialInvestment: Function,
-  
-      SalesRep: string,
-      SetSalesRep: Function,
-  
-      SpecifiedSource: string,
-      SetSpecifiedSource: Function,
-  
-      ReferralCode: string,
-      SetReferralCode: Function
-  }
-  let initialValues : AppInitializeInfo = {
-    AccountType: selectedAccountType,
-    SetAccountType: setSelectedAccountType,
-
-    TransferIra: TransferIra,
-    SetTransferIra: SetTransferIra,
-
-    RolloverEmployer: RolloverEmployer,
-    SetRolloverEmployer: SetRolloverEmployer,
-
-    CashContribution: CashContribution,
-    SetCashContribution: SetCashContribution,
-
-    InitialInvestment: InitialInvestment,
-    SetInitialInvestment: setInitialInvestment,
-
-    SalesRep: SalesRep,
-    SetSalesRep: SetSalesRep,
-
-    SpecifiedSource: SpecifiedSource,
-    SetSpecifiedSource: SetSpecifiedSource,
-
-    ReferralCode: ReferralCode,
-    SetReferralCode: SetReferralCode
-  }
-
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome InitialValues={initialValues} />;
+        return <Welcome InitialValues={welcomePageFields} SetInitialValues={setWelcomePageFields} />;
       case 'Disclosures':
-        return <Disclosures selectedAccountType={selectedAccountType}/>;
+        return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
       default:

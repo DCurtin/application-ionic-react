@@ -2,32 +2,6 @@ import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 
-interface AppInitializeInfo {
-    AccountType: string,
-    SetAccountType: Function,
-    
-    TransferIra: boolean,
-    SetTransferIra: Function,
-
-    RolloverEmployer: boolean,
-    SetRolloverEmployer: Function,
-
-    CashContribution: boolean,
-    SetCashContribution: Function,
-
-    InitialInvestment: string,
-    SetInitialInvestment: Function,
-
-    SalesRep: string,
-    SetSalesRep: Function,
-
-    SpecifiedSource: string,
-    SetSpecifiedSource: Function,
-
-    ReferralCode: string,
-    SetReferralCode: Function
-}
-
 export interface WelcomePageParamters {
     AccountType: string,    
     TransferIra: boolean,
@@ -44,24 +18,7 @@ interface SessionApp {
     SetInitialValues: Function
 }
 
-const IsChecked: Function =  (key: string, initValues: AppInitializeInfo) =>{
-    switch (key) {
-        case 'TransferIra': 
-          return initValues['TransferIra']
-        case 'RolloverEmployer':
-          return initValues['RolloverEmployer']
-        case 'CashContribution':
-          return initValues['CashContribution']
-        default:
-          return false;
-      }
-}
-
 const Welcome: React.FC<SessionApp> = props => {
-
-    useEffect(()=>{
-
-    })
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 
@@ -105,6 +62,19 @@ const Welcome: React.FC<SessionApp> = props => {
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
     }
 
+    const IsChecked: Function =  (key: string, initValues: WelcomePageParamters) =>{
+        switch (key) {
+            case 'TransferIra': 
+              return initValues['TransferIra']
+            case 'RolloverEmployer':
+              return initValues['RolloverEmployer']
+            case 'CashContribution':
+              return initValues['CashContribution']
+            default:
+              return false;
+          }
+    }
+    
     const handleChecked = (event: CustomEvent) => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
