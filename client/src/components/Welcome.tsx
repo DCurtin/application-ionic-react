@@ -74,11 +74,23 @@ const Welcome: React.FC<SessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        props.InitialValues.SetAccountType(event.detail.value);
+        //props.InitialValues.SetAccountType(event.detail.value);
+        props.SetInitialValues(
+            {
+                ...props.InitialValues,
+                AccountType: event.detail.value
+            }
+        )
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        props.InitialValues.SetInitialInvestment(event.detail.value);
+        //props.InitialValues.SetInitialInvestment(event.detail.value);
+        props.SetInitialValues(
+            {
+                ...props.InitialValues,
+                InitialInvestment: event.detail.value
+            }
+        )
     }
 
     const getFundingOptions = (accountType: string) => {
@@ -97,15 +109,32 @@ const Welcome: React.FC<SessionApp> = props => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
-            props.InitialValues.SetTransferIra(event.detail.checked)
+            //props.InitialValues.SetTransferIra(event.detail.checked)
+            props.SetInitialValues(
+                {
+                    ...props.InitialValues,
+                    TransferIra: event.detail.checked
+                }
+            )
         }
 
         if(event.detail.value === 'RolloverEmployer'){
-            props.InitialValues.SetRolloverEmployer(event.detail.checked)
+            props.SetInitialValues(
+                {
+                    ...props.InitialValues,
+                    RolloverEmployer: event.detail.checked
+                }
+            )
         }
 
         if(event.detail.value === 'CashContribution'){
-            props.InitialValues.SetCashContribution(event.detail.checked)
+            //props.InitialValues.SetCashContribution(event.detail.checked)
+            props.SetInitialValues(
+                {
+                    ...props.InitialValues,
+                    CashContribution: event.detail.checked
+                }
+            )
         }
     }
 

@@ -87,7 +87,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   
   useEffect(function(){
     //get paramters
-    //
+    
   },[sessionId])
 
 
