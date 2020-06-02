@@ -68,6 +68,8 @@ app.get('/getPenSignDocuments', (req, res) => {
       res.send({err});
     } 
     else {
+      console.log(response);
+      console.log(response.data);
       console.log(response.body);
       res.send(response.body);
       /*fs.writeFile('penSignDoc.pdf', response, function (err) {
