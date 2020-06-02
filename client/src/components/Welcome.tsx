@@ -29,7 +29,7 @@ const Welcome: React.FC<SessionApp> = props => {
         //var decoder = new TextDecoder('iso-8859-1');
         //var encoder = new TextEncoder('iso-8859-1', {NONSTANDARD_allowLegacyEncoding: true});
         //var decoder = new TextDecoder();
-        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDocuments', true);
+        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDoc', true);
         //xhr.responseType = 'arraybuffer';
         xhr.responseType = "arraybuffer";
 
