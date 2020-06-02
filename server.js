@@ -124,8 +124,7 @@ app.get('/getPenSignDocv2', (req, res) => {
       headers: {
         'Authorization': serverConn.accessToken,
         'Content-Type':  'application/pdf',
-      },
-      body: data
+      }
     }
     let rp  = require('request-promise');
     rp(options).then(function(response){
