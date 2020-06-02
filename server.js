@@ -175,6 +175,36 @@ function updateApplication(){
   });
 }
 
+app.get('/getPenSignDocuments', (req, res) => {
+  console.log('Get Pen Sign Documens on server');
+
+  var accountNumber = '1714927';
+  conn.apex.get('/v1/accounts/' + accountNumber + '/pen-sign-documents', function(err, response) { 
+    if (err) {
+      console.log("error: ", err);
+      console.log("response: ", response);
+      console.log("errorMsg: ", err.data);
+      res.send({err});
+    } 
+    else {
+      fs.writeFile('penSignDoc.pdf', response, function (err) {
+      //fs.writeFile('penSignDoc.pdf', 'Hello Node', function (err) {
+        if (err) throw err;
+        console.log('It\'s saved!');
+      });
+      /*const fileOut = fs.createWriteStream('./penSignDoc.pdf');
+      console.log('fileout ' + fileOut);
+      console.log('response: ' + response);
+      */
+      /*response.pipe();
+      let blob = new Blob([response], { type:"application/pdf" });
+      blob.pipe(fileOut);*/
+      console.log("done downloading");
+      //res.send({eSignUrl: data.eSignUrl}); 
+    }    //{return console.error(err); }
+  })
+});
+
 
 
 
