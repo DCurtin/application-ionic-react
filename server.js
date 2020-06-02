@@ -115,34 +115,27 @@ app.get('/getPenSignDoc', (req, res) => {
 
 
 app.get('/getPenSignDocv2', (req, res) => {
-  var accountNumber = '1234567';
-
-    var _request = {
-      url: '/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents',
-      method: 'GET',
+    console.log(serverConn);
+    let accountNumber = '1234567';
+    let url = 'https://cs37.salesforce.com/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
+    let options = {
+      uri: url,
+      method: 'POST',
       headers: {
-        'Content-Type':'application/pdf'
-      }
-    };
-    serverConn.request(_request,  function(err, response) { 
-      if (err) {
-        console.log("error: ", err);
-        console.log("response: ", response);
-        console.log("errorMsg: ", err.data);
-        res.send({err});
-      } 
-      else {
-        //console.log(response);
-        console.log(response.slice(0,100));
-        console.log(response.headers);
-        //console.log(response.body);
-        //console.log(Object.keys(response));
-        //res.send(new Buffer(response));
-        response.pipe(res);
-        /*var fileSystem = require('fs');
-        var readStream = fileSystem.createWriteStream(response);
-        readStream.pipe(res);*/
-}})});
+        'Authorization': req.get('Authorization'),
+        'Content-Type':  'application/octet-stream',
+        'firstPubId': '001g000002HVCgbAAH',
+        'name:': 'Q1 Sales Brochure.png',
+        'type': 'png'
+      },
+      body: data
+    }
+    let rp  = require('request-promise');
+    rp(options).then(function(response){
+      response.pipe(res);
+    })
+
+});
 
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
