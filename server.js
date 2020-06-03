@@ -132,12 +132,12 @@ app.get('/getPenSignDocv2', (req, res) => {
     var data = []; 
   
     response.on('data', function(chunk) { 
-      data.push(chunk);
+      //data.push(chunk);
       res.write(chunk);
     }); 
   
     response.on('end', function() { 
-      data = Buffer.concat(data); // do something with data
+      //data = Buffer.concat(data); // do something with data
       res.end(); 
     }); 
   }); 
