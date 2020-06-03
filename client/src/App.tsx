@@ -39,15 +39,14 @@ const App: React.FC = () => {
 
   useEffect(()=>{
     let appSections:AppSection[] = generateAppPages(menuParams)
-    setAppSections(appSections);
-  },[menuParams])
-
+    setAppSections(appSections);    
+  },[menuParams,sessionId])
 
   return (
     <IonApp>
       <IonReactRouter>
         <IonSplitPane contentId="main">
-        <Menu sessionId={sessionId} menuSections={appSections}/>
+          <Menu sessionId={sessionId} menuSections={appSections}/>
           <IonRouterOutlet id="main">
             <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={appSections}  setMenuParams={setMenuParams}/>} /> 
             <Redirect from="/" to="/page/Welcome" exact />

@@ -1,6 +1,7 @@
+import { IonContent, IonList, IonItem, IonButton, IonListHeader, IonLabel} from '@ionic/react';
+import {userState} from '../pages/Page'
 import React from 'react';
 import './ExploreContainer.css';
-import {userState} from '../pages/Page';
 
 interface ContainerProps {
   name: string,
@@ -9,10 +10,15 @@ interface ContainerProps {
 
 const ExploreContainer: React.FC<ContainerProps> = ({ name, currentState }) => {
   return (
-    <div className="container">
-      <strong>{name}</strong>
-      <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-    </div>
+    <IonContent>
+      <IonList>
+        <IonListHeader>
+        <IonLabel>
+            {name}
+        </IonLabel>
+        </IonListHeader>
+      </IonList>
+    </IonContent>
   );
 };
 

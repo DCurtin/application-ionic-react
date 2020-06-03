@@ -1,38 +1,49 @@
-  import React from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
+import React, { useEffect } from 'react'; 
+import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 
-interface SessionApp {
-    InitialValues: AppInitializeInfo
+import {useHistory} from 'react-router-dom';
+
+export interface WelcomePageParamters {
+    AccountType: string,    
+    TransferIra: boolean,
+    RolloverEmployer: boolean,
+    CashContribution: boolean,
+    InitialInvestment: string,
+    SalesRep: string,
+    SpecifiedSource: string,
+    ReferralCode: string,
 }
 
-interface AppInitializeInfo {
-    AccountType: string,
-    SetAccountType: Function,
-    
-    TransferIra: boolean,
-    SetTransferIra: Function,
-
-    RolloverEmployer: boolean,
-    SetRolloverEmployer: Function,
-
-    CashContribution: boolean,
-    SetCashContribution: Function,
-
-    InitialInvestment: string,
-    SetInitialInvestment: Function,
-
-    SalesRep: string,
-    SetSalesRep: Function,
-
-    SpecifiedSource: string,
-    SetSpecifiedSource: Function,
-
-    ReferralCode: string,
-    SetReferralCode: Function
+interface SessionApp {
+    InitialValues: WelcomePageParamters,
+    SetInitialValues: Function,
+    SessionId: string,
+    SetSessionId: Function
 }
 
 const Welcome: React.FC<SessionApp> = props => {
+
+    const downloadFile = ()=>{
+        var xhr = new XMLHttpRequest();
+        //var decoder = new TextDecoder('iso-8859-1');
+        //var encoder = new TextEncoder('iso-8859-1', {NONSTANDARD_allowLegacyEncoding: true});
+        //var decoder = new TextDecoder();
+        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDocv2', true);
+        //xhr.responseType = 'arraybuffer';
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function () {
+          if (this.status === 200) {
+              var blob = new Blob([xhr.response], {type: "application/pdf"});
+              var objectUrl = URL.createObjectURL(blob);
+              console.log(objectUrl);
+              window.open(objectUrl, "_blank");
+          }
+        };
+        xhr.send();
+    }
+    const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
         'Roth IRA', 
@@ -45,39 +56,107 @@ const Welcome: React.FC<SessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        props.InitialValues.SetAccountType(event.detail.value);
+        //props.InitialValues.SetAccountType(event.detail.value);
+        props.SetInitialValues(
+            {
+                ...props.InitialValues,
+                AccountType: event.detail.value
+            }
+        )
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        props.InitialValues.SetInitialInvestment(event.detail.value);
+        //props.InitialValues.SetInitialInvestment(event.detail.value);
+        props.SetInitialValues(
+            {
+                ...props.InitialValues,
+                InitialInvestment: event.detail.value
+            }
+        )
     }
 
     const getFundingOptions = (accountType: string) => {
        let fundingOptions = {
-            'IRA_Transfer':'Transfer from another IRA'
+            'TransferIra':'Transfer from another IRA'
         }
 
         if (accountType.includes('Inherited')) {
+            //return {...fundingOptions};
             return Object.entries({...fundingOptions});
         }
-        return Object.entries({...fundingOptions, 'Employer_Plan':'Rollover from an employer plan', 'Cash_Contribution':'Make a new cash contribution'});
+        return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
+    }
+
+    const IsChecked: Function =  (key: string, initValues: WelcomePageParamters) =>{
+        switch (key) {
+            case 'TransferIra': 
+              return initValues['TransferIra']
+            case 'RolloverEmployer':
+              return initValues['RolloverEmployer']
+            case 'CashContribution':
+              return initValues['CashContribution']
+            default:
+              return false;
+          }
     }
 
     const handleChecked = (event: CustomEvent) => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
-        if(event.detail.value === 'IRA_Transfer'){
-            props.InitialValues.SetTransferIra(event.detail.checked)
+        if(event.detail.value === 'TransferIra'){
+            //props.InitialValues.SetTransferIra(event.detail.checked)
+            props.SetInitialValues(
+                {
+                    ...props.InitialValues,
+                    TransferIra: event.detail.checked
+                }
+            )
         }
 
-        if(event.detail.value === 'Employer_Plan'){
-            props.InitialValues.SetRolloverEmployer(event.detail.checked)
+        if(event.detail.value === 'RolloverEmployer'){
+            props.SetInitialValues(
+                {
+                    ...props.InitialValues,
+                    RolloverEmployer: event.detail.checked
+                }
+            )
         }
 
-        if(event.detail.value === 'Cash_Contribution'){
-            props.InitialValues.SetCashContribution(event.detail.checked)
+        if(event.detail.value === 'CashContribution'){
+            //props.InitialValues.SetCashContribution(event.detail.checked)
+            props.SetInitialValues(
+                {
+                    ...props.InitialValues,
+                    CashContribution: event.detail.checked
+                }
+            )
         }
     }
+
+    useEffect(()=>{
+        return history.listen(()=>{
+            //save initial data
+            //return session id
+            console.log('saving welcome page');
+            let url = '/startApplication'
+            let body ={
+                session: {SessionId: props.SessionId, page: 'welcomePage'},
+                data: props.InitialValues
+            }
+            let options = {
+                method : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            }
+
+            fetch(url, options).then((response)=>{
+                response.json().then(function(data: any){
+                    console.log(data);
+                    props.SetSessionId(data.SessionId);
+                  })
+            })
+        })
+    },[props.InitialValues])
 
     return (
         <IonContent className="ion-padding">
@@ -143,7 +222,7 @@ const Welcome: React.FC<SessionApp> = props => {
                             getFundingOptions(props.InitialValues.AccountType).map((fundingType, index) => {
                                 return (
                                 <IonItem key={index}>
-                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked}></IonCheckbox>
+                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked} checked={IsChecked(fundingType[0],  props.InitialValues)}></IonCheckbox>
                                 <IonLabel>{fundingType[1]}</IonLabel>
                                 </IonItem>
                                 )

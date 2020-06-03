@@ -10,16 +10,20 @@ import {
   IonImg,
   IonToolbar,
   IonTitle,
-  isPlatform,
-  getPlatforms
 } from '@ionic/react';
 
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { archiveOutline, archiveSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import './Menu.css';
-import {AppPage} from '../helpers/MenuGenerator';
 
+export interface AppPage {
+  header?: string;
+  url: string;
+  iosIcon: string;
+  mdIcon: string;
+  title: string;
+}
 
 interface AppSection {
   header: string;
@@ -92,6 +96,25 @@ let appPages: AppPage[] = [
   }
 ];
 
+let appSections : AppSection[] = [
+  {
+    header: 'Getting Started',
+    pages: [...appPages.filter(page => page.header === 'Getting Started')]
+  },
+  {
+    header: 'Open Account',
+    pages: [...appPages.filter(page => page.header === 'Open Account')]
+  },
+  {
+    header: 'Make Investment', 
+    pages: [...appPages.filter(page => page.header === 'Make Investment')]
+  },
+  {
+    header: 'Finishing Up',
+    pages: [...appPages.filter(page => page.header === 'Finishing Up')]
+  }
+]
+
 interface session{
   sessionId: string,
   menuSections: AppSection[]
@@ -99,13 +122,11 @@ interface session{
 
 const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
-  useEffect(() => {
-    console.log(getPlatforms());
-  })
+  console.log('menu ' + sessionId);
 
   return (
     <IonMenu contentId="main" type="overlay">
-      <IonContent scrollY={isPlatform('android') || isPlatform('ios')}>
+      <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
           {menuSections.map((appSection, index) => {
             return (
@@ -114,7 +135,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
                  {appSection.pages.map((appPage, index) => {
                     return (
                       <IonMenuToggle key={index} autoHide={false}>
-                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={appPage.url} routerDirection="none" lines="none" detail={false}>
+                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink(location.search, appPage.url, sessionId)} routerDirection="none" lines="none" detail={false}>
                           <IonIcon slot="start" icon={appPage.iosIcon} />
                           <IonLabel>{appPage.title}</IonLabel>
                         </IonItem>
@@ -136,5 +157,27 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
     </IonMenu>
   );
 };
+
+function getLink(location:string, url:string, sessionId:string){
+  /*console.log(location);
+  if(location.includes('id'))
+  {
+    var parameters = location.replace('?','').split('&');
+    var id = parameters.find(e=>{return e.includes('id')});
+    if(id === undefined){
+      return url
+    }else{
+      return url + '?' + id;
+    }
+  }
+
+  if(sessionId !== '')
+  {
+    return url +'?id=' +sessionId
+  }*/
+
+  return url;
+  //appPage.url
+}
 
 export {Menu, appPages};

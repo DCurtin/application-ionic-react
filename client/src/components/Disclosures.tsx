@@ -25,7 +25,7 @@ const Disclosures: React.FC<{selectedAccountType: string}> = props => {
                     <IonCol>
                         <p>
                         <a target="_blank" href={disclosurePDF}>
-                            Click here to download your complete account disclosure.
+                            Click here to download your comlete account disclosure.
                             </a> 
                         </p>
                         <IonCheckbox></IonCheckbox> &nbsp; I have reviewed these disclosures and agree to all terms and conditions herein 
