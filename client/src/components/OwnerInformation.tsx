@@ -1,15 +1,17 @@
-import React, {useState, useEffect, Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { userState } from '../pages/Page'
+import { SessionApp } from '../helpers/Utils';
 
-interface SessionApp {
-    sessionId : String,
-    setSessionId : Function
-}
 
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        const [formData, setFormData] = useState({first_name__c:'', last_name__c:'', ssn__c: '', email__c: '', dob__c: '', salutation__c: ''});
+        const [formData, setFormData] = useState({
+            first_name__c:'',
+             last_name__c:'', 
+             ssn__c: '', 
+             email__c: '', 
+             dob__c: '', 
+             salutation__c: ''});
         const history = useHistory();
         const updateForm = function(e : any){
             setFormData({
