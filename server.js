@@ -126,19 +126,19 @@ app.get('/getPenSignDocv2', (req, res) => {
       }
     }
 
-    var https = require('https');
+    let https = require('https');
 
-   var request = https.request(url, options, function(response) { 
-    var data = []; 
+    let request = https.request(url, options, function(response) { 
+      response.pipe(res);
   
-    response.on('data', function(chunk) { 
+    /*response.on('data', function(chunk) { 
       res.write(chunk);
       console.log('writing chunk');
     }); 
   
     response.on('end', function() {
       res.end(); 
-    }); 
+    }); */
   }); 
   
   request.end();
