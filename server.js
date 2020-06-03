@@ -122,36 +122,24 @@ app.get('/getPenSignDocv2', (req, res) => {
       host: url,
       method: 'GET',
       port: 443,
+      path: '',
       headers: {
         'Authorization': 'Bearer ' + serverConn.accessToken,
         'Content-Type':  'application/pdf',
       }
     }
-    let rp  = require('request-promise');
-    let rq = require('request');
-
-    rp(options).then(function(response){
-      //response.pipe(res);
-      //console.log(response);
-      res.download(response)
-    })
-
-    var options = {
-      method: 'GET',
-      host: 'localhost',
-
-      path: '/file'
-    };
 
    var request = http.request(options, function(response) { 
     var data = []; 
   
     response.on('data', function(chunk) { 
-      data.push(chunk); 
+      data.push(chunk);
+      res.write(chunk);
     }); 
   
     response.on('end', function() { 
-      data = Buffer.concat(data); // do something with data 
+      data = Buffer.concat(data); // do something with data
+      res.end(); 
     }); 
   }); 
   
