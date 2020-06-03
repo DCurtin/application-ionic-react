@@ -10,10 +10,35 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
              last_name__c:'', 
              ssn__c: '', 
              email__c: '', 
+             confirm_email__c:'',
              dob__c: '', 
-             salutation__c: ''});
+             salutation__c: '',
+            marital_status__c: '',
+            mother_s_maiden_name__c: '',
+            occupation__c: '',
+            isSelfEmployed__c: false,
+            hasHSA__c: false,
+            id_type__c: '', 
+            id_number__c: '',
+            issued_by__c:'', 
+            issue_date__c: '', 
+            expiration_date__c: '',
+            legal_address__c: '', 
+            legal_city__c: '', 
+            legal_state__c:'',
+            legal_zip__c: '',
+            home_and_mailing_address_different__c: false,
+            mailing_address__c: '', 
+            mailing_city__c: '', 
+            mailing_state__c: '',
+            mailing_zip__c: '', 
+            primary_phone__c: '', 
+            preferred_contact_method__c:'', 
+            alternate_phone__c:'', 
+            alternate_phone_type__c:''
+        });
         const history = useHistory();
-        const updateForm = function(e : any){
+        const updateForm = (e : any) => {
             setFormData({
             ...formData,
               [e.target.name]: e.target.value
@@ -21,7 +46,38 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     
         function ImportForm(data : any){
-            let importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: ''}
+            let importedForm = {
+                first_name__c: data['first_name__c'], 
+                last_name__c: data['last_name__c'], 
+                ssn__c: data['ssn__c'], 
+                email__c: data['email__c'], 
+                confirm_email__c: data['confirm_email__c'],
+                dob__c: data['dob__c'], 
+                salutation__c: data['salutation__c'],
+                marital_status__c: data['marital_status__c'],
+                mother_s_maiden_name__c: data['mother_s_maiden_name__c'],
+                occupation__c: data['occupation__c'],
+                isSelfEmployed__c: data['isSelfEmployed__c'],
+                hasHSA__c: data['hasHSA__c'],
+                id_type__c: data['id_type__c'], 
+                id_number__c: data['id_number__c'],
+                issued_by__c:data['issued_by__c'], 
+                issue_date__c: data['issue_date__c'], 
+                expiration_date__c: data['expiration_date__c'],
+                legal_address__c: data['legal_address__c'], 
+                legal_city__c: data['legal_city__c'], 
+                legal_state__c:data['legal_state__c'],
+                legal_zip__c: data['legal_zip__c'],
+                home_and_mailing_address_different__c: data['home_and_mailing_address_different__c'],
+                mailing_address__c: data['mailing_address__c'], 
+                mailing_city__c: data['mailing_city__c'], 
+                mailing_state__c: data['mailing_state__c'],
+                mailing_zip__c: data['mailing_zip__c'], 
+                primary_phone__c: data['primary_phone__c'], 
+                preferred_contact_method__c:data['preferred_contact_method__c'], 
+                alternate_phone__c:data['alternate_phone__c'], 
+                alternate_phone_type__c:data['alternate_phone_type__c']
+            }
 
             console.log('data');
             console.log(data);

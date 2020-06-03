@@ -100,7 +100,6 @@ const Welcome: React.FC<SessionApp> = props => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
-            //props.InitialValues.SetTransferIra(event.detail.checked)
             props.SetInitialValues(
                 {
                     ...props.InitialValues,
