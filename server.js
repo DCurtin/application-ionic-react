@@ -119,7 +119,6 @@ app.get('/getPenSignDocv2', (req, res) => {
     let accountNumber = '1234567';
     let url = 'https://entrust--qa.my.salesforce.com/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
     let options = {
-      uri: url,
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + serverConn.accessToken,
@@ -127,12 +126,12 @@ app.get('/getPenSignDocv2', (req, res) => {
       }
     }
     let rp  = require('request-promise');
+    let rq = require('request');
+
     rp(options).then(function(response){
       //response.pipe(res);
       //console.log(response);
-      res.header = {'Content-Type': 'application/pdf'}
-      res.write(response);
-      res.end();
+      res.download(response)
     })
 
 });
