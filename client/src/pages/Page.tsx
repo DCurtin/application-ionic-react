@@ -156,5 +156,4 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   );
 };
 
-
 export default Page;

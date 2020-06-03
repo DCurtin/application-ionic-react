@@ -8,7 +8,6 @@ export interface AppPage {
     title: string;
   }
 
-
   var appPagesMap: {[key :string]: AppPage} = {
     'Welcome':{
       header: 'Getting Started',

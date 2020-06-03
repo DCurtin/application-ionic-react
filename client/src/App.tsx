@@ -3,7 +3,8 @@ import Page from './pages/Page';
 import React, { useState, useEffect } from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route} from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
+import generateAppPages, { AppSection, MenuParamters} from './helpers/MenuGenerator';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -21,16 +22,13 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-import generateAppPages, { AppSection, MenuParamters} from './helpers/MenuGenerator'
-
-
 /* Theme variables */
 import './theme/variables.css';
+import './theme/apptheme.css';
 
 const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('');
   const [appSections, setAppSections] = useState<AppSection[]>([]);
-
   const[menuParams, setMenuParams] = useState<MenuParamters>({
     planInfo: false,
     transferForm: false,

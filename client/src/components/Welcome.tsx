@@ -278,7 +278,7 @@ const Welcome: React.FC<SessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonInput></IonInput>
-                        <IonButton color="primary" onClick={downloadFile}>Apply Code</IonButton>
+                        <IonButton color="primary">Apply Code</IonButton>
                     </IonCol>
                 </IonRow>
                <IonRow className="well">
