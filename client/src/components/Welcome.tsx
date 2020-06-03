@@ -38,7 +38,7 @@ const Welcome: React.FC<SessionApp> = props => {
               var blob = new Blob([xhr.response], {type: "application/pdf"});
               var objectUrl = URL.createObjectURL(blob);
               console.log(objectUrl);
-              window.open(objectUrl);
+              window.open(objectUrl, "_blank");
           }
         };
         xhr.send();
