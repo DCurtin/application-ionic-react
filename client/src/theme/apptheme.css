@@ -1,0 +1,8 @@
+:root {
+    --ion-toolbar-color: var(--ion-color-primary-contrast);
+    --ion-toolbar-background: var(--ion-color-primary);
+}
+
+.ios ion-toolbar {
+    background-color: #1A1B3F;
+}
