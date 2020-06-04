@@ -102,7 +102,6 @@ const Welcome: React.FC<SessionApp> = props => {
         }
 
         if(event.detail.value === 'CashContribution'){
-            //props.InitialValues.SetCashContribution(event.detail.checked)
             props.SetInitialValues(
                 {
                     ...props.InitialValues,
