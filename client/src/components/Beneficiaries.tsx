@@ -1,6 +1,7 @@
 import React from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon } from '@ionic/react';
 import {SessionApp} from '../helpers/Utils';
+import { addOutline } from 'ionicons/icons';
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     return (
@@ -17,6 +18,11 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <p>
                             If you elect not to designate a beneficiary, your assets may pass to your estate - subjecting them to the probate process, estate expenses, and creditor claims, causing delays for your beneficiary to receive these assets.
                         </p>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonButton> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
                     </IonCol>
                 </IonRow>
             </IonGrid>
