@@ -52,7 +52,6 @@ const Welcome: React.FC<SessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        //props.InitialValues.SetAccountType(event.detail.value);
         props.SetInitialValues(
             {
                 ...props.InitialValues,
@@ -62,7 +61,6 @@ const Welcome: React.FC<SessionApp> = props => {
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        //props.InitialValues.SetInitialInvestment(event.detail.value);
         props.SetInitialValues(
             {
                 ...props.InitialValues,
@@ -77,7 +75,6 @@ const Welcome: React.FC<SessionApp> = props => {
         }
 
         if (accountType.includes('Inherited')) {
-            //return {...fundingOptions};
             return Object.entries({...fundingOptions});
         }
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
@@ -118,7 +115,6 @@ const Welcome: React.FC<SessionApp> = props => {
         }
 
         if(event.detail.value === 'CashContribution'){
-            //props.InitialValues.SetCashContribution(event.detail.checked)
             props.SetInitialValues(
                 {
                     ...props.InitialValues,

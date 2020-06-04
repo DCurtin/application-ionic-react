@@ -1,9 +1,48 @@
-import React from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon } from '@ionic/react';
+import React, {useState} from 'react'; 
+import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput } from '@ionic/react';
 import {SessionApp} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+    const [formData, setFormData] = useState({
+        beneficiary_count__c: 0, 
+        beneficiary_first_name_1__c: ''
+    })
+
+    const addBeneficiary = () => {
+        console.log(formData.beneficiary_count__c);
+        let currentCount = formData.beneficiary_count__c;
+        let newCount = currentCount +1;  
+        console.log(currentCount);
+        setFormData({...formData, beneficiary_count__c : newCount});
+    }
+
+    const displayBeneficiaryForm = (beneficiaryCount: number) => {
+        if (beneficiaryCount > 0) {
+            let formRows = [];
+            for (let i = 1; i < beneficiaryCount; i++){
+              formRows.push(
+              <React.Fragment key={i}>
+                  <IonItemDivider>
+                    <strong>
+                    Beneficiary {i}
+                    </strong>
+                </IonItemDivider>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            First Name
+                        </IonLabel>
+                        <IonInput name={`beneficiary_first_name_${i}__c`} value={formData[`beneficiary_first_name_1__c`]}>
+                        </IonInput>
+                    </IonCol>
+                </IonRow>
+              </React.Fragment>)
+            }
+            return formRows; 
+        }
+    }
+
     return (
         <IonContent className='ion-padding'>
             <IonGrid>
@@ -20,9 +59,10 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </p>
                     </IonCol>
                 </IonRow>
+                {displayBeneficiaryForm(formData.beneficiary_count__c)}
                 <IonRow>
                     <IonCol>
-                        <IonButton> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
+                        <IonButton onClick={addBeneficiary}> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
                     </IonCol>
                 </IonRow>
             </IonGrid>
