@@ -118,14 +118,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     
         useEffect(()=>{
           return history.listen(()=>{
-            let url = '';
-            if(sessionId === '')
-            {
-                url = '/startApplication'
-            }else{
-                url = '/saveState'
-            }
-
+            let url = '/saveState'
             let body = {
             session:{sessionId: sessionId, page: 'appId'},
             data: formData
