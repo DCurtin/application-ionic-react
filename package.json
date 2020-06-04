@@ -15,6 +15,8 @@
     "prettier": "^2.0.5",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5",
     "uuid": "^8.1.0"
   },
   "devDependencies": {},
@@ -22,7 +24,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",
     "build": "node scripts/build.js",
-    "start": "concurrently \"nodemon server.js\" \"node server.js\" \"npm run client\"",
+    "start": "concurrently \"nodemon server.tsx\" \"node server.tsx\" \"npm run client\"",
+    "start-server": "concurrently \"nodemon server.tsx\" \"node server.tsx\"",
     "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build"
   },
   "repository": {
