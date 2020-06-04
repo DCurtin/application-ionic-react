@@ -23,22 +23,6 @@ interface SessionApp {
 }
 
 const Welcome: React.FC<SessionApp> = props => {
-
-    const downloadFile = ()=>{
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDocv2', true);
-        xhr.responseType = "arraybuffer";
-
-        xhr.onload = function () {
-          if (this.status === 200) {
-              var blob = new Blob([xhr.response], {type: "application/pdf"});
-              var objectUrl = URL.createObjectURL(blob);
-              console.log(objectUrl);
-              window.open(objectUrl, "_blank");
-          }
-        };
-        xhr.send();
-    }
     const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
