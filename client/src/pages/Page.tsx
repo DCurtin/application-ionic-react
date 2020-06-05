@@ -12,6 +12,7 @@ import OwnerInformation from '../components/OwnerInformation';
 import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
 
 import {useHistory} from 'react-router-dom';
+import Beneficiaries from '../components/Beneficiaries';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -79,7 +80,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const { name } = useParams<{ name: string; }>();
 
   const getPageStateFromPage = (currentPageName:string) => {
-    console.log(appPages);
     const appPagesArr = [...appPages];
     let currentPageIndex = appPagesArr.findIndex(page => page.url.includes(currentPageName));
 
@@ -121,6 +121,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
         return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
+      case 'Beneficiaries':
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId}/>
       default:
         return <ExploreContainer name={pageName} currentState={currentState}/>
     }
