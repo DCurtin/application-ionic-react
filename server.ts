@@ -108,8 +108,11 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   let sessionId : String = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
 
+  console.log("sessionId");
+  console.log(sessionId);
+
   if(sessionId !== ''){
-    console.log('application must be started first, a step was skipped or the session was lost');
+    console.log('application has already been started');
     console.log(sessionId);
     res.status(500).send('SessionId not set');
     return;
