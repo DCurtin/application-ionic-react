@@ -27,7 +27,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",
-    "build": "node scripts/build.js",
+    "build": "npm run tsc && node scripts/build.js",
     "start": "concurrently \"node server.js\" \"npm run client\"",
     "heroku-postbuild": "npm install && npm run tsc && cpx dist/server.js . && cd client && npm install --only=dev && npm install && npm run build",
     "tsc": "tsc --jsx react"
