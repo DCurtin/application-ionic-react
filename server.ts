@@ -3,6 +3,7 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
+import {WelcomePageParamters} from './client/src/components/Welcome'
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
