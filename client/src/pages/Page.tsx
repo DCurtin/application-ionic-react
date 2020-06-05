@@ -14,6 +14,7 @@ import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
 import FeeArrangement from '../components/FeeArrangement';
+import AccountNotifications from '../components/AccountNotifications';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -125,7 +126,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'Beneficiaries':
         return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId}/>
+        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId}/>;
+      case 'AccountNotifications':
+        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId}/>;
       default:
         return <ExploreContainer name={pageName} currentState={currentState}/>
     }

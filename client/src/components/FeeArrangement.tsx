@@ -88,7 +88,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonCol>
                     </IonRow>
                 )}
-
             </IonGrid>
         </IonContent>
     )
