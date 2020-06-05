@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
 import {SessionApp, states} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 
@@ -76,8 +76,6 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     }
 
     const updateForm = (e:any) => {
-        console.log(e.target.name);
-        console.log(formData); 
         setFormData({...formData, [e.target.name]:e.target.value});
     }
  
@@ -90,7 +88,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
               <React.Fragment key={beneficiaryNumber}>
                   <IonItemDivider>
                     <strong>
-                    Beneficiary {beneficiaryNumber}
+                        <IonText color='primary'>
+                            Beneficiary {beneficiaryNumber}
+                        </IonText>
                     </strong>
                 </IonItemDivider>
                 <IonRow>
