@@ -10,11 +10,8 @@
 
 # production
 /build
-<<<<<<< HEAD
 server.js
 dist
-=======
->>>>>>> be85b6fe09e9b12fdbca2fe1486be72f5f5b504e
 
 # misc
 .DS_Store

@@ -23,6 +23,25 @@ interface SessionApp {
 }
 
 const Welcome: React.FC<SessionApp> = props => {
+<<<<<<< HEAD
+=======
+
+    const downloadFile = ()=>{
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDocv2', true);
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function () {
+          if (this.status === 200) {
+              var blob = new Blob([xhr.response], {type: "application/pdf"});
+              var objectUrl = URL.createObjectURL(blob);
+              console.log(objectUrl);
+              window.open(objectUrl, "_blank");
+          }
+        };
+        xhr.send();
+    }
+>>>>>>> 036c43e5942ca39f1782d4d984228e1609e01b9f
     const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
@@ -36,7 +55,6 @@ const Welcome: React.FC<SessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        //props.InitialValues.SetAccountType(event.detail.value);
         props.SetInitialValues(
             {
                 ...props.InitialValues,
@@ -46,7 +64,6 @@ const Welcome: React.FC<SessionApp> = props => {
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        //props.InitialValues.SetInitialInvestment(event.detail.value);
         props.SetInitialValues(
             {
                 ...props.InitialValues,
@@ -61,7 +78,6 @@ const Welcome: React.FC<SessionApp> = props => {
         }
 
         if (accountType.includes('Inherited')) {
-            //return {...fundingOptions};
             return Object.entries({...fundingOptions});
         }
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});

@@ -340,7 +340,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <p></p>
                     </IonCol>
                 </IonRow>
-                {formData.home_and_mailing_address_different__c ? <React.Fragment>
+                {formData.home_and_mailing_address_different__c && <React.Fragment>
                     <IonRow>
                         <IonCol>
                             MAILING ADDRESS
@@ -375,7 +375,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             <IonInput value={formData.mailing_zip__c} name='mailing_zip__c' onIonChange={updateForm}></IonInput>
                         </IonCol>
                     </IonRow>
-                </React.Fragment> : null}
+                </React.Fragment>}
                 <IonRow>
                     <IonCol>
                         PRIMARY CONTACT INFO

@@ -16,7 +16,6 @@
     "jsforce": "^1.9.3",
     "pg": "^8.2.1",
     "prettier": "^2.0.5",
-    "react-router-dom": "^5.2.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "typescript": "^3.9.5",
