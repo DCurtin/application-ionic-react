@@ -3,6 +3,7 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
+import {saveWelcomeParamters, requestBody, WelcomePageParamters} from './client/src/helpers/Utils'
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
@@ -100,27 +101,10 @@ app.get("*", function (req : Express.Response, res : express.Response) {
 });
 
 
-interface WelcomePageParamters {
-  AccountType: string,    
-  TransferIra: boolean,
-  RolloverEmployer: boolean,
-  CashContribution: boolean,
-  InitialInvestment: string,
-  SalesRep: string,
-  SpecifiedSource: string,
-  ReferralCode: string,
-}
-
 app.post('/startApplication', function(req : express.Request, res : express.Response){
-  
-  var session : any = req.body.session;
-  //establish application, generate session
-  //return sessionId
-  var welcomePageData : WelcomePageParamters = req.body.data;
-  var page : any = session.page;
-  var sessionId = session.sessionId;
-
-  console.log(session);
+  let packet : requestBody = req.body;
+  let sessionId : String = packet.session.sessionId;
+  let page : string = packet.session.page;
 
   if(sessionId !== ''){
     console.log('application must be started first, a step was skipped or the session was lost');
@@ -128,15 +112,23 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
     res.status(500).send('SessionId not set');
     return;
   }
+
+  if(page !== 'welcomePage'){
+    console.log('application cannot be initialized on any page but the welcome page.')
+    res.status(500).send('Wrong Session Page ' + page);
+  }
+  
+  let welcomePacket : WelcomePageParamters = packet.data;
+
   //figure out what page they're on
   const hash = require('crypto').createHash('sha256');
-  var token = hash.update(JSON.stringify(welcomePageData) + Math.random().toString()).digest('hex');
-  initializeApplication(welcomePageData, res, token);
+  var token = hash.update(JSON.stringify(welcomePacket) + Math.random().toString()).digest('hex');
+  initializeApplication(welcomePacket, res, token);
 });
 
 function initializeApplication(welcomePageData : WelcomePageParamters, res: express.Response, token : string){
   const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.initial_app_data(account_type, transfer_ira, rollover_employer, cash_contribution, initial_investment, sales_rep, specified_source, referral_code, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
     values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource,welcomePageData.ReferralCode, token],
   }
   client.query(insertAppDataQuery, function(err : any, response : any){
@@ -144,27 +136,16 @@ function initializeApplication(welcomePageData : WelcomePageParamters, res: expr
   });
 }
 
-/*function updateDataBase(onlineAppData, res, token)
-{
-  console.log(token);
-  const insertAppQuery = {
-    text: 'INSERT INTO salesforce.application__c(first_name__c, last_name__c, email__c, ssn__c, dob__c, dedicated_rep__c, token__c) VALUES($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (token__c) DO UPDATE SET first_name__c = EXCLUDED.first_name__c, last_name__c = EXCLUDED.last_name__c, email__c = EXCLUDED.email__c, ssn__c = EXCLUDED.ssn__c, dob__c = EXCLUDED.dob__c, dedicated_rep__c = EXCLUDED.dedicated_rep__c',
-    values: [onlineAppData['first_name__c'], onlineAppData['last_name__c'], onlineAppData['email__c'], onlineAppData['ssn__c'], onlineAppData['dob__c'], onlineAppData['dedicated_rep__c'], token],
-  }
-  client.query(insertAppQuery, function(err, response){
-    console.log("response");
-    console.log(response);
-    console.log("err");
-    console.log(err);
-    res.json({'sessionId': token});
-  });
-}*/
-
-
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
   console.log(serverConn);
   console.log(req.body);
+  var packet : requestBody = req.body;
+  if(packet.session.page === 'welcomePage')
+  {
+    var welcomePacket : saveWelcomeParamters = req.body;
+
+  }
   var onlineAppData = req.body.data;
   var session = req.body.session;
   var page = session.page;
