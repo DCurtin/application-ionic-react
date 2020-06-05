@@ -3,7 +3,6 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
-import {WelcomePageParamters} from './client/src/components/Welcome'
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
@@ -55,7 +54,7 @@ app.use(bodyParser.json());
 //   }
 // });
 // client.connect();
-app.use(function(req, res, next) {
+app.use(function(req : any, res : any, next : any) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header("Access-Control-Allow-Credentials", 'true');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -100,12 +99,23 @@ app.get("*", function (req : express.Request, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
+
+interface WelcomePageParamters {
+  AccountType: string,    
+  TransferIra: boolean,
+  RolloverEmployer: boolean,
+  CashContribution: boolean,
+  InitialInvestment: string,
+  SalesRep: string,
+  SpecifiedSource: string,
+  ReferralCode: string,
+}
+
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
   var session : any = req.body.session;
   //establish application, generate session
   //return sessionId
-
   var welcomePageData : WelcomePageParamters = req.body.data;
   var page : any = session.page;
   var sessionId = session.sessionId;
