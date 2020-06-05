@@ -96,7 +96,7 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 });
 
 app.get("*", function (req : express.Request, res : express.Response) {
-  res.sendFile(path.join(__dirname + "/client/build/index.html"));
+  res.sendFile(path.join(__dirname + "../client/build/index.html"));
 });
 
 
