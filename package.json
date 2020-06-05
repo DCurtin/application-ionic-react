@@ -4,6 +4,11 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "@ionic/react": "^5.1.1",
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.0.11",
+    "@types/react-router": "^5.1.7",
+    "@types/react-router-dom": "^5.1.5",
     "body-parser": "^1.19.0",
     "concurrently": "^5.2.0",
     "dotenv": "^8.2.0",
@@ -13,20 +18,25 @@
     "jsforce": "^1.9.3",
     "pg": "^8.2.1",
     "prettier": "^2.0.5",
+    "react-router-dom": "^5.2.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5",
     "uuid": "^8.1.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",
     "build": "node scripts/build.js",
-    "start": "concurrently \"nodemon server.tsx\" \"node server.tsx\" \"npm run client\"",
-    "start-server": "concurrently \"nodemon server.tsx\" \"node server.tsx\"",
-    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build"
+    "prestart": "npm run build",
+    "start": "concurrently \"nodemon server.js\" \"node server.js\" \"npm run client\"",
+    "heroku-postbuild": "npm install && npm run tsc && cd client && npm install --only=dev && npm install && npm run build",
+    "tsc": "tsc --jsx react"
   },
   "repository": {
     "type": "git",

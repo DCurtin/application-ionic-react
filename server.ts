@@ -1,8 +1,8 @@
 require("dotenv").config();
 var path = require('path');
 //var express = require('express');
-import * as express from 'express';
-import {WelcomePageParamters} from './client/src/components/Welcome';
+import express from 'express';
+import { Http2SecureServer } from 'http2';
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
@@ -21,7 +21,7 @@ var serverConn = new jsforce.Connection({
   }
 });
 //+ process.env.UserToken
-serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err, userInfo) {
+serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
   console.log('token: ' + serverConn.accessToken)
   if (err) {
     console.log(err);
@@ -56,7 +56,7 @@ app.use(bodyParser.json());
 // client.connect();
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Credentials", 'true');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Authorization, Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   next();
@@ -78,7 +78,7 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 
     let https = require('https');
 
-    let request = https.request(url, options, function(response) { 
+    let request = https.request(url, options, function(response: any) { 
       response.pipe(res);
   
     /*response.on('data', function(chunk) { 
@@ -128,7 +128,7 @@ function initializeApplication(welcomePageData : WelcomePageParamters, res: expr
     text: 'INSERT INTO salesforce.initial_app_data(account_type, transfer_ira, rollover_employer, cash_contribution, initial_investment, sales_rep, specified_source, referral_code, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
     values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource,welcomePageData.ReferralCode, token],
   }
-  client.query(insertAppDataQuery, function(err, response){
+  client.query(insertAppDataQuery, function(err : any, response : any){
     res.json({'SessionId': token});
   });
 }
