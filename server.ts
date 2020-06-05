@@ -102,17 +102,6 @@ app.get("*", function (req : Express.Response, res : express.Response) {
 });
 
 
-interface WelcomePageParamters {
-  AccountType: string,    
-  TransferIra: boolean,
-  RolloverEmployer: boolean,
-  CashContribution: boolean,
-  InitialInvestment: string,
-  SalesRep: string,
-  SpecifiedSource: string,
-  ReferralCode: string,
-}
-
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
   let welcomePageData : saveWelcomeParameters = req.body;
@@ -138,7 +127,7 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   initializeApplication(welcomePageData.data, res, token);
 });
 
-function initializeApplication(welcomePageData : WelcomePageParamters, res: express.Response, token : string){
+function initializeApplication(welcomePageData : welcomePageParameters, res: express.Response, token : string){
   //need to resolve offering_id and owner_id
   const insertAppDataQuery = {
     text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
@@ -149,27 +138,16 @@ function initializeApplication(welcomePageData : WelcomePageParamters, res: expr
   });
 }
 
-/*function updateDataBase(onlineAppData, res, token)
-{
-  console.log(token);
-  const insertAppQuery = {
-    text: 'INSERT INTO salesforce.application__c(first_name__c, last_name__c, email__c, ssn__c, dob__c, dedicated_rep__c, token__c) VALUES($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (token__c) DO UPDATE SET first_name__c = EXCLUDED.first_name__c, last_name__c = EXCLUDED.last_name__c, email__c = EXCLUDED.email__c, ssn__c = EXCLUDED.ssn__c, dob__c = EXCLUDED.dob__c, dedicated_rep__c = EXCLUDED.dedicated_rep__c',
-    values: [onlineAppData['first_name__c'], onlineAppData['last_name__c'], onlineAppData['email__c'], onlineAppData['ssn__c'], onlineAppData['dob__c'], onlineAppData['dedicated_rep__c'], token],
-  }
-  client.query(insertAppQuery, function(err, response){
-    console.log("response");
-    console.log(response);
-    console.log("err");
-    console.log(err);
-    res.json({'sessionId': token});
-  });
-}*/
-
-
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
   console.log(serverConn);
   console.log(req.body);
+  var packet : requestBody = req.body;
+  if(packet.session.page === 'welcomePage')
+  {
+    var welcomePacket : saveWelcomeParameters = req.body;
+
+  }
   var onlineAppData = req.body.data;
   var session = req.body.session;
   var page = session.page;
