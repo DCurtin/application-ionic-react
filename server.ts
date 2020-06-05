@@ -3,6 +3,8 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
+import {saveWelcomeParameters, requestBody, welcomePageParameters} from './client/src/helpers/Utils'
+const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
@@ -113,14 +115,9 @@ interface WelcomePageParamters {
 
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
-  var session : any = req.body.session;
-  //establish application, generate session
-  //return sessionId
-  var welcomePageData : WelcomePageParamters = req.body.data;
-  var page : any = session.page;
-  var sessionId = session.sessionId;
-
-  console.log(session);
+  let welcomePageData : saveWelcomeParameters = req.body;
+  let sessionId : String = welcomePageData.session.sessionId;
+  let page : string = welcomePageData.session.page;
 
   if(sessionId !== ''){
     console.log('application must be started first, a step was skipped or the session was lost');
@@ -128,16 +125,24 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
     res.status(500).send('SessionId not set');
     return;
   }
+
+  if(page !== 'welcomePage'){
+    
+    console.log('Cannot start an application on this page ' + page);
+    res.status(500).send('Wrong page ' + page);
+    return;
+  }
+
   //figure out what page they're on
-  const hash = require('crypto').createHash('sha256');
-  var token = hash.update(JSON.stringify(welcomePageData) + Math.random().toString()).digest('hex');
-  initializeApplication(welcomePageData, res, token);
+  var token = uuidv4();
+  initializeApplication(welcomePageData.data, res, token);
 });
 
 function initializeApplication(welcomePageData : WelcomePageParamters, res: express.Response, token : string){
+  //need to resolve offering_id and owner_id
   const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.initial_app_data(account_type, transfer_ira, rollover_employer, cash_contribution, initial_investment, sales_rep, specified_source, referral_code, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-    values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource,welcomePageData.ReferralCode, token],
+    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
   }
   client.query(insertAppDataQuery, function(err : any, response : any){
     res.json({'SessionId': token});

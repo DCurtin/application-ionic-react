@@ -3,7 +3,7 @@ export interface SessionApp {
     setSessionId : Function
 }
 
-export interface WelcomePageParamters {
+export interface welcomePageParameters {
     AccountType: string,    
     TransferIra: boolean,
     RolloverEmployer: boolean,
@@ -20,8 +20,8 @@ export interface requestBody{
     data: any
 }
 
-export interface saveWelcomeParamters extends requestBody{
-    data: WelcomePageParamters
+export interface saveWelcomeParameters extends requestBody{
+    data: welcomePageParameters
 }
 
 export const states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
