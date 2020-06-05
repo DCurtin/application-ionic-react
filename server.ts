@@ -54,7 +54,7 @@ app.use(bodyParser.json());
 //   }
 // });
 // client.connect();
-app.use(function(req : any, res : any, next : any) {
+app.use(function(req : express.Request, res : express.Response, next : express.NextFunction) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header("Access-Control-Allow-Credentials", 'true');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -95,7 +95,7 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 
 });
 
-app.get("*", function (req : any, res : any) {
+app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
