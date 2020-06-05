@@ -17,19 +17,29 @@ var serverConn = new jsforce.Connection({
     // you can change loginUrl to connect to sandbox or prerelease env.
     loginUrl : 'https://test.salesforce.com',
     //loginUrl : 'https://dcurtin-iraonline.cs17.force.com/client',
-    clientId : process.env.QAServer_id,
-    clientSecret : process.env.QAServer_sec,
-    redirectUri : process.env.QAServer_url
+    clientId : process.env.QAServer_id || 'test',
+    clientSecret : process.env.QAServer_sec || 'test',
+    redirectUri : process.env.QAServer_url || 'test'
   }
 });
 //+ process.env.UserToken
-serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
-  console.log('token: ' + serverConn.accessToken)
-  if (err) {
-    console.log(err);
-    return console.log('fail');
+var qaUser = process.env.qaUserId || 'test';
+var qaPw = process.env.qaUserPw || 'test';
+
+if(qaUser === 'test' || qaPw === 'test')
+{
+  serverConn = {
+    accessToken: 'test_conn'
   }
-})
+}else{
+  serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
+    console.log('token: ' + serverConn.accessToken)
+    if (err) {
+      console.log(err);
+      return console.log('fail');
+    }
+  })
+}
 
 console.log('query url: ' +  connectionString)
 client.connect();
