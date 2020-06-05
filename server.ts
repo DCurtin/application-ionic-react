@@ -137,7 +137,9 @@ function initializeApplication(welcomePageData : welcomePageParameters, res: exp
     values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
   }
   client.query(insertAppDataQuery, function(err : any, response : any){
-    res.json({'SessionId': token});
+    console.log(err);
+    console.log(response);
+    res.json({'sessionId': token});
   });
 }
 
