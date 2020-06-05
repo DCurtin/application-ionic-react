@@ -30,7 +30,7 @@
     "build": "node scripts/build.js",
     "prestart": "npm run build",
     "start": "concurrently \"nodemon .\\dist\\server.js\" \"node .\\dist\\server.js\" \"npm run client\"",
-    "heroku-postbuild": "npm install && npm run tsc && cd client && npm install --only=dev && npm install && npm run build && cd ..",
+    "heroku-postbuild": "npm install && npm run tsc && cd client && npm install --only=dev && npm install && npm run build",
     "tsc": "tsc --jsx react"
   },
   "repository": {
