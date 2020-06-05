@@ -17,19 +17,29 @@ var serverConn = new jsforce.Connection({
     // you can change loginUrl to connect to sandbox or prerelease env.
     loginUrl : 'https://test.salesforce.com',
     //loginUrl : 'https://dcurtin-iraonline.cs17.force.com/client',
-    clientId : process.env.QAServer_id,
-    clientSecret : process.env.QAServer_sec,
-    redirectUri : process.env.QAServer_url
+    clientId : process.env.QAServer_id || 'test',
+    clientSecret : process.env.QAServer_sec || 'test',
+    redirectUri : process.env.QAServer_url || 'test'
   }
 });
 //+ process.env.UserToken
-serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
-  console.log('token: ' + serverConn.accessToken)
-  if (err) {
-    console.log(err);
-    return console.log('fail');
+var qaUser = process.env.qaUserId || 'test';
+var qaPw = process.env.qaUserPw || 'test';
+
+if(qaUser === 'test' || qaPw === 'test')
+{
+  serverConn = {
+    accessToken: 'test_conn'
   }
-})
+}else{
+  serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
+    console.log('token: ' + serverConn.accessToken)
+    if (err) {
+      console.log(err);
+      return console.log('fail');
+    }
+  })
+}
 
 console.log('query url: ' +  connectionString)
 client.connect();
@@ -108,8 +118,11 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   let sessionId : String = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
 
+  console.log("sessionId");
+  console.log(sessionId);
+
   if(sessionId !== ''){
-    console.log('application must be started first, a step was skipped or the session was lost');
+    console.log('application has already been started');
     console.log(sessionId);
     res.status(500).send('SessionId not set');
     return;
@@ -130,11 +143,13 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
 function initializeApplication(welcomePageData : welcomePageParameters, res: express.Response, token : string){
   //need to resolve offering_id and owner_id
   const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
     values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
   }
   client.query(insertAppDataQuery, function(err : any, response : any){
-    res.json({'SessionId': token});
+    console.log(err);
+    console.log(response);
+    res.json({'sessionId': token});
   });
 }
 

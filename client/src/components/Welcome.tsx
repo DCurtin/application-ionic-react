@@ -4,11 +4,11 @@ import './Welcome.css';
 
 import {useHistory} from 'react-router-dom';
 
-import {WelcomePageParamters, SessionApp, saveWelcomeParamters} from "../helpers/Utils"
+import {welcomePageParameters, SessionApp, saveWelcomeParameters} from "../helpers/Utils"
 import { Interface } from 'readline';
 
 interface InitSessionApp extends SessionApp {
-    initialValues: WelcomePageParamters,
+    initialValues: welcomePageParameters,
     setInitialValues: Function,
 }
 
@@ -54,7 +54,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
     }
 
-    const IsChecked: Function =  (key: string, initValues: WelcomePageParamters) =>{
+    const IsChecked: Function =  (key: string, initValues: welcomePageParameters) =>{
         switch (key) {
             case 'TransferIra': 
               return initValues['TransferIra']
@@ -106,7 +106,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
             //return session id
             console.log('saving welcome page');
             let url = '/startApplication'
-            let body : saveWelcomeParamters ={
+            console.log(props.sessionId);
+            let body : saveWelcomeParameters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
                 data: props.initialValues
             }

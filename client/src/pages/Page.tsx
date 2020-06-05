@@ -4,7 +4,7 @@ import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
-import {WelcomePageParamters} from '../helpers/Utils'
+import {welcomePageParameters} from '../helpers/Utils'
 import './Page.css';
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
@@ -34,7 +34,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     return e.pages
   })
   
-  const [welcomePageFields, setWelcomePageFields] = useState<WelcomePageParamters>({
+  const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',
     CashContribution: false,
     InitialInvestment: '',
