@@ -44,7 +44,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             ...formData,
               [e.target.name]: newValue
             });
-            console.log(formData);
         }
     
         function ImportForm(data : any){
