@@ -14,6 +14,7 @@
     "express-session": "^1.17.1",
     "fs": "0.0.1-security",
     "jsforce": "^1.9.3",
+    "nodemon": "^2.0.4",
     "pg": "^8.2.1",
     "prettier": "^2.0.5",
     "request": "^2.88.2",
@@ -28,7 +29,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",
     "build": "npm run tsc && node scripts/build.js",
-    "start": "concurrently \"node server.js\"",
+    "start": "node server.js",
+    "dev-start": "concurrently \"nodemy server.js\" \"node server.js\" \"npm run client\"",
     "heroku-postbuild": "npm install && npm run tsc && cd client && npm install --only=dev && npm install && npm run build",
     "tsc": "tsc --jsx react && cpx dist/server.js ."
   },
