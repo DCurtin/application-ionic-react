@@ -3,29 +3,40 @@ import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider
 import {SessionApp} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 
+interface FormData {
+    [key:string] : any
+}
+
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         beneficiary_count__c: 0, 
-        beneficiary_first_name_1__c: ''
+        beneficiary_first_name_1__c: '',
+        beneficiary_first_name_2__c: '', 
+        beneficiary_first_name_3__c: '', 
+        beneficiary_first_name_4__c: ''
     })
 
     const addBeneficiary = () => {
-        console.log(formData.beneficiary_count__c);
         let currentCount = formData.beneficiary_count__c;
-        let newCount = currentCount +1;  
-        console.log(currentCount);
+        let newCount = currentCount < 4 ? currentCount +1 : currentCount;  
         setFormData({...formData, beneficiary_count__c : newCount});
     }
 
+    const updateForm = (e:any) => {
+        console.log(e.target.name);
+        setFormData({...formData, [e.target.name]:e.target.value});
+    }
+ 
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
         if (beneficiaryCount > 0) {
             let formRows = [];
-            for (let i = 1; i < beneficiaryCount; i++){
+            for (let i = 0; i < beneficiaryCount; i++){
+                let beneficiaryNumber = i +1;
               formRows.push(
-              <React.Fragment key={i}>
+              <React.Fragment key={beneficiaryNumber}>
                   <IonItemDivider>
                     <strong>
-                    Beneficiary {i}
+                    Beneficiary {beneficiaryNumber}
                     </strong>
                 </IonItemDivider>
                 <IonRow>
@@ -33,7 +44,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             First Name
                         </IonLabel>
-                        <IonInput name={`beneficiary_first_name_${i}__c`} value={formData[`beneficiary_first_name_1__c`]}>
+                        <IonInput name={`beneficiary_first_name_${beneficiaryNumber}__c`} value={formData[`beneficiary_first_name_${beneficiaryNumber}__c`]} onIonChange={updateForm}>
                         </IonInput>
                     </IonCol>
                 </IonRow>
