@@ -4,7 +4,8 @@ import './Welcome.css';
 
 import {useHistory} from 'react-router-dom';
 
-import {WelcomePageParamters, SessionApp} from "../helpers/Utils"
+import {WelcomePageParamters, SessionApp, saveWelcomeParamters} from "../helpers/Utils"
+import { Interface } from 'readline';
 
 interface InitSessionApp extends SessionApp {
     initialValues: WelcomePageParamters,
@@ -97,13 +98,15 @@ const Welcome: React.FC<InitSessionApp> = props => {
         }
     }
 
+
     useEffect(()=>{
+        //save state on page change
         return history.listen(()=>{
             //save initial data
             //return session id
             console.log('saving welcome page');
             let url = '/startApplication'
-            let body ={
+            let body : saveWelcomeParamters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
                 data: props.initialValues
             }
