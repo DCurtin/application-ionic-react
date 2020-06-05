@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 
 import {useHistory} from 'react-router-dom';
@@ -23,26 +23,6 @@ interface SessionApp {
 }
 
 const Welcome: React.FC<SessionApp> = props => {
-
-    const downloadFile = ()=>{
-        var xhr = new XMLHttpRequest();
-        //var decoder = new TextDecoder('iso-8859-1');
-        //var encoder = new TextEncoder('iso-8859-1', {NONSTANDARD_allowLegacyEncoding: true});
-        //var decoder = new TextDecoder();
-        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDocv2', true);
-        //xhr.responseType = 'arraybuffer';
-        xhr.responseType = "arraybuffer";
-
-        xhr.onload = function () {
-          if (this.status === 200) {
-              var blob = new Blob([xhr.response], {type: "application/pdf"});
-              var objectUrl = URL.createObjectURL(blob);
-              console.log(objectUrl);
-              window.open(objectUrl, "_blank");
-          }
-        };
-        xhr.send();
-    }
     const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
@@ -104,7 +84,6 @@ const Welcome: React.FC<SessionApp> = props => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
-            //props.InitialValues.SetTransferIra(event.detail.checked)
             props.SetInitialValues(
                 {
                     ...props.InitialValues,
@@ -123,7 +102,6 @@ const Welcome: React.FC<SessionApp> = props => {
         }
 
         if(event.detail.value === 'CashContribution'){
-            //props.InitialValues.SetCashContribution(event.detail.checked)
             props.SetInitialValues(
                 {
                     ...props.InitialValues,

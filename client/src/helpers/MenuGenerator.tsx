@@ -1,4 +1,4 @@
-import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import {alertCircleOutline,alertCircleSharp, archiveOutline, archiveSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
 
 export interface AppPage {
     header?: string;
@@ -49,8 +49,8 @@ export interface AppPage {
       header: 'Open Account',
       title: 'Fee Arrangement',
       url: '/page/FeeArrangement',
-      iosIcon: trashOutline,
-      mdIcon: trashSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'AccountNotifications':{
       header: 'Open Account',
