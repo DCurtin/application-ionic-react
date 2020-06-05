@@ -133,7 +133,7 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
 function initializeApplication(welcomePageData : welcomePageParameters, res: express.Response, token : string){
   //need to resolve offering_id and owner_id
   const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token__c) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
     values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
   }
   client.query(insertAppDataQuery, function(err : any, response : any){
