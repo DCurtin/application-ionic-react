@@ -116,7 +116,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome InitialValues={welcomePageFields} SetInitialValues={setWelcomePageFields} SessionId={sessionId} SetSessionId={setSessionId}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Disclosures':
         return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
       case 'OwnerInformation':

@@ -4,25 +4,14 @@ import './Welcome.css';
 
 import {useHistory} from 'react-router-dom';
 
-export interface WelcomePageParamters {
-    AccountType: string,    
-    TransferIra: boolean,
-    RolloverEmployer: boolean,
-    CashContribution: boolean,
-    InitialInvestment: string,
-    SalesRep: string,
-    SpecifiedSource: string,
-    ReferralCode: string,
+import {WelcomePageParamters, SessionApp} from "../helpers/Utils"
+
+interface InitSessionApp extends SessionApp {
+    initialValues: WelcomePageParamters,
+    setInitialValues: Function,
 }
 
-interface SessionApp {
-    InitialValues: WelcomePageParamters,
-    SetInitialValues: Function,
-    SessionId: string,
-    SetSessionId: Function
-}
-
-const Welcome: React.FC<SessionApp> = props => {
+const Welcome: React.FC<InitSessionApp> = props => {
     const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
@@ -36,18 +25,18 @@ const Welcome: React.FC<SessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        props.SetInitialValues(
+        props.setInitialValues(
             {
-                ...props.InitialValues,
+                ...props.initialValues,
                 AccountType: event.detail.value
             }
         )
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        props.SetInitialValues(
+        props.setInitialValues(
             {
-                ...props.InitialValues,
+                ...props.initialValues,
                 InitialInvestment: event.detail.value
             }
         )
@@ -81,27 +70,27 @@ const Welcome: React.FC<SessionApp> = props => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
-            props.SetInitialValues(
+            props.setInitialValues(
                 {
-                    ...props.InitialValues,
+                    ...props.initialValues,
                     TransferIra: event.detail.checked
                 }
             )
         }
 
         if(event.detail.value === 'RolloverEmployer'){
-            props.SetInitialValues(
+            props.setInitialValues(
                 {
-                    ...props.InitialValues,
+                    ...props.initialValues,
                     RolloverEmployer: event.detail.checked
                 }
             )
         }
 
         if(event.detail.value === 'CashContribution'){
-            props.SetInitialValues(
+            props.setInitialValues(
                 {
-                    ...props.InitialValues,
+                    ...props.initialValues,
                     CashContribution: event.detail.checked
                 }
             )
@@ -115,8 +104,8 @@ const Welcome: React.FC<SessionApp> = props => {
             console.log('saving welcome page');
             let url = '/startApplication'
             let body ={
-                session: {SessionId: props.SessionId, page: 'welcomePage'},
-                data: props.InitialValues
+                session: {sessionId: props.sessionId, page: 'welcomePage'},
+                data: props.initialValues
             }
             let options = {
                 method : 'POST',
@@ -127,11 +116,11 @@ const Welcome: React.FC<SessionApp> = props => {
             fetch(url, options).then((response)=>{
                 response.json().then(function(data: any){
                     console.log(data);
-                    props.SetSessionId(data.SessionId);
+                    props.setSessionId(data.sessionId);
                   })
             })
         })
-    },[props.InitialValues])
+    },[props.initialValues])
 
     return (
         <IonContent className="ion-padding">
@@ -165,7 +154,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect value={props.InitialValues.AccountType} onIonChange={handleAccountTypeSelected}>
+                       <IonSelect value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}
@@ -194,10 +183,10 @@ const Welcome: React.FC<SessionApp> = props => {
                         </IonLabel>
                         <p>Check all that apply.</p>
                         {
-                            getFundingOptions(props.InitialValues.AccountType).map((fundingType, index) => {
+                            getFundingOptions(props.initialValues.AccountType).map((fundingType, index) => {
                                 return (
                                 <IonItem key={index}>
-                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked} checked={IsChecked(fundingType[0],  props.InitialValues)}></IonCheckbox>
+                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked} checked={IsChecked(fundingType[0],  props.initialValues)}></IonCheckbox>
                                 <IonLabel>{fundingType[1]}</IonLabel>
                                 </IonItem>
                                 )
@@ -212,7 +201,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.InitialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                        <IonSelect value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
                     {initialInvestmentTypes.map((investmentType, index) => (
                     <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                     ))}
