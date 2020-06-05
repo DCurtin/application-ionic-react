@@ -3,7 +3,8 @@ import {AppPage} from '../components/Menu';
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
-import Welcome, {WelcomePageParamters} from '../components/Welcome';
+import Welcome from '../components/Welcome';
+import {WelcomePageParamters} from '../helpers/Utils'
 import './Page.css';
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
