@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
-var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost/salesforce';
+var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost';
 var pg = require('pg');
 var client = new pg.Client(connectionString);
 var jsforce = require('jsforce');
@@ -127,7 +127,7 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
     res.status(500).send('SessionId not set');
     return;
   }
-
+  
   if(page !== 'welcomePage'){
     
     console.log('Cannot start an application on this page ' + page);
