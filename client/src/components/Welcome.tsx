@@ -43,6 +43,33 @@ const Welcome: React.FC<InitSessionApp> = props => {
         )
     }
 
+    const handleSalesRepChange = (event: CustomEvent) => {
+        props.setInitialValues(
+            {
+                ...props.initialValues,
+                SalesRep: event.detail.value
+            }
+        )
+    }
+    
+    const handleSpecifiedSourceChange = (event: CustomEvent) => {
+        props.setInitialValues(
+            {
+                ...props.initialValues,
+                SpecifiedSource: event.detail.value
+            }
+        )
+    }
+    
+    const handleReferralCodeChange = (event: CustomEvent) => {
+        props.setInitialValues(
+            {
+                ...props.initialValues,
+                ReferralCode: event.detail.value
+            }
+        )
+    }
+
     const getFundingOptions = (accountType: string) => {
        let fundingOptions = {
             'TransferIra':'Transfer from another IRA'
@@ -206,9 +233,9 @@ const Welcome: React.FC<InitSessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonSelect value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
-                    {initialInvestmentTypes.map((investmentType, index) => (
-                    <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
-                    ))}
+                            {initialInvestmentTypes.map((investmentType, index) => (
+                            <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                            ))}
                         </IonSelect>
                     </IonCol>
                 </IonRow>
@@ -219,7 +246,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 Have you been working with a Midland rep?
                             </strong>
                         </IonLabel>
-                        <IonSelect>
+                        <IonSelect value={props.initialValues.SalesRep} onIonChange={handleSalesRepChange}>
                             {midlandReps.map((rep, index) => (
                                 <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
                             ))}
@@ -233,7 +260,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 How did you hear about us?
                             </strong>
                         </IonLabel>
-                        <IonInput>
+                        <IonInput value={props.initialValues.SpecifiedSource} onIonChange={handleSpecifiedSourceChange}>
 
                         </IonInput>
                     </IonCol>
@@ -245,7 +272,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 Referral / Group Code
                             </strong>
                         </IonLabel>
-                        <IonInput></IonInput>
+                        <IonInput value={props.initialValues.ReferralCode} onIonChange={handleReferralCodeChange}></IonInput>
                         <IonButton color="primary">Apply Code</IonButton>
                     </IonCol>
                 </IonRow>
