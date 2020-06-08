@@ -1,5 +1,5 @@
 export interface SessionApp {
-    sessionId : String,
+    sessionId : string,
     setSessionId : Function
 }
 
@@ -16,7 +16,7 @@ export interface welcomePageParameters {
 
 //component client <-> server fetch paramters
 export interface requestBody{
-    session: {sessionId: String, page: string},
+    session: {sessionId: string, page: string},
     data: any
 }
 

@@ -41,31 +41,20 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
         const updateForm = (e : any) => {
             let newValue = e.target.name === 'homeAndMailingAddressDifferent' ? e.target.checked : e.target.value;
-            setFormData({
-            ...formData,
+            setFormData(previousState =>({
+            ...previousState,
               [e.target.name]: newValue
-            });
-            console.log(formData);
+            }));
         }
 
         
     
         function ImportForm(data : any){
             let importedForm : applicantId = data
-
-
-            console.log('data');
-            console.log(data);
-
-            console.log('importedForm');
-            console.log(importedForm);
-
             setFormData(importedForm);
-            console.log(formData);
         }
     
         useEffect(()=>{
-            console.log('sessionId ' + sessionId );
             if(sessionId !== '')
             {
                //query fields
@@ -80,9 +69,10 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 body: JSON.stringify(body)
               }
               fetch(url, options).then(function(response: any){
-                  console.log(response)
                 response.json().then(function(data: any){
-                    console.log(data.data);
+                    if(data.data === undefined){
+                        return;
+                    }
                   ImportForm(data.data);
                 })
               })
@@ -103,7 +93,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             }
             fetch(url, options).then(function(response: any){
             response.json().then(function(data: any){
-                console.log(data);
             })
             });
           })
@@ -138,13 +127,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             First Name *
                         </IonLabel>
-                        <IonInput class='item-input' name="firstName" value={formData.firstName} placeholder="First Name" onIonChange={updateForm} clearInput></IonInput>
+                        <IonInput class='item-input' name="firstName" value={formData.firstName} placeholder="First Name" onIonInput={updateForm} clearInput></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Last Name *
                         </IonLabel>
-                        <IonInput class='item-input' name="lastName" value={formData.lastName} placeholder="Last Name" onIonChange={updateForm} clearInput></IonInput>
+                        <IonInput class='item-input' name="lastName" value={formData.lastName} placeholder="Last Name" onIonInput={updateForm} clearInput></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -152,13 +141,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Social Security Number *
                         </IonLabel>
-                        <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonChange={updateForm} required clearInput></IonInput>
+                        <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} required clearInput></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Date of Birth *
                         </IonLabel>
-                        <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                        <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" onIonInput={e => updateForm(e!)} clearInput></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -166,7 +155,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Marital Status
                         </IonLabel>
-                        <IonSelect name='marital_status' onIonChange={updateForm}>
+                        <IonSelect name='maritalStatus' onIonChange={updateForm}>
                             <IonSelectOption value="Single">Single</IonSelectOption>
                             <IonSelectOption value="Married">Married</IonSelectOption>
                             <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
@@ -174,7 +163,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonCol>
                     <IonCol>
                         <IonLabel>Mother's Maiden Name</IonLabel>
-                        <IonInput name='mother_s_maiden_name' value={formData.mothersMaidenName} onIonChange={updateForm}></IonInput>
+                        <IonInput name='mothersMaidenName' value={formData.mothersMaidenName} onIonInput={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -229,7 +218,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonCol>
                     <IonCol>
                         <IonLabel> ID Number </IonLabel>
-                        <IonInput value={formData.idNumber} name='idNumber' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.idNumber} name='idNumber' onIonInput={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -237,19 +226,19 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Issued By
                         </IonLabel>
-                        <IonInput value={formData.issuedBy} onIonChange={updateForm} name='issuedBy'></IonInput>
+                        <IonInput value={formData.issuedBy} onIonInput={updateForm} name='issuedBy'></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Issue Date
                         </IonLabel>
-                        <IonInput type='date' value={formData.issueDate} onIonChange={updateForm} name='issueDate'></IonInput>
+                        <IonInput type='date' value={formData.issueDate} onIonInput={updateForm} name='issueDate'></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol size='6'>
                         <IonLabel>Expiration Date</IonLabel>
-                        <IonInput type='date' value={formData.expirationDate} onIonChange={updateForm} name='expirationDate'>
+                        <IonInput type='date' value={formData.expirationDate} onIonInput={updateForm} name='expirationDate'>
                         </IonInput>
                     </IonCol>
                 </IonRow>
@@ -282,13 +271,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Physical Street Address
                         </IonLabel>
-                        <IonInput onIonChange={updateForm} value={formData.legalAddress} name='legalAddress'></IonInput>
+                        <IonInput onIonInput={updateForm} value={formData.legalAddress} name='legalAddress'></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             City
                         </IonLabel>
-                        <IonInput onIonChange={updateForm} value={formData.legalCity} name='legalCity'></IonInput>
+                        <IonInput onIonInput={updateForm} value={formData.legalCity} name='legalCity'></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -304,7 +293,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Zip
                         </IonLabel>
-                        <IonInput value={formData.legalZip} name='legalZip' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.legalZip} name='legalZip' onIonInput={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -329,11 +318,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     <IonRow>
                         <IonCol>
                             <IonLabel>Mailing Street Address</IonLabel>
-                            <IonInput value={formData.mailingAddress} name='mailingAddress' onIonChange={updateForm}></IonInput>
+                            <IonInput value={formData.mailingAddress} name='mailingAddress' onIonInput={updateForm}></IonInput>
                         </IonCol>
                         <IonCol>
                             <IonLabel>Mailing City</IonLabel>
-                            <IonInput value={formData.mailingCity} name='mailingCity' onIonChange={updateForm}></IonInput>
+                            <IonInput value={formData.mailingCity} name='mailingCity' onIonInput={updateForm}></IonInput>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -345,7 +334,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonCol>
                         <IonCol>
                             <IonLabel> Mailing Zip</IonLabel>
-                            <IonInput value={formData.mailingZip} name='mailingZip' onIonChange={updateForm}></IonInput>
+                            <IonInput value={formData.mailingZip} name='mailingZip' onIonInput={updateForm}></IonInput>
                         </IonCol>
                     </IonRow>
                 </React.Fragment>}
@@ -359,7 +348,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Primary Phone
                         </IonLabel>
-                        <IonInput value={formData.primaryPhone} name='primaryPhone' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.primaryPhone} name='primaryPhone' onIonInput={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
@@ -377,12 +366,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Email</IonLabel>
-                        <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' onIonChange={updateForm} required clearInput>
+                        <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' onIonInput={updateForm} required clearInput>
                         </IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Confirm Email</IonLabel>
-                        <IonInput value={formData.confirmEmail} name='confirmEmail' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.confirmEmail} name='confirmEmail' onIonInput={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -393,7 +382,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Alternate Phone</IonLabel>
-                        <IonInput value={formData.alternatePhone} name='alternatePhone' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.alternatePhone} name='alternatePhone' onIonInput={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Alternate Phone Type</IonLabel>

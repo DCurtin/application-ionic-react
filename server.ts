@@ -4,14 +4,18 @@ var path = require('path');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
 import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId} from './client/src/helpers/Utils'
+import * as salesforceSchema from './server/utils/salesforce'
+import {queryParameters} from './server/utils/helperSchemas'
+
+import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
+import * as saveStateHandlers from './server/utils/saveStateHandlers'
+
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
-var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost';
-import * as salesforceSchema from './server/utils/salesforce'
+var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcome@localhost';
 import pg, { Client } from 'pg'
-import e from 'express';
 var client  = new pg.Client(connectionString);
 var jsforce = require('jsforce');
 var serverConn = new jsforce.Connection({
@@ -28,6 +32,7 @@ var serverConn = new jsforce.Connection({
 var qaUser = process.env.qaUserId || 'test';
 var qaPw = process.env.qaUserPw || 'test';
 
+//need to setup for local testing
 if(qaUser === 'test' || qaPw === 'test')
 {
   serverConn = {
@@ -59,15 +64,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-// var connectionString = process.env.DATABASE_URL;
 
-// const client = new Client({
-//   connectionString: connectionString,
-//   ssl: {
-//     rejectUnauthorized: false
-//   }
-// });
-// client.connect();
 app.use(function(req : express.Request, res : express.Response, next : express.NextFunction) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header("Access-Control-Allow-Credentials", 'true');
@@ -94,15 +91,6 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 
     let request = https.request(url, options, function(response: any) { 
       response.pipe(res);
-  
-    /*response.on('data', function(chunk) { 
-      res.write(chunk);
-      console.log('writing chunk');
-    }); 
-  
-    response.on('end', function() {
-      res.end(); 
-    }); */
   }); 
   
   request.end();
@@ -158,8 +146,8 @@ function initializeApplication(welcomePageData : welcomePageParameters, res: exp
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : requestBody = req.body;
-  let sessionId : String = packet.session.sessionId;
-  let page : String = packet.session.page;
+  let sessionId : string = packet.session.sessionId;
+  let page : string = packet.session.page;
   console.log('saving state')
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
@@ -181,70 +169,10 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'appId'){
-    let appIdPacket : applicantId = packet.data;
-    let appQueryInsert : queryParameters = updateAppId(appIdPacket, sessionId);
-    client.query(appQueryInsert).then(result=>{
-      res.send('ok')
-    })
+    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client);
+    return
   }
-  //figure out what page the user is on, upsert data
-
 });
-
-interface fieldValuePair{
-  schemaField: string, insertValue?: any
-}
-
-interface queryParameters{
-  text: string,
-  values: Array<any>
-}
-
-function updateAppId(appIdPacket : applicantId, token : String): queryParameters{
-  let fieldValuePairs:Array<fieldValuePair> = [
-    createFieldValuePair('salutation',appIdPacket.salutation),
-    createFieldValuePair('first_name',appIdPacket.firstName),
-    createFieldValuePair('last_name',appIdPacket.lastName),
-    createFieldValuePair('social_security_number',appIdPacket.ssn),
-    createFieldValuePair('date_of_birth',appIdPacket.dob === '' ? undefined : appIdPacket.dob),
-    createFieldValuePair('email',appIdPacket.email),
-    createFieldValuePair('phone',appIdPacket.primaryPhone),
-    createFieldValuePair('marital_status',appIdPacket.maritalStatus),
-    createFieldValuePair('alternate_phone',appIdPacket.alternatePhone),
-    createFieldValuePair('preferred_contact_method',appIdPacket.preferredContactMethod),
-    createFieldValuePair('mothers_maiden_name',appIdPacket.mothersMaidenName),
-    createFieldValuePair('occupation',appIdPacket.occupation),
-    createFieldValuePair('token',token)
-  ]
-  return generateQueryString('applicant', fieldValuePairs)
-}
-
-function generateQueryString(table : string, paramters : Array<fieldValuePair>) : queryParameters{
-  let substitutes : Array<string> = []
-  let fields : Array<string> = []
-  let values : Array<any>  = []
-  let count = 1;
-
-  paramters.forEach(element => {
-    substitutes.push(`$${count}`)
-    fields.push(element.schemaField)
-    values.push(element.insertValue)
-    count++ 
-  });
-  let fieldsString = fields.join(',')
-  let substitutesString = substitutes.join(',')
-  let textString = `INSERT INTO salesforce.${table}(${fieldsString}) VALUES(${substitutesString})`
-  console.log(textString)
-  return {
-    text: `INSERT INTO salesforce.${table}(${fieldsString}) VALUES(${substitutesString})`,
-    values: values
-  };
-}
-
-function createFieldValuePair(fieldName: string, value: any): fieldValuePair{
-  let result : fieldValuePair = {schemaField: fieldName, insertValue: value} 
-  return result
-}
 
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
   var session = req.body.session;
@@ -274,99 +202,18 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
 
   if(page === 'rootPage')
   {
-    let bodyQuery = {
-      text : 'SELECT * FROM salesforce.body WHERE token = $1',
-      values : [sessionId]
-    }
-    client.query(bodyQuery).then( function(result:any){
-    //get data from database
-    //load into response
-    let welcomePage : welcomePageParameters;
-    let rows = result['rows'];
-    welcomePage.AccountType = rows.account_type;
-    welcomePage.TransferIra = rows.transfer_form;
-    welcomePage.RolloverEmployer = rows.rollover_form;
-    welcomePage.CashContribution = rows.cash_contribution_form;
-    welcomePage.InitialInvestment = rows.investment_type;
-    welcomePage.SalesRep = rows.owner_id;
-    welcomePage.SpecifiedSource = rows.referred_by;
-    welcomePage.ReferralCode = rows.offering_id;
-    
-    res.json(welcomePage);
-  })
+    getPageInfoHandlers.handleWelcomePageRequest(sessionId, res, client);
+    return
   }
 
   if(page === 'appId')
   {
-    let bodyQuery = {
-      text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
-      values : [sessionId]
-    }
-    client.query(bodyQuery).then( function(result:pg.QueryResult ){
-      let data : applicantId = {
-        isSelfEmployed: false,
-        hasHSA: false,
-        homeAndMailingAddressDifferent: false,
-        firstName:'',
-        lastName:'', 
-        ssn: '', 
-        email: '', 
-        confirmEmail:'',
-        dob: '', 
-        salutation: '',
-        maritalStatus: '',
-        mothersMaidenName: '',
-        occupation: '',
-        idType: '', 
-        idNumber: '',
-        issuedBy:'', 
-        issueDate: '', 
-        expirationDate: '',
-        legalAddress: '', 
-        legalCity: '', 
-        legalState:'',
-        legalZip: '',
-        mailingAddress: '', 
-        mailingCity: '', 
-        mailingState: '',
-        mailingZip: '', 
-        primaryPhone: '', 
-        preferredContactMethod:'', 
-        alternatePhone:'', 
-        alternatePhoneType:''
-    };
-      let row : salesforceSchema.applicant = result.rows[0]
-      console.log(row);
-      //console.log(result)
-      data.firstName = row.first_name;
-      data.lastName = row.last_name;
-      //data.dob = row.date_of_birth;
-      res.json({'data': data})
-    })
+    getPageInfoHandlers.handleApplicationIdPage(sessionId, res, client);
+    return
   }
-  //res.send('ok');
+
+  res.status(500).send('no handler for this page');
   })
-
-/*function insertApplication(onlineApp){
-  serverConn.sobject("Online_Application__c").create(onlineApp, function(err, ret){
-    console.log(ret);
-    if(ret.success === true){
-      
-    }
-  });
-}
-
-function updateApplication(){
-  serverConn.sobject("Online_Application__c").create(onlineApp, function(err, ret){
-    console.log(ret);
-    if(ret.success === true){
-      
-    }
-  });
-}*/
-
-
-
 
 var port = process.env.PORT || 3030;
 
