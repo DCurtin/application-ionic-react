@@ -33,7 +33,7 @@
     "start": "node server.js",
     "dev-start": "concurrently \"nodemy server.js\" \"node server.js\" \"npm run client\"",
     "heroku-postbuild": "npm install && npm run tsc && cd client && npm install --only=dev && npm install && npm run build",
-    "tsc": "tsc --jsx react && cpx dist/server.js ."
+    "tsc": "tsc --jsx react && cpx server/server.js ."
   },
   "repository": {
     "type": "git",
