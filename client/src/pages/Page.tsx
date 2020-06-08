@@ -4,7 +4,7 @@ import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
-import {welcomePageParameters} from '../helpers/Utils'
+import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import './Page.css';
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
@@ -14,6 +14,7 @@ import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
+import { response } from 'express';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -36,12 +37,12 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',
-    CashContribution: false,
     InitialInvestment: '',
     ReferralCode: '',
-    RolloverEmployer: false,
     SalesRep: '',
     SpecifiedSource: '',
+    CashContribution: false,
+    RolloverEmployer: false,
     TransferIra: false
   });
 
@@ -73,10 +74,23 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   
   useEffect(function(){
     let url = '/getPageFields'
-    //get paramters
-    //setWelcomePageFields()
+    let body : requestBody ={
+        session: {sessionId: sessionId, page: 'rootPage'},
+        data: undefined
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    fetch(url, options).then((response)=>{
+      response.json().then((data:any)=>{
+        console.log(data)
+        setWelcomePageFields(data.welcomePageFields);
+      })
+    })
     
-  },[sessionId])
+  },[])
 
   const { name } = useParams<{ name: string; }>();
 

@@ -3,14 +3,16 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
-import {saveWelcomeParameters, requestBody, welcomePageParameters} from './client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId} from './client/src/helpers/Utils'
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
-var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost/salesforce';
-var pg = require('pg');
-var client = new pg.Client(connectionString);
+var connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost';
+import * as salesforceSchema from './server/utils/salesforce'
+import pg, { Client } from 'pg'
+import e from 'express';
+var client  = new pg.Client(connectionString);
 var jsforce = require('jsforce');
 var serverConn = new jsforce.Connection({
   oauth2 : {
@@ -127,7 +129,7 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
     res.status(500).send('SessionId not set');
     return;
   }
-
+  
   if(page !== 'welcomePage'){
     
     console.log('Cannot start an application on this page ' + page);
@@ -155,19 +157,10 @@ function initializeApplication(welcomePageData : welcomePageParameters, res: exp
 
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
-  console.log(serverConn);
-  console.log(req.body);
-  var packet : requestBody = req.body;
-  if(packet.session.page === 'welcomePage')
-  {
-    var welcomePacket : saveWelcomeParameters = req.body;
-
-  }
-  var onlineAppData = req.body.data;
-  var session = req.body.session;
-  var page = session.page;
-  var sessionId = session.sessionId;
-
+  let packet : requestBody = req.body;
+  let sessionId : String = packet.session.sessionId;
+  let page : String = packet.session.page;
+  console.log('saving state')
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
     console.log(sessionId);
@@ -175,10 +168,83 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
     return;
   }
 
-  //updateDataBase(onlineAppData, res, sessionId);
+  if(page === ''){
+    console.log('no page specified.');
+    console.log(page);
+    res.status(500).send('no page specified');
+    return;
+  }
+  
+  if(page === 'welcomePage'){
+    let welcomePacket : saveWelcomeParameters = req.body;
+    //updateDataBase(onlineAppData, res, sessionId);
+  }
+
+  if(page === 'appId'){
+    let appIdPacket : applicantId = packet.data;
+    let appQueryInsert : queryParameters = updateAppId(appIdPacket, sessionId);
+    client.query(appQueryInsert).then(result=>{
+      res.send('ok')
+    })
+  }
   //figure out what page the user is on, upsert data
 
 });
+
+interface fieldValuePair{
+  schemaField: string, insertValue?: any
+}
+
+interface queryParameters{
+  text: string,
+  values: Array<any>
+}
+
+function updateAppId(appIdPacket : applicantId, token : String): queryParameters{
+  let fieldValuePairs:Array<fieldValuePair> = [
+    createFieldValuePair('salutation',appIdPacket.salutation),
+    createFieldValuePair('first_name',appIdPacket.firstName),
+    createFieldValuePair('last_name',appIdPacket.lastName),
+    createFieldValuePair('social_security_number',appIdPacket.ssn),
+    createFieldValuePair('date_of_birth',appIdPacket.dob === '' ? undefined : appIdPacket.dob),
+    createFieldValuePair('email',appIdPacket.email),
+    createFieldValuePair('phone',appIdPacket.primaryPhone),
+    createFieldValuePair('marital_status',appIdPacket.maritalStatus),
+    createFieldValuePair('alternate_phone',appIdPacket.alternatePhone),
+    createFieldValuePair('preferred_contact_method',appIdPacket.preferredContactMethod),
+    createFieldValuePair('mothers_maiden_name',appIdPacket.mothersMaidenName),
+    createFieldValuePair('occupation',appIdPacket.occupation),
+    createFieldValuePair('token',token)
+  ]
+  return generateQueryString('applicant', fieldValuePairs)
+}
+
+function generateQueryString(table : string, paramters : Array<fieldValuePair>) : queryParameters{
+  let substitutes : Array<string> = []
+  let fields : Array<string> = []
+  let values : Array<any>  = []
+  let count = 1;
+
+  paramters.forEach(element => {
+    substitutes.push(`$${count}`)
+    fields.push(element.schemaField)
+    values.push(element.insertValue)
+    count++ 
+  });
+  let fieldsString = fields.join(',')
+  let substitutesString = substitutes.join(',')
+  let textString = `INSERT INTO salesforce.${table}(${fieldsString}) VALUES(${substitutesString})`
+  console.log(textString)
+  return {
+    text: `INSERT INTO salesforce.${table}(${fieldsString}) VALUES(${substitutesString})`,
+    values: values
+  };
+}
+
+function createFieldValuePair(fieldName: string, value: any): fieldValuePair{
+  let result : fieldValuePair = {schemaField: fieldName, insertValue: value} 
+  return result
+}
 
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
   var session = req.body.session;
@@ -190,19 +256,96 @@ app.post('/saveApplication', function(req : express.Request, res : express.Respo
 })
 
 app.post('/getPageFields', function(req : express.Request, res : express.Response){
-  var session = req.body.session;
+  let requestPacket:requestBody = req.body;
+  let sessionId = requestPacket.session.sessionId;
+  let page = requestPacket.session.page;
 
-  let applicationQuery = {
-    text : 'SELECT * FROM salesforce.application__c WHERE token__c = $1',
-    values : [session.sessionId]
+  if(sessionId === ''){
+    console.log('no sessionId set');
+    res.status(500).send('no sessionId');
+    return
   }
-  client.query(applicationQuery).then( function(result:any){
-  //get data from database
-  //load into response
-  res.json(result['rows']);
+
+  if(page === '' || page === undefined){
+    console.log('no page set');
+    res.status(500).send('no page');
+    return
+  }
+
+  if(page === 'rootPage')
+  {
+    let bodyQuery = {
+      text : 'SELECT * FROM salesforce.body WHERE token = $1',
+      values : [sessionId]
+    }
+    client.query(bodyQuery).then( function(result:any){
+    //get data from database
+    //load into response
+    let welcomePage : welcomePageParameters;
+    let rows = result['rows'];
+    welcomePage.AccountType = rows.account_type;
+    welcomePage.TransferIra = rows.transfer_form;
+    welcomePage.RolloverEmployer = rows.rollover_form;
+    welcomePage.CashContribution = rows.cash_contribution_form;
+    welcomePage.InitialInvestment = rows.investment_type;
+    welcomePage.SalesRep = rows.owner_id;
+    welcomePage.SpecifiedSource = rows.referred_by;
+    welcomePage.ReferralCode = rows.offering_id;
+    
+    res.json(welcomePage);
+  })
+  }
+
+  if(page === 'appId')
+  {
+    let bodyQuery = {
+      text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
+      values : [sessionId]
+    }
+    client.query(bodyQuery).then( function(result:pg.QueryResult ){
+      let data : applicantId = {
+        isSelfEmployed: false,
+        hasHSA: false,
+        homeAndMailingAddressDifferent: false,
+        firstName:'',
+        lastName:'', 
+        ssn: '', 
+        email: '', 
+        confirmEmail:'',
+        dob: '', 
+        salutation: '',
+        maritalStatus: '',
+        mothersMaidenName: '',
+        occupation: '',
+        idType: '', 
+        idNumber: '',
+        issuedBy:'', 
+        issueDate: '', 
+        expirationDate: '',
+        legalAddress: '', 
+        legalCity: '', 
+        legalState:'',
+        legalZip: '',
+        mailingAddress: '', 
+        mailingCity: '', 
+        mailingState: '',
+        mailingZip: '', 
+        primaryPhone: '', 
+        preferredContactMethod:'', 
+        alternatePhone:'', 
+        alternatePhoneType:''
+    };
+      let row : salesforceSchema.applicant = result.rows[0]
+      console.log(row);
+      //console.log(result)
+      data.firstName = row.first_name;
+      data.lastName = row.last_name;
+      //data.dob = row.date_of_birth;
+      res.json({'data': data})
+    })
+  }
   //res.send('ok');
   })
-})
 
 /*function insertApplication(onlineApp){
   serverConn.sobject("Online_Application__c").create(onlineApp, function(err, ret){
