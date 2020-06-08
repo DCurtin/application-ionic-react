@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, states } from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterly', 'Mailed Annually']
 
 const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
@@ -63,8 +63,126 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                     </IonCol>
                 </IonRow>
                 <IonItemDivider>
-                    
+                    <strong>
+                        <IonText color='primary'>
+                            Third-Party Representative
+                        </IonText>
+                    </strong>
                 </IonItemDivider>
+                <IonRow>
+                    <IonCol>
+                        <em> You can provide another party such as your spouse, financial advisor, or investment manager with access to your account. </em>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol size='6'>
+                        <IonLabel>
+                        Do you want to provide someone else access to your account? *
+                        </IonLabel>
+                        <IonSelect value={formData.interested_party_access_level__c} name='interested_party_access_level__c' onIonChange={updateForm}>
+                            <IonSelectOption value='None'>No</IonSelectOption>
+                            <IonSelectOption value='Interested Party'>
+                                Yes
+                            </IonSelectOption>
+                        </IonSelect>
+                    </IonCol>
+                </IonRow>
+                {formData.interested_party_access_level__c == 'Interested Party' && 
+                (
+                    <React.Fragment>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    First Name
+                                </IonLabel>
+                                <IonInput value={formData.interested_party_first_name__c} name='interested_party_first_name__c' onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Last Name
+                                </IonLabel>
+                                <IonInput value={formData.interested_party_last_name__c} name='interested_party_last_name__c' onIonChange={updateForm}>
+                                </IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    Email
+                                </IonLabel>
+                                <IonInput value={formData.interested_party_email__c} name='interested_party_email__c' onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>Phone</IonLabel>
+                                <IonInput value={formData.interested_party_phone__c} name='interested_party_phone__c' onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>Street</IonLabel>
+                                <IonInput value={formData.interested_party_street__c} name='interested_party_street__c' onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    City
+                                </IonLabel>
+                                <IonInput value={formData.interested_party_city__c} name='interested_party_city__c' onIonChange={updateForm}>
+                                </IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    State
+                                </IonLabel>
+                                <IonSelect value={formData.interested_party_state__c} name='interested_party_state__c' onIonChange={updateForm}>
+                                    {states.map((state, index) => (
+                                        <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
+                                        )
+                                )}
+                                </IonSelect>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel> Zip</IonLabel>
+                                <IonInput value={formData.interested_party_zip__c} name='interested_party_zip__c' onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    Company Name
+                                </IonLabel>
+                                <IonInput value={formData.interested_party_company_name__c} name='interested_party_company_name__c' onIonChange={updateForm}>
+                                </IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Title
+                                </IonLabel>
+                                <IonInput value={formData.interested_party_title__c} name='interested_party_title__c' onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>Online Access</IonLabel>
+                                <IonSelect value={formData.interested_party_online_access__c} name='interested_party_online_access__c' onIonChange={updateForm}>
+                                    <IonSelectOption value={true}>Yes</IonSelectOption>
+                                    <IonSelectOption  value={false}>No</IonSelectOption>
+                                </IonSelect>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Paper Statement Options
+                                </IonLabel>
+                                <IonSelect value={formData.interested_party_ira_statement__c} name='interested_party_ira_statement__c' onIonChange={updateForm}>
+                                    {paperStatementOptions.map((statementOption, index) => (
+                                        <IonSelectOption value={statementOption} key={index}>{statementOption}</IonSelectOption>
+                                    ))}
+                                </IonSelect>
+                            </IonCol>
+                        </IonRow>
+                    </React.Fragment>
+                )}
             </IonGrid>
         </IonContent>
     )
