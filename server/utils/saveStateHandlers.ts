@@ -4,7 +4,7 @@ import {addressSchema, identificationSchema, queryParameters} from './helperSche
 import express from 'express';
 import pg from 'pg';
 
-export function saveApplicationIdPage(sessiondId: string, appIdPacket : applicantId, res: express.Response, client: pg.Client){
+export function saveApplicationIdPage(sessionId: string, appIdPacket : applicantId, res: express.Response, client: pg.Client){
     let appQueryInsert : queryParameters = updateAppId(appIdPacket, sessionId);
     client.query(appQueryInsert).then(result=>{
       res.send('ok')
