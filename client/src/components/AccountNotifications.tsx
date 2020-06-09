@@ -9,6 +9,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
     })
     const [formData, setFormData] = useState({
         statement_option__c: '', 
+        interested_party_email_notifications__c: true,
         interested_party_access_level__c: '',
         interested_party_first_name__c: '', 
         interested_party_last_name__c: '', 

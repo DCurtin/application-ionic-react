@@ -1,11 +1,8 @@
 import React, {useState, useEffect} from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
-import {SessionApp, states} from '../helpers/Utils';
+import {SessionApp, states, FormData} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 
-interface FormData {
-    [key:string] : any
-}
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     useEffect( () => {
@@ -208,7 +205,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 {displayBeneficiaryForm(formData.beneficiary_count__c)}
                 <IonRow>
                     <IonCol>
+                        {formData.beneficiary_count__c < 4 && 
                         <IonButton onClick={addBeneficiary}> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
+                        }
                     </IonCol>
                 </IonRow>
             </IonGrid>
