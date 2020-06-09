@@ -42,7 +42,8 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     })
 
     const updateForm = (e:any) => {
-        setFormData(prevState => ({...prevState, [e.target.name]:e.target.value}));
+        let newValue = e.target.value;
+        setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 
     const addTransfer = () => {
