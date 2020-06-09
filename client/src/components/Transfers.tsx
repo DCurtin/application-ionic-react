@@ -42,15 +42,17 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     })
 
     const updateForm = (e:any) => {
-        setFormData({...formData, [e.target.name]:e.target.value});
+        setFormData(prevState => ({...prevState, [e.target.name]:e.target.value}));
     }
 
     const addTransfer = () => {
-        let transferCount = formData.existing_ira_transfers__c;
-        let newCount = transferCount < 2 ? transferCount + 1 : transferCount;
-        setFormData({
-            ...formData, 
+        setFormData(prevState => {
+            let currentCount = prevState.existing_ira_transfers__c;
+            let newCount = currentCount < 2 ? currentCount + 1: currentCount; 
+            return {
+            ...prevState, 
             existing_ira_transfers__c: newCount
+            }; 
         })
     }
 

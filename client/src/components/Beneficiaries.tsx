@@ -67,13 +67,15 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     })
 
     const addBeneficiary = () => {
-        let currentCount = formData.beneficiary_count__c;
-        let newCount = currentCount < 4 ? currentCount +1 : currentCount;  
-        setFormData({...formData, beneficiary_count__c : newCount});
+        setFormData(prevState => {
+            let currentCount = prevState.beneficiary_count__c;
+            let newCount = currentCount < 4 ? currentCount +1 : currentCount;  
+         return {...prevState, beneficiary_count__c : newCount}
+        });
     }
 
     const updateForm = (e:any) => {
-        setFormData({...formData, [e.target.name]:e.target.value});
+        setFormData(prevState => ({...prevState, [e.target.name]:e.target.value}));
     }
  
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
