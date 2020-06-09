@@ -148,7 +148,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : requestBody = req.body;
   let sessionId : string = packet.session.sessionId;
   let page : string = packet.session.page;
-  console.log('saving state')
+  console.log('saving state ' + sessionId)
 
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');

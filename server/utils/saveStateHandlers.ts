@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas'
 import express from 'express';
@@ -11,6 +11,22 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: welc
     res.send('ok');
  })
 }
+
+export function saveApplicationIdPage(sessionId: string, applicantForm : applicantId, res: express.Response, client: pg.Client){
+    let appQueryInsert : queryParameters = updateAppId(sessionId, applicantForm);
+    client.query(appQueryInsert).then(result=>{
+      res.send('ok')
+    })
+}
+
+export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: beneficiaryForm, res: express.Response, client: pg.Client){
+  console.log(beneficiaryForm.beneficiaries[0])
+  console.log(beneficiaryForm.beneficiaries[1])
+  res.send('ok');
+}
+
+//HELPERS
+//function 
 
 function updateWelcomeForm(token: string, welcomeParameters: welcomePageParameters): queryParameters{
   let upsertWelcomeParameters : salesforceSchema.body ={
@@ -32,14 +48,6 @@ function updateWelcomeForm(token: string, welcomeParameters: welcomePageParamete
   return generateQueryString('body', updateWelcomeForm, 'token');
 }
 
-export function saveApplicationIdPage(sessionId: string, applicantForm : applicantId, res: express.Response, client: pg.Client){
-    let appQueryInsert : queryParameters = updateAppId(sessionId, applicantForm);
-    client.query(appQueryInsert).then(result=>{
-      res.send('ok')
-    })
-}
-
-//HELPERS
 function updateAppId(token : string, applicantForm : applicantId): queryParameters{
     let addresses: {'mailing': addressSchema, 'legal': addressSchema} = generateAddress(applicantForm);
     let identification: identificationSchema = generateIdentification(applicantForm);
