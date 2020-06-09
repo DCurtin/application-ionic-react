@@ -140,9 +140,9 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </ul>
                     </IonCol>
                 </IonRow>
+                    {displayTransferForm(formData.existing_ira_transfers__c)}
                 
                 <IonRow>
-                    {displayTransferForm(formData.existing_ira_transfers__c)}
                     <IonCol>
                         <IonButton onClick={addTransfer}>
                             <IonIcon icon={addOutline} slot='start'></IonIcon>
