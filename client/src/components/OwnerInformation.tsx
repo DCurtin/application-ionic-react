@@ -2,10 +2,11 @@ import React, {useState, useEffect} from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantId, saveApplicationId} from '../helpers/Utils';
-
+import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers'
 
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        const [formData, setFormData] = useState<applicantId>({
+    const history = useHistory();
+    const [formData, setFormData] = useState<applicantId>({
             isSelfEmployed: false,
             hasHSA: false,
             homeAndMailingAddressDifferent: false,
@@ -37,7 +38,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             alternatePhone:'', 
             alternatePhoneType:''
         });
-        const history = useHistory();
 
         const updateForm = (e : any) => {
             let newValue = e.target.name === 'homeAndMailingAddressDifferent' ? e.target.checked : e.target.value;
@@ -46,55 +46,28 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
               [e.target.name]: newValue
             }));
         }
-
-        
+    
+        useEffect(()=>{
+            if(sessionId !== '')
+            {
+                getAppPage(sessionId).then(data =>{
+                    if(data === undefined)
+                    {
+                        return;
+                    }
+                    ImportForm(data);
+                })
+            }
+        },[sessionId])
     
         function ImportForm(data : any){
             let importedForm : applicantId = data
             setFormData(importedForm);
         }
-    
-        useEffect(()=>{
-            if(sessionId !== '')
-            {
-               //query fields
-              let url = '/getPageFields'
-              let body : requestBody ={
-                session:{sessionId: sessionId, page: 'appId'},
-                data: undefined
-              }
-              let options = {
-                method : 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(body)
-              }
-              fetch(url, options).then(function(response: any){
-                response.json().then(function(data: any){
-                    if(data.data === undefined){
-                        return;
-                    }
-                  ImportForm(data.data);
-                })
-              })
-            }
-        },[sessionId])
-    
+        
         useEffect(()=>{
           return history.listen(()=>{
-            let url = '/saveState'
-            let body : saveApplicationId= {
-            session: {sessionId: sessionId, page: 'appId'},
-            data: formData
-            }
-            let options = {
-            method : 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
-            }
-            fetch(url, options).then(function(response: any){
-            response.json().then(function(data: any){
-            })
-            });
+            saveAppPage(sessionId, formData);
           })
         },[formData])
 
