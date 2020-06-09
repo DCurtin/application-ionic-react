@@ -4,39 +4,67 @@ import {addressSchema, identificationSchema, queryParameters} from './helperSche
 import express from 'express';
 import pg from 'pg';
 
-export function saveApplicationIdPage(sessionId: string, appIdPacket : applicantId, res: express.Response, client: pg.Client){
-    let appQueryInsert : queryParameters = updateAppId(appIdPacket, sessionId);
+export function saveWelcomeParameters(sessionId: string, welcomeParameters: welcomePageParameters, res: express.Response, client: pg.Client)
+{
+  let welcomePageUpsertQuery : queryParameters = updateWelcomeForm(sessionId, welcomeParameters);
+  client.query(welcomePageUpsertQuery).then(result=>{
+    res.send('ok');
+ })
+}
+
+function updateWelcomeForm(token: string, welcomeParameters: welcomePageParameters): queryParameters{
+  let upsertWelcomeParameters : salesforceSchema.body ={
+    account_type: welcomeParameters.AccountType,
+    transfer_form: welcomeParameters.TransferIra,
+    rollover_form: welcomeParameters.RolloverEmployer,
+    cash_contribution_form: welcomeParameters.CashContribution,
+    investment_type: welcomeParameters.InitialInvestment,
+    owner_id: welcomeParameters.SalesRep,
+    referred_by: welcomeParameters.SpecifiedSource,
+    offering_id: welcomeParameters.ReferralCode,
+    token: token,
+    //need to make these nullable and exclude them from this upsert or possibly move them to their own table
+    bank_account: '',
+    case_management: '',
+    credit_card: '',
+    investment_amount:0
+  }
+  return generateQueryString('body', updateWelcomeForm, 'token');
+}
+
+export function saveApplicationIdPage(sessionId: string, applicantForm : applicantId, res: express.Response, client: pg.Client){
+    let appQueryInsert : queryParameters = updateAppId(sessionId, applicantForm);
     client.query(appQueryInsert).then(result=>{
       res.send('ok')
     })
 }
 
 //HELPERS
-function updateAppId(appIdPacket : applicantId, token : string): queryParameters{
-    let addresses: {'mailing': addressSchema, 'legal': addressSchema} = generateAddress(appIdPacket);
-    let identification: identificationSchema = generateIdentification(appIdPacket);
+function updateAppId(token : string, applicantForm : applicantId): queryParameters{
+    let addresses: {'mailing': addressSchema, 'legal': addressSchema} = generateAddress(applicantForm);
+    let identification: identificationSchema = generateIdentification(applicantForm);
     let upsertApplicant : salesforceSchema.applicant ={
-      alternate_phone: appIdPacket.alternatePhone,
-      alternate_phone_type: appIdPacket.alternatePhoneType,
-      date_of_birth: appIdPacket.dob === '' ? null : new Date(appIdPacket.dob),
-      email: appIdPacket.email,
-      first_name: appIdPacket.firstName,
-      last_name: appIdPacket.lastName,
-      has_hsa: appIdPacket.hasHSA,
-      home_and_mailing_address_different: appIdPacket.homeAndMailingAddressDifferent,
+      alternate_phone: applicantForm.alternatePhone,
+      alternate_phone_type: applicantForm.alternatePhoneType,
+      date_of_birth: applicantForm.dob === '' ? null : new Date(applicantForm.dob),
+      email: applicantForm.email,
+      first_name: applicantForm.firstName,
+      last_name: applicantForm.lastName,
+      has_hsa: applicantForm.hasHSA,
+      home_and_mailing_address_different: applicantForm.homeAndMailingAddressDifferent,
       identification: identification,
-      is_self_employed: appIdPacket.isSelfEmployed,
+      is_self_employed: applicantForm.isSelfEmployed,
       legal_address: addresses.legal,
       mailing_address: addresses.mailing,
-      marital_status: appIdPacket.maritalStatus,
+      marital_status: applicantForm.maritalStatus,
       middle_name: '',
-      mothers_maiden_name: appIdPacket.mothersMaidenName,
-      occupation: appIdPacket.occupation,
-      phone: appIdPacket.primaryPhone,
-      preferred_contact_method: appIdPacket.preferredContactMethod,
-      salutation: appIdPacket.salutation,
-      social_security_number: appIdPacket.ssn,
-      statement: appIdPacket.salutation,
+      mothers_maiden_name: applicantForm.mothersMaidenName,
+      occupation: applicantForm.occupation,
+      phone: applicantForm.primaryPhone,
+      preferred_contact_method: applicantForm.preferredContactMethod,
+      salutation: applicantForm.salutation,
+      social_security_number: applicantForm.ssn,
+      statement: applicantForm.salutation,
       token: token
     }
     return generateQueryString('applicant', upsertApplicant, 'token')
@@ -80,30 +108,30 @@ function generateQueryString(table : string, upsertApplicant : any , constraint:
 }
   
   
-function generateAddress(appIdPacket: applicantId): {'mailing': addressSchema, 'legal': addressSchema}{
+function generateAddress(applicantForm: applicantId): {'mailing': addressSchema, 'legal': addressSchema}{
   let resultAddress : {'mailing': addressSchema, 'legal': addressSchema} ={
-    mailing :{address: appIdPacket.mailingAddress,
-      city: appIdPacket.mailingCity,
-      state: appIdPacket.mailingState,
-      zip: appIdPacket.mailingZip
+    mailing :{address: applicantForm.mailingAddress,
+      city: applicantForm.mailingCity,
+      state: applicantForm.mailingState,
+      zip: applicantForm.mailingZip
     },
     legal:{
-      address: appIdPacket.legalAddress,
-      city: appIdPacket.legalCity,
-      state: appIdPacket.legalState,
-      zip: appIdPacket.legalZip
+      address: applicantForm.legalAddress,
+      city: applicantForm.legalCity,
+      state: applicantForm.legalState,
+      zip: applicantForm.legalZip
     }
   }
   return resultAddress;
 }
 
-function generateIdentification(appIdPacket: applicantId): identificationSchema{
+function generateIdentification(applicantForm: applicantId): identificationSchema{
   let resultId: identificationSchema ={
-    expirationDate: appIdPacket.expirationDate,
-    idNumber: appIdPacket.idNumber,
-    idType: appIdPacket.idType,
-    issueDate: appIdPacket.issueDate,
-    issuedBy: appIdPacket.issuedBy
+    expirationDate: applicantForm.expirationDate,
+    idNumber: applicantForm.idNumber,
+    idType: applicantForm.idType,
+    issueDate: applicantForm.issueDate,
+    issuedBy: applicantForm.issuedBy
   }
 
   return resultId;

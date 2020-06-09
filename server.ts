@@ -149,6 +149,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   let sessionId : string = packet.session.sessionId;
   let page : string = packet.session.page;
   console.log('saving state')
+
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
     console.log(sessionId);
@@ -164,7 +165,8 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
   
   if(page === 'welcomePage'){
-    let welcomePacket : saveWelcomeParameters = req.body;
+    saveStateHandlers.saveWelcomeParameters(sessionId, packet.data, res, client);
+    return;
     //updateDataBase(onlineAppData, res, sessionId);
   }
 
