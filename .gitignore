@@ -10,6 +10,13 @@
 
 # production
 /build
+server.js
+server.js.map
+dist
+client/**/*.js
+client/**/*.map
+server/**/*.js
+server/**/*.map
 
 # misc
 .DS_Store

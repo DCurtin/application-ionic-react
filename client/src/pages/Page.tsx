@@ -3,7 +3,8 @@ import {AppPage} from '../components/Menu';
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import ExploreContainer from '../components/ExploreContainer';
-import Welcome, {WelcomePageParamters} from '../components/Welcome';
+import Welcome from '../components/Welcome';
+import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import './Page.css';
 import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
@@ -13,6 +14,7 @@ import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
+
 import FeeArrangement from '../components/FeeArrangement';
 import AccountNotifications from '../components/AccountNotifications';
 import Transfers from '../components/Transfers';
@@ -36,14 +38,14 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     return e.pages
   })
   
-  const [welcomePageFields, setWelcomePageFields] = useState<WelcomePageParamters>({
+  const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',
-    CashContribution: false,
     InitialInvestment: '',
     ReferralCode: '',
-    RolloverEmployer: false,
     SalesRep: '',
     SpecifiedSource: '',
+    CashContribution: false,
+    RolloverEmployer: false,
     TransferIra: false
   });
 
@@ -75,10 +77,23 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   
   useEffect(function(){
     let url = '/getPageFields'
-    //get paramters
-    //setWelcomePageFields()
+    let body : requestBody ={
+        session: {sessionId: sessionId, page: 'rootPage'},
+        data: undefined
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    fetch(url, options).then((response)=>{
+      response.json().then((data:any)=>{
+        console.log(data)
+        setWelcomePageFields(data.welcomePageFields);
+      })
+    })
     
-  },[sessionId])
+  },[])
 
   const { name } = useParams<{ name: string; }>();
 
@@ -119,7 +134,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome InitialValues={welcomePageFields} SetInitialValues={setWelcomePageFields} SessionId={sessionId} SetSessionId={setSessionId}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Disclosures':
         return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
       case 'OwnerInformation':
