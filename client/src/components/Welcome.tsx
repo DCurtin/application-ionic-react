@@ -132,7 +132,12 @@ const Welcome: React.FC<InitSessionApp> = props => {
             //save initial data
             //return session id
             console.log('saving welcome page');
-            let url = '/startApplication'
+            
+            var url = '/startApplication'
+            if(props.sessionId !== ''){
+                url = '/saveState'
+            }
+            console.log(url);
             console.log(props.sessionId);
             let body : saveWelcomeParameters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
