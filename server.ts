@@ -221,6 +221,12 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
     return
   }
 
+  if(page === 'beneficiary')
+  {
+    getPageInfoHandlers.handleBeneficiaryPage(sessionId, res, client);
+    return
+  }
+
   res.status(500).send('no handler for this page');
   })
 
