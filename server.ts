@@ -3,10 +3,10 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId} from './client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiaryForm} from './client/src/helpers/Utils'
 import * as salesforceSchema from './server/utils/salesforce'
 import {queryParameters} from './server/utils/helperSchemas'
-
+import {transformBeneficiaries} from './server/utils/transformBeneficiaries'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 
@@ -148,7 +148,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : requestBody = req.body;
   let sessionId : string = packet.session.sessionId;
   let page : string = packet.session.page;
-  console.log('saving state')
+  console.log('saving state ' + sessionId + ' page ' + page)
 
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
@@ -173,6 +173,13 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   if(page === 'appId'){
     saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client);
     return
+  }
+
+  if(page === 'beneficiary'){
+    //console.log(packet.data)
+    let beneficiaryData : beneficiaryForm = transformBeneficiaries(packet.data)
+    saveStateHandlers.saveBeneficiaryPage(sessionId, beneficiaryData, res, client);
+    return 
   }
 });
 

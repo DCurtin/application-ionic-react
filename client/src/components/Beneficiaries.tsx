@@ -1,15 +1,12 @@
 import React, {useState, useEffect} from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
-import {SessionApp, states, FormData} from '../helpers/Utils';
+import {SessionApp, states, FormData, requestBody} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
-
+import { useHistory } from 'react-router-dom';
+import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-    useEffect( () => {
-        // GRAB DATA ON MOUNT
-        //SAVE DATA ON DISMOUNT
-    })
-
+    const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count__c: 0, 
         beneficiary_first_name_1__c: '',
@@ -25,6 +22,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         beneficiary_zip_1__c: '',
         beneficiary_phone_1__c: '',
         beneficiary_email_1__c: '',
+        beneficiary_token_1__c: '',
         beneficiary_first_name_2__c: '',
         beneficiary_last_name_2__c: '', 
         beneficiary_ssn_2__c: '',
@@ -38,6 +36,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         beneficiary_zip_2__c: '',
         beneficiary_phone_2__c: '',
         beneficiary_email_2__c: '',
+        beneficiary_token_2__c: '',
         beneficiary_first_name_3__c: '',
         beneficiary_last_name_3__c: '', 
         beneficiary_ssn_3__c: '', 
@@ -51,6 +50,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         beneficiary_zip_3__c: '',
         beneficiary_phone_3__c: '',
         beneficiary_email_3__c: '',
+        beneficiary_token_3__c: '',
         beneficiary_first_name_4__c: '',
         beneficiary_last_name_4__c: '',
         beneficiary_ssn_4__c:'',
@@ -64,7 +64,34 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         beneficiary_zip_4__c: '',
         beneficiary_phone_4__c: '',
         beneficiary_email_4__c: '',
+        beneficiary_token_4__c: '',
     })
+
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getBenePage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+    },[sessionId])
+
+    
+    function ImportForm(data : any){
+        let importedForm : FormData = data
+        setFormData(importedForm);
+    }
+
+    useEffect(()=>{
+      return history.listen(()=>{
+        console.log('saving bene');
+        saveBenePage(sessionId, formData);
+      })
+    },[formData])
 
     const addBeneficiary = () => {
         setFormData(prevState => {

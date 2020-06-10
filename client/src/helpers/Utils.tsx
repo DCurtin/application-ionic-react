@@ -66,7 +66,7 @@ export interface FormData {
 }
 
 export interface beneficiaryForm{
-    beneficiary_count__c: number
+    beneficiary_count: number
     beneficiaries: Array<beneficiary>
 }
 
@@ -84,6 +84,71 @@ beneficiary_state: string,
 beneficiary_zip: string,
 beneficiary_phone: string,
 beneficiary_email: string
+beneficiary_token: string
+}
+
+export interface saveBeneficiary extends requestBody{
+    data: beneficiaryPlaceHolder
+}
+
+export interface beneficiaryPlaceHolder{
+    beneficiary_count__c: number, 
+    beneficiary_first_name_1__c: string,
+    beneficiary_last_name_1__c:string,
+    beneficiary_ssn_1__c:string,
+    beneficiary_dob_1__c:string,
+    beneficiary_type_1__c: string,
+    beneficiary_relationship_1__c:string,
+    beneficiary_share_1__c:string,
+    beneficiary_street_1__c: string,
+    beneficiary_city_1__c:string, 
+    beneficiary_state_1__c:string,
+    beneficiary_zip_1__c: string,
+    beneficiary_phone_1__c: string,
+    beneficiary_email_1__c: string,
+    beneficiary_token_1__c: string,
+    beneficiary_first_name_2__c: string,
+    beneficiary_last_name_2__c: string, 
+    beneficiary_ssn_2__c: string,
+    beneficiary_dob_2__c: string,
+    beneficiary_type_2__c: string,
+    beneficiary_relationship_2__c:string,
+    beneficiary_share_2__c: string,
+    beneficiary_street_2__c: string,
+    beneficiary_city_2__c:string, 
+    beneficiary_state_2__c:string,
+    beneficiary_zip_2__c: string,
+    beneficiary_phone_2__c: string,
+    beneficiary_email_2__c: string,
+    beneficiary_token_2__c: string,
+    beneficiary_first_name_3__c: string,
+    beneficiary_last_name_3__c: string, 
+    beneficiary_ssn_3__c: string, 
+    beneficiary_dob_3__c: string,
+    beneficiary_type_3__c: string,
+    beneficiary_relationship_3__c:string,
+    beneficiary_share_3__c: string,
+    beneficiary_street_3__c: string,
+    beneficiary_city_3__c:string, 
+    beneficiary_state_3__c:string,
+    beneficiary_zip_3__c: string,
+    beneficiary_phone_3__c: string,
+    beneficiary_email_3__c: string,
+    beneficiary_token_3__c: string,
+    beneficiary_first_name_4__c: string,
+    beneficiary_last_name_4__c: string,
+    beneficiary_ssn_4__c:string,
+    beneficiary_dob_4__c:string,
+    beneficiary_type_4__c:string,
+    beneficiary_relationship_4__c:string,
+    beneficiary_share_4__c:string,
+    beneficiary_street_4__c: string,
+    beneficiary_city_4__c:string, 
+    beneficiary_state_4__c:string,
+    beneficiary_zip_4__c: string,
+    beneficiary_phone_4__c: string,
+    beneficiary_email_4__c: string,
+    beneficiary_token_4__c: string
 }
 
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];
