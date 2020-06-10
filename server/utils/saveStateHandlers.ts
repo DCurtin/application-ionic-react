@@ -29,7 +29,9 @@ export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: benefici
 //HELPERS
 //function 
 function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): queryParameters{
-  let beneCount = beneficiaryData.beneficiary_count
+  let thing : queryParameters;
+  return thing;
+  /*let beneCount = beneficiaryData.beneficiary_count
   for(let index = 0; index < beneCount; ++index){
     let beneficiaries : salesforceSchema.benneficiary ={
       address: beneficiaryData.beneficiaries[index].beneficiary_street,
@@ -47,7 +49,7 @@ function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): q
     }
 
 
-  }
+  }*/
   
 }
 
