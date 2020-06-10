@@ -11,4 +11,5 @@ relationship,text,,
 share_percentage,float(2),,
 address,json,,
 position,integer,,
+bene_uuid,text,yes,yes
 token,uuid,,yes

@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas'
 import express from 'express';
@@ -9,48 +9,34 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: welc
   let welcomePageUpsertQuery : queryParameters = updateWelcomeForm(sessionId, welcomeParameters);
   client.query(welcomePageUpsertQuery).then(result=>{
     res.send('ok');
- })
+ }).catch(err=>{
+  console.log(err);
+  res.status(500).send('failed');
+})
 }
 
 export function saveApplicationIdPage(sessionId: string, applicantForm : applicantId, res: express.Response, client: pg.Client){
     let appQueryInsert : queryParameters = updateAppId(sessionId, applicantForm);
     client.query(appQueryInsert).then(result=>{
       res.send('ok')
+    }).catch(err=>{
+      console.log(err);
+      res.status(500).send('failed');
     })
 }
 
 export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: beneficiaryForm, res: express.Response, client: pg.Client){
-  
-  console.log(beneficiaryForm.beneficiaries[0])
-  console.log(beneficiaryForm.beneficiaries[1])
-  res.send('ok');
+  let queryString :queryParameters = updateBeneficiaries(sessionId, beneficiaryForm);
+  client.query(queryString).then(result=>{
+    res.send('ok');
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).send('failed');
+  })
+  //res.send('ok');
 }
 
 //HELPERS
-//function 
-function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): queryParameters{
-  let beneCount = beneficiaryData.beneficiary_count
-  for(let index = 0; index < beneCount; ++index){
-    let beneficiaries : salesforceSchema.benneficiary ={
-      address: beneficiaryData.beneficiaries[index].beneficiary_street,
-      beneficiary_type: beneficiaryData.beneficiaries[index].beneficiary_type,
-      date_of_birth: new Date(beneficiaryData.beneficiaries[index].beneficiary_dob),
-      email: beneficiaryData.beneficiaries[index].beneficiary_email,
-      first_name: beneficiaryData.beneficiaries[index].beneficiary_first_name,
-      last_name: beneficiaryData.beneficiaries[index].beneficiary_last_name,
-      middle_name: '',
-      phone: beneficiaryData.beneficiaries[index].beneficiary_phone,
-      relationship: beneficiaryData.beneficiaries[index].beneficiary_relationship,
-      share_percentage: parseFloat(beneficiaryData.beneficiaries[index].beneficiary_share),
-      social_security_number: beneficiaryData.beneficiaries[index].beneficiary_ssn,
-      token: token
-    }
-
-
-  }
-  
-}
-
 function updateWelcomeForm(token: string, welcomeParameters: welcomePageParameters): queryParameters{
   let upsertWelcomeParameters : salesforceSchema.body ={
     account_type: welcomeParameters.AccountType,
@@ -101,41 +87,76 @@ function updateAppId(token : string, applicantForm : applicantId): queryParamete
     return generateQueryString('applicant', upsertApplicant, 'token')
 }
 
-function generateQueryString(table : string, upsertApplicant : any , constraint: string = undefined) : queryParameters{
-  let substitutes : Array<string> = []
-  let fields : Array<string> = []
-  let upsertFields : Array<string> = []
-  let values : Array<any>  = []
-  let count = 1;
-
-  for(let [key, value] of Object.entries(upsertApplicant)){
-    substitutes.push(`$${count}`)
-    fields.push(key)
-    if(key !== constraint){
-      upsertFields.push(`${key} = EXCLUDED.${key}`)
+function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): queryParameters{
+  let beneCount = beneficiaryData.beneficiary_count
+  let beneficiaryDataList : Array<salesforceSchema.beneficiary> = [];
+  let count = 0;
+  beneficiaryData.beneficiaries.forEach(bene =>{
+    count++;
+    let beneficiaries : salesforceSchema.beneficiary ={
+      address: generateBeneAddress(bene),
+      beneficiary_type: bene.beneficiary_type,
+      date_of_birth: bene.beneficiary_dob === '' ? undefined : new Date(bene.beneficiary_dob),
+      email: bene.beneficiary_email,
+      first_name: bene.beneficiary_first_name,
+      last_name: bene.beneficiary_last_name,
+      middle_name: '',
+      phone: bene.beneficiary_phone,
+      relationship: bene.beneficiary_relationship,
+      share_percentage: bene.beneficiary_share === '' ? 0 : parseFloat(bene.beneficiary_share),
+      social_security_number: bene.beneficiary_ssn,
+      position: count,
+      bene_uuid: token + count.toString(),
+      token: token
     }
-    values.push(value)
-    count++ 
-  };
-  let fieldsString = fields.join(',')
-  let substitutesString = substitutes.join(',')
-  let textString = `INSERT INTO salesforce.${table}(${fieldsString}) VALUES(${substitutesString})`
-  console.log(textString)
-  
-  if(constraint !== undefined)
-  {
+    beneficiaryDataList.push(beneficiaries);
+  })
+  //let queryString:string = 
+  return generateQueryStringFromList('beneficiary', beneficiaryDataList, 'bene_uuid');
+}
+
+
+function generateQueryStringFromList(table: string, upsertObjectList : Array<any>, constraint: string = undefined): queryParameters{
+  let pgFields : string = '';
+  let placeHolderList : Array<string> = [];
+  let valueList : Array<any> = [];
+  let upsertFields : Array<string> = []
+  let itemCount = 0;
+
+  upsertObjectList.forEach(element => {
+    let elementValues: Array<any> = Object.values(element);
+    if(pgFields === '')
+    {
+      pgFields = Object.keys(element).join(',');
+      Object.keys(element).forEach(key=>{
+        if(key !== constraint && key !== undefined){
+          upsertFields.push(`${key} = EXCLUDED.${key}`)
+        }
+      })
+    }
+    placeHolderList.push('('+ elementValues.map(e=>{itemCount++; return `$${itemCount}`}) +')')
+    valueList = valueList.concat(elementValues)
+  });
+  let valueString = placeHolderList.join(',');
+  let insertString : string = `INSERT INTO salesforce.${table}(${pgFields}) VALUES${valueString}`
+
+  if(constraint !== undefined){
     let handleConflict : string = upsertFields.join(',');
-    let upsertString : string = textString + ` ON CONFLICT(${constraint}) DO UPDATE SET ` + handleConflict;
-    console.log(upsertString);
-    return {
+    let upsertString : string = insertString + ` ON CONFLICT(${constraint}) DO UPDATE SET ` + handleConflict;
+    return{
       text: upsertString,
-      values: values
-    };  
+      values: valueList
+    }
   }
+
   return {
-    text: textString,
-    values: values
-  };
+    text: insertString,
+    values: valueList
+  }
+}
+
+function generateQueryString(table : string, upsertObject : any , constraint: string = undefined) : queryParameters{
+  return generateQueryStringFromList(table, [upsertObject], constraint);
 }
   
   
@@ -152,6 +173,17 @@ function generateAddress(applicantForm: applicantId): {'mailing': addressSchema,
       state: applicantForm.legalState,
       zip: applicantForm.legalZip
     }
+  }
+  return resultAddress;
+}
+
+function generateBeneAddress(beneForm: beneficiary): addressSchema{
+  let resultAddress : addressSchema ={
+    address: beneForm.beneficiary_street,
+    city: beneForm.beneficiary_city,
+    state: beneForm.beneficiary_state,
+    zip: beneForm.beneficiary_zip
+
   }
   return resultAddress;
 }

@@ -6,11 +6,11 @@ import pg from 'pg';
 
 export function handleWelcomePageRequest(sessionId: string, res: express.Response, client: pg.Client)
 {
-    let bodyQuery = {
+    let objectQuery = {
         text : 'SELECT * FROM salesforce.body WHERE token = $1',
         values : [sessionId]
       }
-      client.query(bodyQuery).then( function(result:any){
+      client.query(objectQuery).then( function(result:any){
       //get data from database
       //load into response
       let welcomePage : welcomePageParameters;
@@ -25,16 +25,17 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       welcomePage.ReferralCode = rows.offering_id;
       
       res.json(welcomePage);
+    }).catch(err=>{
+      res.status(500).send('failed getting body data');
     })
 }
 
-export function handleApplicationIdPage(sessionId: string, res: express.Response, client: pg.Client)
-{
-    let bodyQuery = {
+export function handleApplicationIdPage(sessionId: string, res: express.Response, client: pg.Client){
+    let objectQuery = {
         text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
         values : [sessionId]
       }
-      client.query(bodyQuery).then( function(result:pg.QueryResult ){
+      client.query(objectQuery).then( function(result:pg.QueryResult ){
         let row : salesforceSchema.applicant = result.rows[0]
         if(row === undefined){
           console.log('now row')
@@ -85,5 +86,20 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
         //data.lastName = row.last_name;
         ////data.dob = row.date_of_birth;
         res.json({'data': data})
+      }).catch(err=>{
+        res.status(500).send('failed getting apllicant data');
       })
+}
+
+export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
+  let objectQuery = {
+    text: 'SELECT * FROM salesforce.beneficiary WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(objectQuery).then( function( result : pg.QueryResult){
+
+  }).catch(err=>{
+    res.status(500).send('failed getting bene data');
+  })
 }
