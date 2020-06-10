@@ -58,10 +58,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     ImportForm(data);
                 })
             }
+            console.log(sessionId + 'this is my sessionId');
         },[sessionId])
     
         function ImportForm(data : any){
-            let importedForm : applicantId = data
+            let importedForm : applicantId = data;
+            console.log(importedForm);
             setFormData(importedForm);
         }
         

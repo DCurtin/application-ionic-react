@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, states, FormData } from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 
 const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
@@ -62,6 +62,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         if (transferCount > 0) {
             let formRows = [];
             for (let i = 1; i < transferCount + 1; i++) {
+                let deliveryMethodField = (i === 1) ? 'delivery_method__c' : `delivery_method_${i}__c` 
                 formRows.push(
                     <React.Fragment key={i}>
                         <IonItemDivider>
@@ -225,9 +226,34 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                 To expedite this transfer request, Midland will send your signed request via fax or scan if acceptable by your current IRA custodian. If your current IRA custodian requires original documents, how do you want this transfer to be delivered?
                                 </IonLabel>
-                                
+                                <div className="ion-text-wrap">
+                                    <IonRadioGroup name={deliveryMethodField} value={formData[deliveryMethodField]} onIonChange={updateForm}>
+                                        <IonLabel>Mail (No charge)</IonLabel>
+                                        <IonRadio value='Certified Mail' className='ion-margin-horizontal'>
+                                        </IonRadio>
+                                        <IonLabel>Overnight ($30 Fee Applies)</IonLabel>
+                                        <IonRadio value='FedEx Overnight' className='ion-margin-horizontal'></IonRadio>
+                                    </IonRadioGroup>
+                                </div>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                Upload Current Institution's Statement
+                                </IonLabel>
+                                <input type='file'></input>
                             </IonCol>
                         </IonRow>
+                        {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                            <IonRow>
+                                <IonCol>
+                                    <b>
+                                        <IonText color='primary'>
+                                            Midland Trust is unable to transfer in publically traded securities.
+                                        </IonText>
+                                    </b>
+                                </IonCol>
+                            </IonRow>
+                        )}
                     </React.Fragment>
                 )
             }
@@ -253,10 +279,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 
                 <IonRow>
                     <IonCol>
-                        <IonButton onClick={addTransfer}>
-                            <IonIcon icon={addOutline} slot='start'></IonIcon>
-                            Add Transfer
-                        </IonButton>
+                        {formData.existing_ira_transfers__c < 2 && (
+                            <IonButton onClick={addTransfer}>
+                                <IonIcon icon={addOutline} slot='start'></IonIcon>
+                                Add Transfer
+                            </IonButton>
+                        )}
                     </IonCol>
                 </IonRow>
             </IonGrid>            

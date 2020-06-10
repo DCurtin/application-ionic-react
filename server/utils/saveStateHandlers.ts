@@ -1,6 +1,6 @@
 import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
-import {addressSchema, identificationSchema, queryParameters} from './helperSchemas'
+import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
 import pg from 'pg';
 
