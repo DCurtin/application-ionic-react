@@ -27,6 +27,7 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
+    "build-psql": "powershell.exe .\\scripts\\build-psql.ps1",
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",
     "build": "npm run tsc && node scripts/build.js",

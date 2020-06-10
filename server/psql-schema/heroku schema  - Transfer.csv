@@ -1,0 +1,12 @@
+Identifier,Type,Unique,Required
+amount,float(2),,
+full_or_partial,text,,
+institution_name,text,,
+account_type,text,,
+account_number,text,,
+funds_delivery_method_to_midland,text,,
+delivery_method,text,,
+contact_name,text,,
+contact_phone_number,text,,
+address,json,,
+token,uuid,,yes
