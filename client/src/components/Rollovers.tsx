@@ -6,7 +6,6 @@ import { addOutline } from 'ionicons/icons';
 const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
         existing_employer_plan_roll_overs__c: 0
-
     });
 
     const addRollover = () => {
@@ -18,6 +17,13 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 existing_employer_plan_roll_overs__c: newCount
             };
         })
+    }
+
+    const updateForm = (e:any) => {
+        let newValue = e.target.value;
+        setFormData(prevState => {
+            console.log(prevState);
+            return {...prevState, [e.target.name]:newValue}});
     }
 
     const displayRolloverForm = (rolloverCount: number) => {
@@ -34,6 +40,39 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 </IonText>
                             </strong>
                         </IonItemDivider>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel> Institution Name</IonLabel>
+                                <IonInput name={`employer_institution_name_${i}__c`} value={formData[`employer_institution_name_${i}__c`]} onIonChange={updateForm} placeholder='Institution Name'></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel> Cash Amount (approximate value allowed)</IonLabel>
+                                <IonInput name={`employer_cash_amount_${i}__c`} value={formData[`employer_cash_amount_${i}__c`]} onIonChange={updateForm}>
+                                </IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    Contact Name
+                                </IonLabel>
+                                <IonInput name={`employer_contact_name_${i}__c`} value={formData[`employer_contact_name_${i}__c`]} onIonChange={updateForm}>
+                                </IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Contact Phone Number
+                                </IonLabel>
+                                <IonInput pattern='/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/' name={`employer_contact_phone_${i}__c`} value={formData[`employer_contact_phone_${i}__c`]} placeholder='(555)555-5555'></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    Street
+                                </IonLabel>
+                            </IonCol>
+                        </IonRow>
                     </React.Fragment>
                 )
             }

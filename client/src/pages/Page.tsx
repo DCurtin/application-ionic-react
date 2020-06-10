@@ -168,8 +168,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
           <IonTitle>{currentState.currentPage.title}</IonTitle>
         </IonToolbar>
         <IonButtons>
-            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
             <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
+            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
         </IonButtons>
       </IonHeader>
 
