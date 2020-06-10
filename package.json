@@ -27,6 +27,7 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
+    "build-psql-schema": "pwsh.exe .\\server\\psql-schema\\psql_table_creator\\generate_table.ps1 import-table -path server\\psql-schema\\",
     "build-psql": "powershell.exe .\\scripts\\build-psql.ps1",
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",

@@ -10,4 +10,5 @@ beneficiary_type,text,,
 relationship,text,,
 share_percentage,float(2),,
 address,json,,
+position,integer,,
 token,uuid,,yes
