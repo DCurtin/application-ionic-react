@@ -137,7 +137,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
                       <IonMenuToggle key={index} autoHide={false}>
                         <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink(location.search, appPage.url, sessionId)} routerDirection="none" lines="none" detail={false}>
                           <IonIcon slot="start" icon={appPage.iosIcon} />
-                          <IonLabel>{appPage.title}</IonLabel>
+                          <IonLabel className='ion-text-wrap'>{appPage.title}</IonLabel>
                         </IonItem>
                       </IonMenuToggle>
                     );

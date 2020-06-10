@@ -34,6 +34,7 @@ export function saveAppPage(sessionId: string, formData: applicantId){
     body: JSON.stringify(body)
     }
     return fetch(url, options).then(function(response: any){
+        console.log(`mdy114 ${response}`);
         return response.json().then(function(data: any){
         })
     });

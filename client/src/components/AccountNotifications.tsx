@@ -26,7 +26,10 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
     })
 
     const updateForm = (e:any) => {
-        setFormData({...formData, [e.target.name]:e.target.value});
+        setFormData(prevState => {
+            let newValue = e.target.value;
+            return {...prevState, [e.target.name]: newValue}
+        });
     }
 
     return(

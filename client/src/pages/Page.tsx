@@ -18,6 +18,7 @@ import Beneficiaries from '../components/Beneficiaries';
 import FeeArrangement from '../components/FeeArrangement';
 import AccountNotifications from '../components/AccountNotifications';
 import Transfers from '../components/Transfers';
+import Rollovers from '../components/Rollovers';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -147,6 +148,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
         return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'TransferIRA':
         return <Transfers sessionId={sessionId} setSessionId={setSessionId}/>;
+      case 'RolloverPlan':
+        return <Rollovers sessionId={sessionId} setSessionId={setSessionId}/>;
       default:
         return <ExploreContainer name={pageName} currentState={currentState}/>
     }
@@ -165,8 +168,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
           <IonTitle>{currentState.currentPage.title}</IonTitle>
         </IonToolbar>
         <IonButtons>
-            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
             <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
+            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
         </IonButtons>
       </IonHeader>
 

@@ -1,6 +1,6 @@
 import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
-import {addressSchema, identificationSchema, queryParameters} from './helperSchemas'
+import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
 import pg from 'pg';
 
@@ -111,7 +111,7 @@ function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): q
     }
     beneficiaryDataList.push(beneficiaries);
   })
-  //let queryString:string = 
+
   return generateQueryStringFromList('beneficiary', beneficiaryDataList, 'bene_uuid');
 }
 
