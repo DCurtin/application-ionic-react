@@ -5,6 +5,7 @@ import { addOutline } from 'ionicons/icons';
 
 const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
+        account_type__c: 'Traditional IRA',
         existing_ira_transfers__c: 0,
         ira_account_number_1__c: '',
         ira_institution_name_1__c: '',
@@ -120,6 +121,111 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                     Zip
                                 </IonLabel>
                                 <IonInput value={formData[`ira_zip_${i}__c`]} name={`ira_zip_${i}__c`} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    Transfer Type 
+                                </IonLabel>
+                                <IonSelect value={formData[`transfertype${i}__c`]} name={`transfertype${i}__c`} onIonChange={updateForm}>
+                                    <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
+                                    <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
+                                </IonSelect>
+                            </IonCol>
+                            {formData[`transfertype${i}__c`] === 'Cash Transfer' && (
+                                <IonCol>
+                                    <IonLabel>Account Type</IonLabel>
+                                    <IonSelect value={formData[`ira_account_type_${i}__c`]} name={`ira_account_type_${i}__c`} onIonChange={updateForm}>
+                                        {formData.account_type__c.includes('Roth') ? (
+                                            <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
+                                        ) : (
+                                            <React.Fragment>
+                                                <IonSelectOption value='Traditional IRA'>Traditional IRA</IonSelectOption>
+                                                <IonSelectOption value='SEP IRA'>SEP IRA</IonSelectOption>
+                                                <IonSelectOption value='Simple IRA'> Simple IRA</IonSelectOption>
+                                            </React.Fragment>
+                                        )}
+                                    </IonSelect>
+                                </IonCol>
+                            )}
+                            {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                                <IonCol>
+                                    <IonLabel>
+                                        Holding Name
+                                    </IonLabel>
+                                    <IonInput name={`transfer${i}assetname1__c`} value={formData[`transfer${i}assetname1__c`]} onIonChange={updateForm}></IonInput>
+                                </IonCol>
+                            )}
+                        </IonRow>
+                        {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                            <React.Fragment>
+                                <IonRow>
+                                    <IonCol>
+                                        <IonLabel> Account Type</IonLabel>
+                                        <IonSelect value={formData[`ira_account_type_${i}__c`]} name={`ira_account_type_${i}__c`} onIonChange={updateForm}>
+                                            {formData.account_type__c.includes('Roth') ? (
+                                                <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
+                                            ) : (
+                                                <React.Fragment>
+                                                    <IonSelectOption value='Traditional IRA'>Traditional IRA</IonSelectOption>
+                                                    <IonSelectOption value='SEP IRA'>SEP IRA</IonSelectOption>
+                                                    <IonSelectOption value='Simple IRA'> Simple IRA</IonSelectOption>
+                                                </React.Fragment>
+                                            )}
+                                        </IonSelect>
+                                    </IonCol>
+                                    <IonCol>
+                                        <IonLabel>
+                                            Holding 2 Name (if applicable)
+                                        </IonLabel>
+                                        <IonInput value={formData[`transfer${i}assetname2__c`]}name={`transfer${i}assetname2__c`} onIonChange={updateForm}></IonInput>
+                                    </IonCol>
+                                </IonRow>
+                                <IonRow>
+                                    <IonCol>
+                                        <IonLabel>
+                                            Complete or Partial Transfer
+                                        </IonLabel>
+                                        <IonSelect value={formData[`ira_full_or_partial_cash_transfer_${i}__c`]} name={`ira_full_or_partial_cash_transfer_${i}__c`} onIonChange={updateForm}>
+                                            <IonSelectOption value='All Available Cash'> Complete </IonSelectOption>
+                                            <IonSelectOption value=''>Partial</IonSelectOption>
+                                        </IonSelect>
+                                    </IonCol>
+                                    <IonCol>
+                                        <IonLabel>
+                                            Holding 3 Name (if applicable)
+                                        </IonLabel>
+                                        <IonInput name={`transfer${i}assetname3__c`} value={formData[`transfer${i}assetname3__c`]}></IonInput>
+                                    </IonCol>
+                                </IonRow>
+                            </React.Fragment>
+                        )}
+                        {formData[`transfertype${i}__c`] === 'Cash Transfer' && 
+                        (
+                            <React.Fragment>
+                                <IonRow>
+                                    <IonCol size='6'>
+                                    <IonSelect value={formData[`ira_full_or_partial_cash_transfer_${i}__c`]} name={`ira_full_or_partial_cash_transfer_${i}__c`} onIonChange={updateForm}>
+                                        <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
+                                        <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
+                                    </IonSelect>
+                                    </IonCol>
+                                    {formData[`ira_full_or_partial_cash_transfer_${i}__c`] == 'Partial Cash Transfer' && (
+                                        <IonCol>
+                                            <IonLabel>Cash Amount</IonLabel>
+                                            <IonInput value={formData[`ira_cash_amount_${i}__c`]} name={`ira_cash_amount_${i}__c`} onIonChange={updateForm}></IonInput>
+                                        </IonCol>
+                                    )}
+                                </IonRow>
+                            </React.Fragment>
+                        )}
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                To expedite this transfer request, Midland will send your signed request via fax or scan if acceptable by your current IRA custodian. If your current IRA custodian requires original documents, how do you want this transfer to be delivered?
+                                </IonLabel>
+                                
                             </IonCol>
                         </IonRow>
                     </React.Fragment>
