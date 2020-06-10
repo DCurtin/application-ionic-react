@@ -20,6 +20,7 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
 }
 
 export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: beneficiaryForm, res: express.Response, client: pg.Client){
+  
   console.log(beneficiaryForm.beneficiaries[0])
   console.log(beneficiaryForm.beneficiaries[1])
   res.send('ok');
@@ -27,6 +28,28 @@ export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: benefici
 
 //HELPERS
 //function 
+function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): queryParameters{
+  let beneCount = beneficiaryData.beneficiary_count
+  for(let index = 0; index < beneCount; ++index){
+    let beneficiaries : salesforceSchema.benneficiary ={
+      address: beneficiaryData.beneficiaries[index].beneficiary_street,
+      beneficiary_type: beneficiaryData.beneficiaries[index].beneficiary_type,
+      date_of_birth: new Date(beneficiaryData.beneficiaries[index].beneficiary_dob),
+      email: beneficiaryData.beneficiaries[index].beneficiary_email,
+      first_name: beneficiaryData.beneficiaries[index].beneficiary_first_name,
+      last_name: beneficiaryData.beneficiaries[index].beneficiary_last_name,
+      middle_name: '',
+      phone: beneficiaryData.beneficiaries[index].beneficiary_phone,
+      relationship: beneficiaryData.beneficiaries[index].beneficiary_relationship,
+      share_percentage: parseFloat(beneficiaryData.beneficiaries[index].beneficiary_share),
+      social_security_number: beneficiaryData.beneficiaries[index].beneficiary_ssn,
+      token: token
+    }
+
+
+  }
+  
+}
 
 function updateWelcomeForm(token: string, welcomeParameters: welcomePageParameters): queryParameters{
   let upsertWelcomeParameters : salesforceSchema.body ={
