@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
+import { stat } from 'fs';
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
@@ -70,6 +71,39 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             <IonCol>
                                 <IonLabel>
                                     Street
+                                </IonLabel>
+                                <IonInput name={`employer_rollover_street_${i}__c`} value={formData[`employer_rollover_street_${i}__c`]} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    City
+                                </IonLabel>
+                                <IonInput name={`employer_rollover_city_${i}__c`} value={formData[`employer_rollover_city_${i}__c`]} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    State
+                                </IonLabel>
+                                <IonSelect value={formData[`employer_rollover_state_${i}__c`]} name={`employer_rollover_state_${i}__c`} onIonChange={updateForm}>
+                                    {states.map((state,index) => (
+                                        <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
+                                    ))}
+                                </IonSelect>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Zip
+                                </IonLabel>
+                                <IonInput value={formData[`employer_rollover_zip_${i}__c
+                                `]} name={`employer_rollover_zip_${i}__c`} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    
                                 </IonLabel>
                             </IonCol>
                         </IonRow>
