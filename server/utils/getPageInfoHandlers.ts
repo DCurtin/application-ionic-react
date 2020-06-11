@@ -38,12 +38,9 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
       client.query(objectQuery).then( function(result:pg.QueryResult ){
         let row : salesforceSchema.applicant = result.rows[0]
         if(row === undefined){
-          console.log('now row')
           res.json({data:row});
           return;
         }
-        console.log(result.rows[0]);
-        console.log(row);
         let identification : identificationSchema = <identificationSchema>row?.identification;
         let legalAddress : addressSchema = <addressSchema>row?.legal_address;
         let mailingAddress: addressSchema = <addressSchema>row?.mailing_address;
@@ -57,7 +54,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
           ssn: row.social_security_number, 
           email: row.email, 
           confirmEmail: row.email,
-          dob: row.date_of_birth === null ? '' : row.date_of_birth.toISOString().split('T')[0],
+          dob: row.date_of_birth,
           salutation: row.salutation,
           maritalStatus: row.marital_status,
           mothersMaidenName: row.mothers_maiden_name,
@@ -65,8 +62,8 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
           idType: identification === null ? '' : identification.idType, 
           idNumber: identification === null ? '' : identification.idNumber,
           issuedBy: identification === null ? '' : identification.issuedBy, 
-          issueDate: identification === null ? '' : identification.issueDate === null ? '' : identification.issueDate.split('T')[0],
-          expirationDate: identification === null ? '' : identification.expirationDate === null ? '' : identification.expirationDate.split('T')[0],
+          issueDate: identification === null ? '' : identification.issueDate,
+          expirationDate: identification === null ? '' : identification.expirationDate,
           legalAddress: legalAddress === null ? ''  : legalAddress.address,
           legalCity: legalAddress === null ? ''  : legalAddress.city,
           legalState: legalAddress === null ? ''  : legalAddress.state,
@@ -80,11 +77,6 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
           alternatePhone: row.alternate_phone,
           alternatePhoneType: row.alternate_phone_type
       };  
-        console.log(data);
-        ////console.log(result)
-        //data.firstName = row.first_name;
-        //data.lastName = row.last_name;
-        ////data.dob = row.date_of_birth;
         res.json({'data': data})
       }).catch(err=>{
         res.status(500).send('failed getting apllicant data');
@@ -98,10 +90,8 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
   }
 
   client.query(objectQuery).then( function( result : pg.QueryResult){
-    console.log(result)
   let beneficiaryList : Array<salesforceSchema.beneficiary> = result.rows;
   let returnData : beneficiaryPlaceHolder = transformBeneficiaries(beneficiaryList)
-  console.log(returnData)
   res.json({data:returnData});
   }).catch(err=>{
     res.status(500).send('failed getting bene data');
@@ -114,7 +104,6 @@ function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.benefic
   returnData[`beneficiary_count__c`] = beneficiaryList.length,
   beneficiaryList.forEach(element => {
     let address : addressSchema = element.address as addressSchema;
-    console.log(element)
     ++count;
     returnData[`beneficiary_city_${count}__c`] = address.city
     returnData[`beneficiary_dob_${count}__c`] = element.date_of_birth
@@ -131,7 +120,7 @@ function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.benefic
     returnData[`beneficiary_type_${count}__c`] = element.beneficiary_type
     returnData[`beneficiary_zip_${count}__c`] = address.zip
   })
-  //console.log(returnData);
+
 
   return returnData;
 }
@@ -160,7 +149,6 @@ export function handleFeeArrangementPage(sessionId:string, res: express.Response
       payment_method__c: feeArrangementData.payment_method,
       initial_investment_type__c: investMentType
     }
-    console.log(feeArrangementForm)
     res.json({data:feeArrangementForm});
     })
   }).catch(err=>{
