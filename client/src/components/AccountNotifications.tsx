@@ -1,13 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, states } from '../helpers/Utils';
+import { SessionApp, states, accountNotificationsForm } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterly', 'Mailed Annually']
 
 const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-    useEffect(() => {
-
-    })
-    const [formData, setFormData] = useState({
+    const history = useHistory();
+    const [formData, setFormData] = useState<accountNotificationsForm>({
         statement_option__c: '', 
         interested_party_email_notifications__c: true,
         interested_party_access_level__c: '',
@@ -24,6 +23,8 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
         interested_party_online_access__c: false,
         interested_party_ira_statement__c: ''
     })
+
+
 
     const updateForm = (e:any) => {
         setFormData(prevState => {

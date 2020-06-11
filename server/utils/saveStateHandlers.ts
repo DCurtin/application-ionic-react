@@ -85,7 +85,7 @@ function updateAppId(token : string, applicantForm : applicantId): queryParamete
     let upsertApplicant : salesforceSchema.applicant ={
       alternate_phone: applicantForm.alternatePhone,
       alternate_phone_type: applicantForm.alternatePhoneType,
-      date_of_birth: applicantForm.dob === '' ? null : new Date(applicantForm.dob),
+      date_of_birth: applicantForm.dob,
       email: applicantForm.email,
       first_name: applicantForm.firstName,
       last_name: applicantForm.lastName,
@@ -120,7 +120,7 @@ function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): q
     let beneficiaries : salesforceSchema.beneficiary ={
       address: generateBeneAddress(bene),
       beneficiary_type: bene.beneficiary_type,
-      date_of_birth: (bene.beneficiary_dob === '' || bene.beneficiary_dob === undefined) ? undefined : new Date(bene.beneficiary_dob),
+      date_of_birth: bene.beneficiary_dob,
       email: bene.beneficiary_email,
       first_name: bene.beneficiary_first_name,
       last_name: bene.beneficiary_last_name,
