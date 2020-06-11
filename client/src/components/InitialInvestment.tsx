@@ -10,7 +10,19 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
         initial_investment_name__c: '',
         investment_contact_person__c: '',
         investment_contact_person_phone__c: null, 
-        investment_amount__c: ''
+        investment_amount__c: '', 
+        ira_full_or_partial_cash_transfer_1__c: '', 
+        ira_full_or_partial_cash_transfer_2__c: '',
+        transfertype1__c: '', 
+        transfertype2__c:'', 
+        existing_ira_transfer__c: false,
+        existing_employer_plan_rollover__c: false, 
+        new_ira_contribution__c: false,
+        ira_cash_amount_1__c: '',
+        ira_cash_amount_2__c: '', 
+        employer_cash_amount_1__c: '', 
+        employer_cash_amount_2__c: '',
+        new_contribution_amount__c: ''
     });
     
     useEffect(() => {
@@ -40,6 +52,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
     const showMinCashBalanceCheckbox = (investmentAmount:string) => {
         const initialInvestmentAmount = +investmentAmount;
 
+    return (<div>{initialInvestmentAmount}</div>)
     }
 
     const showNotEnoughProjectedCashWarning = (investmentAmount:string) => {
@@ -80,9 +93,25 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                 </IonRow>
                 <IonRow>
                     <IonCol>
+                        <IonLabel>
+                            Contact Person
+                        </IonLabel>
                         <IonInput name='investment_contact_person__c' value={formData.investment_contact_person__c} onIonChange={updateForm}></IonInput>
                     </IonCol>
+                    <IonCol>
+                        <IonLabel>
+                            Contact Phone
+                        </IonLabel>
+                        <IonInput name='investment_contact_person_phone__c' value={formData.investment_contact_person_phone__c} onIonChange={updateForm} placeholder='(555)555-5555'></IonInput>
+                    </IonCol>
                 </IonRow>
+                <IonRow>
+                    <IonCol size='6'>
+                        <IonLabel>Investment Amount</IonLabel>
+                        <IonInput value={formData.investment_amount__c} name='investment_amount__c' onIonChange={updateForm}></IonInput>
+                    </IonCol>
+                </IonRow>
+                {showMinCashBalanceCheckbox(formData.investment_amount__c)}
             </IonGrid>
         </IonContent>
     )
