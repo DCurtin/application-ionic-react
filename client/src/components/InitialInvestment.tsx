@@ -7,7 +7,10 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
 
     const [formData, setFormData] = useState({
         initial_investment_type__c : 'Futures/Forex',
-        initial_investment_name__c: ''
+        initial_investment_name__c: '',
+        investment_contact_person__c: '',
+        investment_contact_person_phone__c: null, 
+        investment_amount__c: ''
     });
     
     useEffect(() => {
@@ -32,6 +35,15 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
             entityNameLabel = 'Dealer Name';
         }
         return entityNameLabel;
+    }
+
+    const showMinCashBalanceCheckbox = (investmentAmount:string) => {
+        const initialInvestmentAmount = +investmentAmount;
+
+    }
+
+    const showNotEnoughProjectedCashWarning = (investmentAmount:string) => {
+        const initialInvestmentAmount = + investmentAmount; 
     }
     
 
@@ -64,6 +76,11 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                     <IonCol>
                             <IonLabel>{displayEntityNameLabel(formData.initial_investment_type__c)}</IonLabel>
                             <IonInput name='initial_investment_name__c' value={formData.initial_investment_name__c}></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonInput name='investment_contact_person__c' value={formData.investment_contact_person__c} onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
             </IonGrid>
