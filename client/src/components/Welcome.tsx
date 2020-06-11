@@ -4,7 +4,7 @@ import './Welcome.css';
 
 import {useHistory} from 'react-router-dom';
 
-import {welcomePageParameters, SessionApp, saveWelcomeParameters} from "../helpers/Utils"
+import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes} from "../helpers/Utils";
 import { Interface } from 'readline';
 
 interface InitSessionApp extends SessionApp {
@@ -21,7 +21,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
         'Inherited IRA - Traditional',
         'Inherited IRA - Roth'
     ]
-    const initialInvestmentTypes = [`I'm Not Sure`, `Futures/Forex`, `Closely-Held LLC`, `Private Placement`, `Promissory Note (Unsecured)`, `Promissory Note (Secured by Real Estate)`, `Promissory Note (Secured by Other)`, `Precious Metals`, `Real Estate`, `Other`];
 
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
