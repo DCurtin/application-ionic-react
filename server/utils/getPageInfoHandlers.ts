@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema} from './helperSchemas'
 import express from 'express';
@@ -134,22 +134,36 @@ function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.benefic
   //console.log(returnData);
 
   return returnData;
-   /*{
-    beneficiary_count__c: beneficiaryList.length,
-    beneficiary_city_1__c: '',
-    beneficiary_dob_1__c: '',
-    beneficiary_email_1__c: '',
-    beneficiary_first_name_1__c: '',
-    beneficiary_last_name_1__c: '',
-    beneficiary_phone_1__c: '',
-    beneficiary_relationship_1__c: '',
-    beneficiary_share_1__c: '',
-    beneficiary_ssn_1__c:'',
-    beneficiary_state_1__c:'',
-    beneficiary_street_1__c:'',
-    beneficiary_token_1__c:'',
-    beneficiary_type_1__c:'',
-    beneficiary_zip_1__c:''
-  }*/
+}
 
+export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
+  let feeArrangementQuery = {
+    text: 'SELECT * FROM salesforce.fee_arrangement WHERE token = $1',
+    values: [sessionId]
+  }
+
+  let bodyQuery = {
+    text: 'SELECT investment_type FROM salesforce.body WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(feeArrangementQuery).then( function( feeArrangementResult : pg.QueryResult){
+    let feeArrangementData : salesforceSchema.fee_arrangement = feeArrangementResult.rows[0];
+    
+    client.query(bodyQuery).then( function(bodyResult:pg.QueryResult){
+    let investMentType : string = bodyResult.rows[0].investment_type
+
+    let feeArrangementForm : feeArrangementForm ={
+      cc_exp_date__c: feeArrangementData.expiration_date,
+      fee_schedule__c: feeArrangementData.fee_agreement,
+      cc_number__c: feeArrangementData.credit_number,
+      payment_method__c: feeArrangementData.payment_method,
+      initial_investment_type__c: investMentType
+    }
+    console.log(feeArrangementForm)
+    res.json({data:feeArrangementForm});
+    })
+  }).catch(err=>{
+    res.status(500).send('failed getting bene data');
+  })
 }
