@@ -18,7 +18,6 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
 export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: beneficiaryForm, res: express.Response, client: pg.Client){
   let beneQueryUpsert :queryParameters = updateBeneficiaries(sessionId, beneficiaryForm);
   runQuery(beneQueryUpsert, res, client);
-  //res.send('ok');
 }
 
 export function saveFeeArrangementPage(sessionId: string, feeArrangementForm: feeArrangementForm, res: express.Response, client: pg.Client){

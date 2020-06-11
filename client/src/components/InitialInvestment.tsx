@@ -31,7 +31,6 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
-        console.log(formData);
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 
