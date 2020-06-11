@@ -6,44 +6,12 @@ import { addOutline } from 'ionicons/icons';
 const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
         account_type__c: 'Traditional IRA',
-        existing_ira_transfers__c: 0,
-        ira_account_number_1__c: '',
-        ira_institution_name_1__c: '',
-        ira_contact_name_1__c: '',
-        ira_contact_phone_number_1__c: '', 
-        ira_street_1__c: '',
-        ira_city_1__c: '',
-        ira_state_1__c: '',
-        ira_zip_1__c: '',
-        transfertype1__c: '',
-        transfer1assetname1__c: '',
-        transfer1assetname2__c: '',
-        transfer1assetname3__c : '',
-        ira_account_type_1__c: '',
-        ira_full_or_partial_cash_transfer_1__c: '',
-        ira_cash_amount_1__c: '',
-        delivery_method__c: '',
-        ira_account_number_2__c: '',
-        ira_institution_name_2__c: '',
-        ira_contact_name_2__c: '',
-        ira_contact_phone_number_2__c:'',
-        ira_street_2__c:'',
-        ira_city_2__c: '',
-        ira_state_2__c : '',
-        ira_zip_2__c: '',
-        transfertype2__c : '',
-        ira_account_type_2__c: '',
-        transfer2assetname1__c: '',
-        transfer2assetname2__c: '',
-        transfer2assetname3__c: '',
-        ira_full_or_partial_cash_transfer_2__c: '',
-        ira_cash_amount_2__c: '',
-        delivery_method_2__c:''
-
+        existing_ira_transfers__c: 0
     })
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
+        console.log(formData);
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 

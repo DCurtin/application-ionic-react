@@ -34,7 +34,6 @@ export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: benefici
     console.log(err);
     res.status(500).send('failed');
   })
-  //res.send('ok');
 }
 
 export function saveFeeArrangementPage(sessionId: string, feeArrangementForm: feeArrangementForm, res: express.Response, client: pg.Client){
