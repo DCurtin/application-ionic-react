@@ -162,8 +162,9 @@ export interface feeArrangementForm{
     cc_number__c: string,
     cc_exp_date__c: string
 }
+export const initialInvestmentTypes = ['I\'m Not Sure', 'Futures/Forex', 'Closely-Held LLC', 'Private Placement', 'Promissory Note (Unsecured)', 'Promissory Note (Secured by Real Estate)', 'Promissory Note (Secured by Other)', 'Precious Metals', 'Real Estate', 'Other'];
 
-export interface accountNotificationsForm{
+export interface accountNotificationsForm {
     statement_option__c: string, 
     interested_party_email_notifications__c: boolean,
     interested_party_access_level__c: string,
