@@ -1,48 +1,18 @@
 import React, { useEffect } from 'react'; 
-import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItemDivider, IonItem, IonItemGroup, IonCheckbox, IonInput, IonButton } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 
 import {useHistory} from 'react-router-dom';
 
-export interface WelcomePageParamters {
-    AccountType: string,    
-    TransferIra: boolean,
-    RolloverEmployer: boolean,
-    CashContribution: boolean,
-    InitialInvestment: string,
-    SalesRep: string,
-    SpecifiedSource: string,
-    ReferralCode: string,
+import {welcomePageParameters, SessionApp, saveWelcomeParameters} from "../helpers/Utils"
+import { Interface } from 'readline';
+
+interface InitSessionApp extends SessionApp {
+    initialValues: welcomePageParameters,
+    setInitialValues: Function,
 }
 
-interface SessionApp {
-    InitialValues: WelcomePageParamters,
-    SetInitialValues: Function,
-    SessionId: string,
-    SetSessionId: Function
-}
-
-const Welcome: React.FC<SessionApp> = props => {
-
-    const downloadFile = ()=>{
-        var xhr = new XMLHttpRequest();
-        //var decoder = new TextDecoder('iso-8859-1');
-        //var encoder = new TextEncoder('iso-8859-1', {NONSTANDARD_allowLegacyEncoding: true});
-        //var decoder = new TextDecoder();
-        xhr.open('GET', 'https://dc-application-ionic-react.herokuapp.com/getPenSignDocv2', true);
-        //xhr.responseType = 'arraybuffer';
-        xhr.responseType = "arraybuffer";
-
-        xhr.onload = function () {
-          if (this.status === 200) {
-              var blob = new Blob([xhr.response], {type: "application/pdf"});
-              var objectUrl = URL.createObjectURL(blob);
-              console.log(objectUrl);
-              window.open(objectUrl, "_blank");
-          }
-        };
-        xhr.send();
-    }
+const Welcome: React.FC<InitSessionApp> = props => {
     const history = useHistory();
     const accountTypes = [
         'Traditional IRA', 
@@ -56,21 +26,46 @@ const Welcome: React.FC<SessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        //props.InitialValues.SetAccountType(event.detail.value);
-        props.SetInitialValues(
+        props.setInitialValues(
             {
-                ...props.InitialValues,
+                ...props.initialValues,
                 AccountType: event.detail.value
             }
         )
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
-        //props.InitialValues.SetInitialInvestment(event.detail.value);
-        props.SetInitialValues(
+        props.setInitialValues(
             {
-                ...props.InitialValues,
+                ...props.initialValues,
                 InitialInvestment: event.detail.value
+            }
+        )
+    }
+
+    const handleSalesRepChange = (event: CustomEvent) => {
+        props.setInitialValues(
+            {
+                ...props.initialValues,
+                SalesRep: event.detail.value
+            }
+        )
+    }
+    
+    const handleSpecifiedSourceChange = (event: CustomEvent) => {
+        props.setInitialValues(
+            {
+                ...props.initialValues,
+                SpecifiedSource: event.detail.value
+            }
+        )
+    }
+    
+    const handleReferralCodeChange = (event: CustomEvent) => {
+        props.setInitialValues(
+            {
+                ...props.initialValues,
+                ReferralCode: event.detail.value
             }
         )
     }
@@ -81,13 +76,12 @@ const Welcome: React.FC<SessionApp> = props => {
         }
 
         if (accountType.includes('Inherited')) {
-            //return {...fundingOptions};
             return Object.entries({...fundingOptions});
         }
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
     }
 
-    const IsChecked: Function =  (key: string, initValues: WelcomePageParamters) =>{
+    const IsChecked: Function =  (key: string, initValues: welcomePageParameters) =>{
         switch (key) {
             case 'TransferIra': 
               return initValues['TransferIra']
@@ -104,44 +98,50 @@ const Welcome: React.FC<SessionApp> = props => {
         console.log(event.detail.value);
         console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
-            //props.InitialValues.SetTransferIra(event.detail.checked)
-            props.SetInitialValues(
+            props.setInitialValues(
                 {
-                    ...props.InitialValues,
+                    ...props.initialValues,
                     TransferIra: event.detail.checked
                 }
             )
         }
 
         if(event.detail.value === 'RolloverEmployer'){
-            props.SetInitialValues(
+            props.setInitialValues(
                 {
-                    ...props.InitialValues,
+                    ...props.initialValues,
                     RolloverEmployer: event.detail.checked
                 }
             )
         }
 
         if(event.detail.value === 'CashContribution'){
-            //props.InitialValues.SetCashContribution(event.detail.checked)
-            props.SetInitialValues(
+            props.setInitialValues(
                 {
-                    ...props.InitialValues,
+                    ...props.initialValues,
                     CashContribution: event.detail.checked
                 }
             )
         }
     }
 
+
     useEffect(()=>{
+        //save state on page change
         return history.listen(()=>{
             //save initial data
             //return session id
             console.log('saving welcome page');
-            let url = '/startApplication'
-            let body ={
-                session: {SessionId: props.SessionId, page: 'welcomePage'},
-                data: props.InitialValues
+            
+            var url = '/startApplication'
+            if(props.sessionId !== ''){
+                url = '/saveState'
+            }
+            console.log(url);
+            console.log(props.sessionId);
+            let body : saveWelcomeParameters ={
+                session: {sessionId: props.sessionId, page: 'welcomePage'},
+                data: props.initialValues
             }
             let options = {
                 method : 'POST',
@@ -152,11 +152,11 @@ const Welcome: React.FC<SessionApp> = props => {
             fetch(url, options).then((response)=>{
                 response.json().then(function(data: any){
                     console.log(data);
-                    props.SetSessionId(data.SessionId);
+                    props.setSessionId(data.sessionId);
                   })
             })
         })
-    },[props.InitialValues])
+    },[props.initialValues])
 
     return (
         <IonContent className="ion-padding">
@@ -190,7 +190,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect value={props.InitialValues.AccountType} onIonChange={handleAccountTypeSelected}>
+                       <IonSelect value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}
@@ -219,10 +219,10 @@ const Welcome: React.FC<SessionApp> = props => {
                         </IonLabel>
                         <p>Check all that apply.</p>
                         {
-                            getFundingOptions(props.InitialValues.AccountType).map((fundingType, index) => {
+                            getFundingOptions(props.initialValues.AccountType).map((fundingType, index) => {
                                 return (
                                 <IonItem key={index}>
-                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked} checked={IsChecked(fundingType[0],  props.InitialValues)}></IonCheckbox>
+                                    <IonCheckbox color="primary" slot="start" value={fundingType[0]} onIonChange={handleChecked} checked={IsChecked(fundingType[0],  props.initialValues)}></IonCheckbox>
                                 <IonLabel>{fundingType[1]}</IonLabel>
                                 </IonItem>
                                 )
@@ -237,10 +237,10 @@ const Welcome: React.FC<SessionApp> = props => {
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.InitialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
-                    {initialInvestmentTypes.map((investmentType, index) => (
-                    <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
-                    ))}
+                        <IonSelect value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                            {initialInvestmentTypes.map((investmentType, index) => (
+                            <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                            ))}
                         </IonSelect>
                     </IonCol>
                 </IonRow>
@@ -251,7 +251,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 Have you been working with a Midland rep?
                             </strong>
                         </IonLabel>
-                        <IonSelect>
+                        <IonSelect value={props.initialValues.SalesRep} onIonChange={handleSalesRepChange}>
                             {midlandReps.map((rep, index) => (
                                 <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
                             ))}
@@ -265,7 +265,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 How did you hear about us?
                             </strong>
                         </IonLabel>
-                        <IonInput>
+                        <IonInput value={props.initialValues.SpecifiedSource} onIonChange={handleSpecifiedSourceChange}>
 
                         </IonInput>
                     </IonCol>
@@ -277,7 +277,7 @@ const Welcome: React.FC<SessionApp> = props => {
                                 Referral / Group Code
                             </strong>
                         </IonLabel>
-                        <IonInput></IonInput>
+                        <IonInput value={props.initialValues.ReferralCode} onIonChange={handleReferralCodeChange}></IonInput>
                         <IonButton color="primary">Apply Code</IonButton>
                     </IonCol>
                 </IonRow>

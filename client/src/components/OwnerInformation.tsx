@@ -1,89 +1,75 @@
-import React, {useState, useEffect, Component} from 'react';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
+import React, {useState, useEffect} from 'react';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { userState } from '../pages/Page'
-
-interface SessionApp {
-    sessionId : String,
-    setSessionId : Function
-}
+import { SessionApp, states, requestBody, applicantId, saveApplicationId} from '../helpers/Utils';
+import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers'
 
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        //const sessionId = props?.location?.state?.sessionId;
-        const [formData, setFormData] = useState({first_name__c:'', last_name__c:'', ssn__c: '', email__c: '', dob__c: '', salutation__c: ''});
-        const history = useHistory();
-        const updateForm = function(e : any){
-            setFormData({
-            ...formData,
-              [e.target.name]: e.target.value
-            });
-        }
-    
-        function ImportForm(data : any){
-            let importedForm = {first_name__c: data['first_name__c'], last_name__c: data['last_name__c'], ssn__c: data['ssn__c'], email__c: data['email__c'], dob__c: data['dob__c'], salutation__c: ''}
+    const history = useHistory();
+    const [formData, setFormData] = useState<applicantId>({
+            isSelfEmployed: false,
+            hasHSA: false,
+            homeAndMailingAddressDifferent: false,
+            firstName:'',
+            lastName:'', 
+            ssn: '', 
+            email: '', 
+            confirmEmail:'',
+            dob: '', 
+            salutation: '',
+            maritalStatus: '',
+            mothersMaidenName: '',
+            occupation: '',
+            idType: '', 
+            idNumber: '',
+            issuedBy:'', 
+            issueDate: '', 
+            expirationDate: '',
+            legalAddress: '', 
+            legalCity: '', 
+            legalState:'',
+            legalZip: '',
+            mailingAddress: '', 
+            mailingCity: '', 
+            mailingState: '',
+            mailingZip: '', 
+            primaryPhone: '', 
+            preferredContactMethod:'', 
+            alternatePhone:'', 
+            alternatePhoneType:''
+        });
 
-            console.log('data');
-            console.log(data);
-
-            console.log('importedForm');
-            console.log(importedForm);
-
-            setFormData(importedForm);
+        const updateForm = (e : any) => {
+            let newValue = e.target.name === 'homeAndMailingAddressDifferent' ? e.target.checked : e.target.value;
+            setFormData(previousState =>({
+            ...previousState,
+              [e.target.name]: newValue
+            }));
         }
     
         useEffect(()=>{
-            console.log('sessionId ' + sessionId );
             if(sessionId !== '')
             {
-               //query fields
-              let url = '/getPageFields'
-              let body ={
-                session:{sessionId: sessionId, page: 'appId'}
-              }
-              let options = {
-                method : 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(body)
-              }
-              fetch(url, options).then(function(response: any){
-                response.json().then(function(data: any){
-                  //setFormData(data[0]);
-                  ImportForm(data[0]);
-                  //console.log(data[0])
-                  //console.log(formData)
+                getAppPage(sessionId).then(data =>{
+                    if(data === undefined)
+                    {
+                        return;
+                    }
+                    ImportForm(data);
                 })
-              })
             }
-           
-            return function cleanup() {
-                console.log('cleaning up sess id')
-              }
+            console.log(sessionId + 'this is my sessionId');
         },[sessionId])
     
+        function ImportForm(data : any){
+            let importedForm : applicantId = data;
+            console.log(importedForm);
+            setFormData(importedForm);
+        }
+        
         useEffect(()=>{
           return history.listen(()=>{
-            let url = '';
-            if(sessionId === '')
-            {
-                url = '/startApplication'
-            }else{
-                url = '/saveState'
-            }
-
-            let body = {
-            session:{sessionId: sessionId, page: 'appId'},
-            data: formData
-            }
-            let options = {
-            method : 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
-            }
-            fetch(url, options).then(function(response: any){
-            response.json().then(function(data: any){
-                setSessionId(data.sessionId);
-            })
-            });
+            saveAppPage(sessionId, formData);
           })
         },[formData])
 
@@ -105,7 +91,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Salutation *
                         </IonLabel>
-                        <IonSelect name="salutation__c" value={formData.salutation__c} onIonChange={e => updateForm(e!)}>
+                        <IonSelect name="salutation" value={formData.salutation} onIonChange={updateForm}>
                             <IonSelectOption value="Mr.">Mr.</IonSelectOption>
                             <IonSelectOption value="Ms.">Ms.</IonSelectOption>
                             <IonSelectOption value="Mrs.">Mrs.</IonSelectOption>
@@ -116,13 +102,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             First Name *
                         </IonLabel>
-                        <IonInput class='item-input' name="first_name__c" value={formData.first_name__c} placeholder="First Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                        <IonInput class='item-input' name="firstName" value={formData.firstName} placeholder="First Name" onIonInput={updateForm} clearInput></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Last Name *
                         </IonLabel>
-                        <IonInput class='item-input' name="last_name__c" value={formData.last_name__c} placeholder="Last Name" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                        <IonInput class='item-input' name="lastName" value={formData.lastName} placeholder="Last Name" onIonInput={updateForm} clearInput></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -130,24 +116,258 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Social Security Number *
                         </IonLabel>
-                        <IonInput class='item-input' name="ssn__c" value={formData.ssn__c} placeholder="Social" onIonChange={e => updateForm(e!)} required clearInput></IonInput>
+                        <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} required clearInput></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Date of Birth *
                         </IonLabel>
-                        <IonInput type='date' class='item-input' name="dob__c" value={formData.dob__c} placeholder="Date of Birth" onIonChange={e => updateForm(e!)} clearInput></IonInput>
+                        <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" onIonInput={e => updateForm(e!)} clearInput></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel>
-                            Email *
+                            Marital Status
                         </IonLabel>
-                        <IonInput class='item-input' name="email__c" value={formData.email__c} placeholder="Email" onIonChange={e => updateForm(e!)} required clearInput></IonInput>
+                        <IonSelect name='maritalStatus' onIonChange={updateForm}>
+                            <IonSelectOption value="Single">Single</IonSelectOption>
+                            <IonSelectOption value="Married">Married</IonSelectOption>
+                            <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
+                        </IonSelect>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>Mother's Maiden Name</IonLabel>
+                        <IonInput name='mothersMaidenName' value={formData.mothersMaidenName} onIonInput={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
-
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>Occupation</IonLabel>
+                        <IonSelect name='occupation' onIonChange={updateForm} value={formData.occupation}>
+                            <IonSelectOption value="Accountant">Accountant
+                            </IonSelectOption>
+                            <IonSelectOption value="Attorney">Attorney</IonSelectOption>
+                            <IonSelectOption value="Financial Advisor">Financial Adviser</IonSelectOption>
+                            <IonSelectOption value="Realtor">Realtor</IonSelectOption>
+                            <IonSelectOption value="Other">Other</IonSelectOption>
+                        </IonSelect>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>Are you Self-Employed? &nbsp;</IonLabel> 
+                        <div className="ion-text-wrap">
+                            <IonRadioGroup name='isSelfEmployed' onIonChange={updateForm} value={formData.isSelfEmployed} >
+                                <IonLabel>Yes</IonLabel>
+                                <IonRadio value={true} className='ion-margin-horizontal'/>
+                                &nbsp;
+                                <IonLabel>No</IonLabel>
+                                <IonRadio value={false} className='ion-margin-horizontal'/>
+                            </IonRadioGroup>
+                        </div>               
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>Do you have a Health Savings Account?</IonLabel>
+                        <div className="ion-text-wrap ion-text-justify">
+                            <IonRadioGroup name='hasHSA' onIonChange={updateForm} value={formData.hasHSA}> 
+                                <IonLabel>Yes</IonLabel>
+                                <IonRadio value={true} className='ion-margin-horizontal'/>
+                                <IonLabel>No</IonLabel>
+                                <IonRadio className='ion-margin-horizontal' value={false} />
+                            </IonRadioGroup>
+                        </div>
+                    </IonCol>
+                </IonRow>
+                <IonItemDivider>
+                    <strong>
+                    Proof of ID
+                    </strong>
+                </IonItemDivider>
+                <IonRow>
+                    <IonCol>
+                      <IonLabel>Proof of Identification</IonLabel>
+                        <IonSelect value={formData.idType} onIonChange={updateForm} name='idType'>
+                            <IonSelectOption value={`Driver's License`}>Driver's License</IonSelectOption>
+                            <IonSelectOption value='Passport'>Passport</IonSelectOption>
+                            <IonSelectOption value='Other'>Other</IonSelectOption>
+                        </IonSelect>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel> ID Number </IonLabel>
+                        <IonInput value={formData.idNumber} name='idNumber' onIonInput={updateForm}></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            Issued By
+                        </IonLabel>
+                        <IonInput value={formData.issuedBy} onIonInput={updateForm} name='issuedBy'></IonInput>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>
+                            Issue Date
+                        </IonLabel>
+                        <IonInput type='date' value={formData.issueDate} onIonInput={updateForm} name='issueDate'></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol size='6'>
+                        <IonLabel>Expiration Date</IonLabel>
+                        <IonInput type='date' value={formData.expirationDate} onIonInput={updateForm} name='expirationDate'>
+                        </IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <strong>
+                            If you provided a Passport ID, please supply Midland with a copy of the passport. If you provided a Driver's License ID, a copy is not necessary.
+                        </strong>
+                    </IonCol>
+                </IonRow>
+                <IonItemDivider>
+                    <strong>
+                    Contact Information
+                    </strong>
+                </IonItemDivider>
+                <IonRow>
+                    <IonCol>
+                        PHYSICAL ADDRESS
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <i>
+                        If you currently reside outside of the US, please call our office at (866) 839-0429 for help setting up your IRA.
+                        </i>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            Physical Street Address
+                        </IonLabel>
+                        <IonInput onIonInput={updateForm} value={formData.legalAddress} name='legalAddress'></IonInput>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>
+                            City
+                        </IonLabel>
+                        <IonInput onIonInput={updateForm} value={formData.legalCity} name='legalCity'></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            Physical State
+                        </IonLabel>
+                        <IonSelect onIonChange={updateForm} value={formData.legalState} name='legalState'>
+                            {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
+                        </IonSelect>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>
+                            Zip
+                        </IonLabel>
+                        <IonInput value={formData.legalZip} name='legalZip' onIonInput={updateForm}></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonCheckbox checked={formData.homeAndMailingAddressDifferent} name='homeAndMailingAddressDifferent' onIonChange={updateForm}></IonCheckbox> &nbsp; My mailing address is different than my physical address
+                        <p></p>
+                    </IonCol>
+                </IonRow>
+                {formData.homeAndMailingAddressDifferent && <React.Fragment>
+                    <IonRow>
+                        <IonCol>
+                            MAILING ADDRESS
+                        </IonCol>
+                    </IonRow>
+                    <IonRow>
+                        <IonCol>
+                            <i>
+                            If you currently reside outside of United States, Midland will make all client correspondence electronic.  
+                            </i>
+                        </IonCol>
+                    </IonRow>
+                    <IonRow>
+                        <IonCol>
+                            <IonLabel>Mailing Street Address</IonLabel>
+                            <IonInput value={formData.mailingAddress} name='mailingAddress' onIonInput={updateForm}></IonInput>
+                        </IonCol>
+                        <IonCol>
+                            <IonLabel>Mailing City</IonLabel>
+                            <IonInput value={formData.mailingCity} name='mailingCity' onIonInput={updateForm}></IonInput>
+                        </IonCol>
+                    </IonRow>
+                    <IonRow>
+                        <IonCol>
+                            <IonLabel>Mailing State</IonLabel>
+                            <IonSelect name='mailingState' value={formData.mailingState} onIonChange={updateForm}>
+                            {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
+                            </IonSelect>
+                        </IonCol>
+                        <IonCol>
+                            <IonLabel> Mailing Zip</IonLabel>
+                            <IonInput value={formData.mailingZip} name='mailingZip' onIonInput={updateForm}></IonInput>
+                        </IonCol>
+                    </IonRow>
+                </React.Fragment>}
+                <IonRow>
+                    <IonCol>
+                        PRIMARY CONTACT INFO
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>
+                            Primary Phone
+                        </IonLabel>
+                        <IonInput value={formData.primaryPhone} name='primaryPhone' onIonInput={updateForm}></IonInput>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>
+                            Preferred Contact Method
+                        </IonLabel>
+                        <IonSelect value={formData.preferredContactMethod} name='preferredContactMethod' onIonChange={updateForm}>
+                            <IonSelectOption value='Email'>Email</IonSelectOption>
+                            <IonSelectOption value='Mail'>Mail</IonSelectOption>
+                            <IonSelectOption value='Phone (Home)'>Phone (Home)</IonSelectOption>
+                            <IonSelectOption value='Phone (Mobile)'>Phone (Mobile)</IonSelectOption>
+                            <IonSelectOption value='Phone (Work)'>Phone (Work)</IonSelectOption>
+                        </IonSelect>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>Email</IonLabel>
+                        <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' onIonInput={updateForm} required clearInput>
+                        </IonInput>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>Confirm Email</IonLabel>
+                        <IonInput value={formData.confirmEmail} name='confirmEmail' onIonInput={updateForm}></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <p>SECONDARY CONTACT INFO</p>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>Alternate Phone</IonLabel>
+                        <IonInput value={formData.alternatePhone} name='alternatePhone' onIonInput={updateForm}></IonInput>
+                    </IonCol>
+                    <IonCol>
+                        <IonLabel>Alternate Phone Type</IonLabel>
+                        <IonSelect value={formData.alternatePhoneType} name='alternatePhoneType' onIonChange={updateForm}>
+                            <IonSelectOption value='Home'>Home</IonSelectOption>
+                            <IonSelectOption value='Mobile'>Mobile</IonSelectOption>
+                            <IonSelectOption value='Office'>Office</IonSelectOption>
+                        </IonSelect>
+                    </IonCol>
+                </IonRow>
             </IonGrid>
         </IonContent>
     )
