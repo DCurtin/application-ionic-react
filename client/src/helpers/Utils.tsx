@@ -151,4 +151,34 @@ export interface beneficiaryPlaceHolder{
     beneficiary_token_4__c: string
 }
 
+export interface saveFeeArrangement extends requestBody{
+    data: feeArrangementForm
+}
+
+export interface feeArrangementForm{
+    initial_investment_type__c: string,
+    fee_schedule__c: string,
+    payment_method__c: string,
+    cc_number__c: string,
+    cc_exp_date__c: string
+}
+
+export interface accountNotificationsForm{
+    statement_option__c: string, 
+    interested_party_email_notifications__c: boolean,
+    interested_party_access_level__c: string,
+    interested_party_first_name__c: string, 
+    interested_party_last_name__c: string, 
+    interested_party_email__c: string, 
+    interested_party_phone__c:string, 
+    interested_party_street__c: string, 
+    interested_party_city__c: string,
+    interested_party_state__c: string,
+    interested_party_zip__c: string, 
+    interested_party_company_name__c: string,
+    interested_party_title__c: string, 
+    interested_party_online_access__c: boolean,
+    interested_party_ira_statement__c: string
+}
+
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];

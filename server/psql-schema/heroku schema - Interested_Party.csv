@@ -1,0 +1,13 @@
+﻿Identifier,Type,Unique,required
+first_name,text,,
+middle_name,text,,
+last_name,text,,
+social_security_number,text,,
+date_of_birth,date,,
+email,text,,
+phone,text,,
+beneficiary_type,text,,
+relationship,text,,
+share_percentage,float(2),,
+address,json,,
+token,uuid,,yes

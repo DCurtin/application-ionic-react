@@ -1,0 +1,6 @@
+Identifier,Type,Unique,Required
+fee_agreement,text,,
+payment_method,text,,
+credit_number,text,,
+expiration_date,text,,
+token,uuid,yes,yes

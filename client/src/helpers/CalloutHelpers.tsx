@@ -1,31 +1,34 @@
-import {requestBody, applicantId, saveApplicationId, FormData, beneficiaryPlaceHolder, saveBeneficiary} from './Utils'
-
-export function getAppPage(sessionId: string) {
-       //query fields
-        let url = '/getPageFields'
-        let body : requestBody ={
-            session:{sessionId: sessionId, page: 'appId'},
-            data: undefined
-        }
-       let options = {
-            method : 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
-        }
-        return fetch(url, options).then(function(response: any){
-            console.log('before json parse')
-            return response.json().then(function(data: any){
-                console.log('after json parse')
-                return data.data;
-            })
-        })
-}
-
+import {requestBody, applicantId, saveApplicationId, FormData, beneficiaryPlaceHolder, saveBeneficiary, feeArrangementForm, saveFeeArrangement} from './Utils'
 
 export function saveAppPage(sessionId: string, formData: applicantId){
+    return makeSaveStateCallout(sessionId, 'appId', formData)
+}
+
+export function getAppPage(sessionId: string) {
+    return makeGetPageInfoCallout(sessionId, 'appId');
+}
+
+export function saveBenePage(sessionId: string, formData: FormData)
+{
+    return makeSaveStateCallout(sessionId, 'beneficiary', formData)
+}
+
+export function getBenePage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'beneficiary')
+}
+
+export function saveFeeArangementPage(sessionId: string, formData: feeArrangementForm){
+    return makeSaveStateCallout(sessionId, 'feeArrangement', formData)
+}
+
+export function getFeeArrangementPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'feeArrangement')
+}
+
+function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
     let url = '/saveState'
-    let body : saveApplicationId= {
-    session: {sessionId: sessionId, page: 'appId'},
+    let body : requestBody= {
+    session: {sessionId: sessionId, page: page},
     data: formData
     }
     let options = {
@@ -39,10 +42,12 @@ export function saveAppPage(sessionId: string, formData: applicantId){
     });
 }
 
-export function getBenePage(sessionId: string){
+
+function makeGetPageInfoCallout(sessionId: string, page: string)
+{
     let url = '/getPageFields'
         let body : requestBody ={
-            session:{sessionId: sessionId, page: 'beneficiary'},
+            session:{sessionId: sessionId, page: page},
             data: undefined
         }
        let options = {
@@ -57,24 +62,4 @@ export function getBenePage(sessionId: string){
                 return data.data;
             })
         })
-}
-
-export function saveBenePage(sessionId: string, formData: FormData)
-{
-    let beneData : beneficiaryPlaceHolder = formData as beneficiaryPlaceHolder
-    let url = '/saveState'
-    //temporarily setting this as requestBody until we can more strongly type formData
-    let body : saveBeneficiary= {
-        session: {sessionId: sessionId, page: 'beneficiary'},
-        data: beneData
-    }
-    let options = {
-    method : 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
-    }
-    return fetch(url, options).then(function(response: any){
-        return response.json().then(function(data: any){
-        })
-    });
 }
