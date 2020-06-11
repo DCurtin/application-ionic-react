@@ -99,7 +99,7 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
 
   client.query(objectQuery).then( function( result : pg.QueryResult){
     console.log(result)
-  let beneficiaryList : Array<beneficiary> = result.rows;
+  let beneficiaryList : Array<salesforceSchema.beneficiary> = result.rows;
   let returnData : beneficiaryPlaceHolder = transformBeneficiaries(beneficiaryList)
   console.log(returnData)
   res.json({data:returnData});
@@ -108,27 +108,30 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
   })
 }
 
-function transformBeneficiaries(beneficiaryList : Array<beneficiary>) : beneficiaryPlaceHolder{
+function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.beneficiary>) : beneficiaryPlaceHolder{
   let returnData : any = {};
   let count = 0;
   returnData[`beneficiary_count__c`] = beneficiaryList.length,
   beneficiaryList.forEach(element => {
+    let address : addressSchema = element.address as addressSchema;
+    console.log(element)
     ++count;
-    returnData[`beneficiary_city_${count}__c`]= element.beneficiary_city,
-    returnData[`beneficiary_dob_${count}__c`] = ''
-    returnData[`beneficiary_email_${count}__c`] = ''
-    returnData[`beneficiary_first_name_${count}__c`]= ''
-    returnData[`beneficiary_last_name_${count}__c`]= ''
-    returnData[`beneficiary_phone_${count}__c`] = ''
-    returnData[`beneficiary_relationship_${count}__c`] =''
-    returnData[`beneficiary_share_${count}__c`] = ''
-    returnData[`beneficiary_ssn_${count}__c`] =''
-    returnData[`beneficiary_state_${count}__c`] = ''
-    returnData[`beneficiary_street_${count}__c`] = ''
-    returnData[`beneficiary_token_${count}__c`] =''
-    returnData[`beneficiary_type_${count}__c`] = ''
-    returnData[`beneficiary_zip_${count}__c`] =''
+    returnData[`beneficiary_city_${count}__c`] = address.city
+    returnData[`beneficiary_dob_${count}__c`] = element.date_of_birth
+    returnData[`beneficiary_email_${count}__c`] = element.email
+    returnData[`beneficiary_first_name_${count}__c`]= element.first_name
+    returnData[`beneficiary_last_name_${count}__c`]= element.last_name
+    returnData[`beneficiary_phone_${count}__c`] = element.phone
+    returnData[`beneficiary_relationship_${count}__c`] = element.relationship
+    returnData[`beneficiary_share_${count}__c`] = element.share_percentage
+    returnData[`beneficiary_ssn_${count}__c`] = element.social_security_number
+    returnData[`beneficiary_state_${count}__c`] = address.state
+    returnData[`beneficiary_street_${count}__c`] = address.address
+    returnData[`beneficiary_token_${count}__c`] = element.token
+    returnData[`beneficiary_type_${count}__c`] = element.beneficiary_type
+    returnData[`beneficiary_zip_${count}__c`] = address.zip
   })
+  //console.log(returnData);
 
   return returnData;
    /*{
