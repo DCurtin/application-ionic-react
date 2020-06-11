@@ -20,6 +20,7 @@ import AccountNotifications from '../components/AccountNotifications';
 import Transfers from '../components/Transfers';
 import Rollovers from '../components/Rollovers';
 import InitialInvestment from '../components/InitialInvestment';
+import NewContribution from '../components/NewContribution';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -152,7 +153,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'RolloverPlan':
         return <Rollovers sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId}/>
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId}/>;
+      case 'NewContribution':
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId}/>;
       default:
         return <ExploreContainer name={pageName} currentState={currentState}/>
     }
