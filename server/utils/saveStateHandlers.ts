@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
@@ -7,46 +7,54 @@ import pg from 'pg';
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: welcomePageParameters, res: express.Response, client: pg.Client)
 {
   let welcomePageUpsertQuery : queryParameters = updateWelcomeForm(sessionId, welcomeParameters);
-  console.log(welcomePageUpsertQuery);
-  client.query(welcomePageUpsertQuery).then(result=>{
-    res.send('ok');
- }).catch(err=>{
-  console.log(err);
-  res.status(500).send('failed');
-})
+  runQuery(welcomePageUpsertQuery, res, client);
 }
 
 export function saveApplicationIdPage(sessionId: string, applicantForm : applicantId, res: express.Response, client: pg.Client){
-    let appQueryInsert : queryParameters = updateAppId(sessionId, applicantForm);
-    client.query(appQueryInsert).then(result=>{
-      res.send('ok')
-    }).catch(err=>{
-      console.log(err);
-      res.status(500).send('failed');
-    })
+    let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
+    runQuery(appQueryUpsert, res, client);
 }
 
 export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: beneficiaryForm, res: express.Response, client: pg.Client){
-  let queryString :queryParameters = updateBeneficiaries(sessionId, beneficiaryForm);
-  client.query(queryString).then(result=>{
-    res.send('ok');
-  }).catch(err=>{
-    console.log(err);
-    res.status(500).send('failed');
-  })
+  let beneQueryUpsert :queryParameters = updateBeneficiaries(sessionId, beneficiaryForm);
+  runQuery(beneQueryUpsert, res, client);
+  //res.send('ok');
 }
 
 export function saveFeeArrangementPage(sessionId: string, feeArrangementForm: feeArrangementForm, res: express.Response, client: pg.Client){
-  let queryString : queryParameters = updateFeeArrangementPage(sessionId, feeArrangementForm);
-  client.query(queryString).then(result=>{
-    res.send('ok');
-  }).catch(err=>{
-    console.log(err);
-    res.status(500).send('failed saving fee arrangements');
-  })
+  let feeArrangementQueryUpsert : queryParameters = updateFeeArrangementPage(sessionId, feeArrangementForm);
+  runQuery(feeArrangementQueryUpsert, res, client);
+}
+
+export function saveAccountNotificationsPage(sessionId: string, accountNotificationsForm: accountNotificationsForm,  res: express.Response, client: pg.Client){
+  let accountNotificationsQueryUpsert : queryParameters = updateAccountNotifications(sessionId, accountNotificationsForm);
+  runQuery(accountNotificationsQueryUpsert, res, client);
 }
 
 //HELPERS
+
+
+function updateAccountNotifications(token: string, accountNotificationsForm: accountNotificationsForm): queryParameters
+{
+  let upsertAccountNotificationsParameters: salesforceSchema.interested_party ={
+    statement_option : accountNotificationsForm.statement_option__c,
+    access_level: accountNotificationsForm.interested_party_access_level__c,
+    address : generateIPAddress(accountNotificationsForm),
+    company_name: accountNotificationsForm.interested_party_company_name__c,
+    email : accountNotificationsForm.interested_party_email__c,
+    email_notifications : accountNotificationsForm.interested_party_email_notifications__c,
+    first_name : accountNotificationsForm.interested_party_first_name__c,
+    middle_name : '',
+    last_name : accountNotificationsForm.interested_party_last_name__c,
+    phone : accountNotificationsForm.interested_party_phone__c,
+    title : accountNotificationsForm.interested_party_title__c,
+    online_access : accountNotificationsForm.interested_party_online_access__c,
+    ira_statement : accountNotificationsForm.interested_party_ira_statement__c,
+    token : token
+  }
+  return generateQueryString('interested_party', upsertAccountNotificationsParameters, 'token')
+}
+
 function updateFeeArrangementPage(token: string, feeArrangementForm: feeArrangementForm): queryParameters{
   let upsertFeeArrangementParamters : salesforceSchema.fee_arrangement ={
     credit_number: feeArrangementForm.cc_number__c,
@@ -139,6 +147,9 @@ function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): q
   return generateQueryStringFromList('beneficiary', beneficiaryDataList, 'bene_uuid');
 }
 
+function generateQueryString(table : string, upsertObject : any , constraint: string = undefined) : queryParameters{
+  return generateQueryStringFromList(table, [upsertObject], constraint);
+}
 
 function generateQueryStringFromList(table: string, upsertObjectList : Array<any>, constraint: string = undefined): queryParameters{
   let pgFields : string = '';
@@ -177,12 +188,7 @@ function generateQueryStringFromList(table: string, upsertObjectList : Array<any
     text: insertString,
     values: valueList
   }
-}
-
-function generateQueryString(table : string, upsertObject : any , constraint: string = undefined) : queryParameters{
-  return generateQueryStringFromList(table, [upsertObject], constraint);
-}
-  
+}  
   
 function generateAddress(applicantForm: applicantId): {'mailing': addressSchema, 'legal': addressSchema}{
   let resultAddress : {'mailing': addressSchema, 'legal': addressSchema} ={
@@ -212,6 +218,16 @@ function generateBeneAddress(beneForm: beneficiary): addressSchema{
   return resultAddress;
 }
 
+function generateIPAddress(accountNotificationsForm: accountNotificationsForm): addressSchema{
+  let resultAddress: addressSchema ={
+    address : accountNotificationsForm.interested_party_street__c,
+    city : accountNotificationsForm.interested_party_city__c,
+    state : accountNotificationsForm.interested_party_state__c,
+    zip : accountNotificationsForm.interested_party_zip__c
+  }
+  return resultAddress;
+}
+
 function generateIdentification(applicantForm: applicantId): identificationSchema{
   let resultId: identificationSchema ={
     expirationDate: applicantForm.expirationDate,
@@ -222,4 +238,14 @@ function generateIdentification(applicantForm: applicantId): identificationSchem
   }
 
   return resultId;
+}
+
+function runQuery(queryString: queryParameters, res: express.Response, client: pg.Client)
+{
+  client.query(queryString).then(result=>{
+    res.send('ok');
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).send('failed saving fee arrangements');
+  })
 }
