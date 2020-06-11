@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
+import moment from 'moment'; 
 
 const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState({
@@ -10,13 +11,32 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         bank_account_type__c: '', 
         routing_number__c: '', 
         account_number__c: '', 
-        bank_name__c: ''
+        bank_name__c: '', 
+        account_type__c: 'Traditional IRA'
     });
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
-        console.log(formData);
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
+    }
+
+    const validateRoutingNumber = (e:CustomEvent) => {
+        let routingNumberInput = e.detail.value;
+    }
+
+    const showTaxYearInput = (accountType:string) => {
+        let showTaxYearInput = false; 
+        let jan = moment().date(1);
+        jan.month(0);
+        
+        //TO DO: After 2020 Tax Deadline, update to Apr 15
+        let jul = moment().date(15);
+        jul.month(6);
+
+        if (moment().isBetween(jan, jul) && accountType !== 'SEP IRA'){
+            showTaxYearInput = true; 
+        }
+        return showTaxYearInput; 
     }
 
     return (
@@ -35,20 +55,25 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonText>
                 </IonItemDivider>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size='6'>
                         <IonLabel>
                             Amount
                         </IonLabel>
                         <IonInput name='new_contribution_amount__c' value={formData.new_contribution_amount__c} onIonChange={updateForm}></IonInput>
                     </IonCol>
-                    <IonCol>
-                        <IonLabel>
-                            Tax Year
-                        </IonLabel>
-                        <IonSelect value={formData.tax_year__c} name='tax_year__c' onIonChange={updateForm}>
-
-                        </IonSelect>
-                    </IonCol>
+                    {showTaxYearInput(formData.account_type__c) && (
+                        <IonCol>
+                            <IonLabel>
+                                Tax Year
+                            </IonLabel>
+                            <IonSelect value={formData.tax_year__c} name='tax_year__c' onIonChange={updateForm}>
+                                <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
+                                <IonSelectOption value='Last Year'>
+                                    Last Year
+                                </IonSelectOption>
+                            </IonSelect>
+                        </IonCol>
+                    )}
                 </IonRow>
                 <IonRow>
                     <IonCol>
@@ -66,6 +91,12 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             <IonSelectOption value='Savings'>Savings </IonSelectOption>
                         </IonSelect>
                     </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        Bank ABA/Routing Number
+                    </IonCol>
+                    <IonInput name='routing_number__c' value={formData.routing_number__c} onIonChange={validateRoutingNumber}></IonInput>
                 </IonRow>
             </IonGrid>
         </IonContent>
