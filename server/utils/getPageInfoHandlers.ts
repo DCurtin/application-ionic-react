@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema} from './helperSchemas'
 import express from 'express';
@@ -99,7 +99,7 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
 
   client.query(objectQuery).then( function( result : pg.QueryResult){
     console.log(result)
-  let beneficiaryList : Array<beneficiary> = result.rows;
+  let beneficiaryList : Array<salesforceSchema.beneficiary> = result.rows;
   let returnData : beneficiaryPlaceHolder = transformBeneficiaries(beneficiaryList)
   console.log(returnData)
   res.json({data:returnData});
@@ -108,45 +108,62 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
   })
 }
 
-function transformBeneficiaries(beneficiaryList : Array<beneficiary>) : beneficiaryPlaceHolder{
+function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.beneficiary>) : beneficiaryPlaceHolder{
   let returnData : any = {};
   let count = 0;
   returnData[`beneficiary_count__c`] = beneficiaryList.length,
   beneficiaryList.forEach(element => {
+    let address : addressSchema = element.address as addressSchema;
+    console.log(element)
     ++count;
-    returnData[`beneficiary_city_${count}__c`]= element.beneficiary_city,
-    returnData[`beneficiary_dob_${count}__c`] = ''
-    returnData[`beneficiary_email_${count}__c`] = ''
-    returnData[`beneficiary_first_name_${count}__c`]= ''
-    returnData[`beneficiary_last_name_${count}__c`]= ''
-    returnData[`beneficiary_phone_${count}__c`] = ''
-    returnData[`beneficiary_relationship_${count}__c`] =''
-    returnData[`beneficiary_share_${count}__c`] = ''
-    returnData[`beneficiary_ssn_${count}__c`] =''
-    returnData[`beneficiary_state_${count}__c`] = ''
-    returnData[`beneficiary_street_${count}__c`] = ''
-    returnData[`beneficiary_token_${count}__c`] =''
-    returnData[`beneficiary_type_${count}__c`] = ''
-    returnData[`beneficiary_zip_${count}__c`] =''
+    returnData[`beneficiary_city_${count}__c`] = address.city
+    returnData[`beneficiary_dob_${count}__c`] = element.date_of_birth
+    returnData[`beneficiary_email_${count}__c`] = element.email
+    returnData[`beneficiary_first_name_${count}__c`]= element.first_name
+    returnData[`beneficiary_last_name_${count}__c`]= element.last_name
+    returnData[`beneficiary_phone_${count}__c`] = element.phone
+    returnData[`beneficiary_relationship_${count}__c`] = element.relationship
+    returnData[`beneficiary_share_${count}__c`] = element.share_percentage
+    returnData[`beneficiary_ssn_${count}__c`] = element.social_security_number
+    returnData[`beneficiary_state_${count}__c`] = address.state
+    returnData[`beneficiary_street_${count}__c`] = address.address
+    returnData[`beneficiary_token_${count}__c`] = element.token
+    returnData[`beneficiary_type_${count}__c`] = element.beneficiary_type
+    returnData[`beneficiary_zip_${count}__c`] = address.zip
   })
+  //console.log(returnData);
 
   return returnData;
-   /*{
-    beneficiary_count__c: beneficiaryList.length,
-    beneficiary_city_1__c: '',
-    beneficiary_dob_1__c: '',
-    beneficiary_email_1__c: '',
-    beneficiary_first_name_1__c: '',
-    beneficiary_last_name_1__c: '',
-    beneficiary_phone_1__c: '',
-    beneficiary_relationship_1__c: '',
-    beneficiary_share_1__c: '',
-    beneficiary_ssn_1__c:'',
-    beneficiary_state_1__c:'',
-    beneficiary_street_1__c:'',
-    beneficiary_token_1__c:'',
-    beneficiary_type_1__c:'',
-    beneficiary_zip_1__c:''
-  }*/
+}
 
+export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
+  let feeArrangementQuery = {
+    text: 'SELECT * FROM salesforce.fee_arrangement WHERE token = $1',
+    values: [sessionId]
+  }
+
+  let bodyQuery = {
+    text: 'SELECT investment_type FROM salesforce.body WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(feeArrangementQuery).then( function( feeArrangementResult : pg.QueryResult){
+    let feeArrangementData : salesforceSchema.fee_arrangement = feeArrangementResult.rows[0];
+    
+    client.query(bodyQuery).then( function(bodyResult:pg.QueryResult){
+    let investMentType : string = bodyResult.rows[0].investment_type
+
+    let feeArrangementForm : feeArrangementForm ={
+      cc_exp_date__c: feeArrangementData.expiration_date,
+      fee_schedule__c: feeArrangementData.fee_agreement,
+      cc_number__c: feeArrangementData.credit_number,
+      payment_method__c: feeArrangementData.payment_method,
+      initial_investment_type__c: investMentType
+    }
+    console.log(feeArrangementForm)
+    res.json({data:feeArrangementForm});
+    })
+  }).catch(err=>{
+    res.status(500).send('failed getting bene data');
+  })
 }

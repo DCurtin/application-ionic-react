@@ -11,5 +11,7 @@ DROP TABLE IF EXISTS salesforce.Rollover;
 CREATE TABLE salesforce.Rollover(amount float(2),institution_name text,account_type text,account_number text,funds_delivery_method_to_midland text,rollover_type text,delivery_method text,contact_name text,contact_phone_number text,address json,token uuid NOT NULL);
 DROP TABLE IF EXISTS salesforce.Transfer;
 CREATE TABLE salesforce.Transfer(amount float(2),full_or_partial text,institution_name text,account_type text,account_number text,funds_delivery_method_to_midland text,delivery_method text,contact_name text,contact_phone_number text,address json,token uuid NOT NULL);
+DROP TABLE IF EXISTS salesforce.Fee_Arrangement;
+CREATE TABLE salesforce.Fee_Arrangement(fee_agreement text,payment_method text,credit_number text,expiration_date text,token uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Interested_Party;
 CREATE TABLE salesforce.Interested_Party(first_name text,middle_name text,last_name text,social_security_number text,date_of_birth date,email text,phone text,beneficiary_type text,relationship text,share_percentage float(2),address json,token uuid NOT NULL);

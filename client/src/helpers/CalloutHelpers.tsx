@@ -1,4 +1,4 @@
-import {requestBody, applicantId, saveApplicationId, FormData, beneficiaryPlaceHolder, saveBeneficiary} from './Utils'
+import {requestBody, applicantId, saveApplicationId, FormData, beneficiaryPlaceHolder, saveBeneficiary, feeArrangementForm, saveFeeArrangement} from './Utils'
 
 export function getAppPage(sessionId: string) {
        //query fields
@@ -78,4 +78,43 @@ export function saveBenePage(sessionId: string, formData: FormData)
         return response.json().then(function(data: any){
         })
     });
+}
+
+export function saveFeeArangementPage(sessionId: string, formData: feeArrangementForm){
+    let feeArangementData : feeArrangementForm = formData
+    let url = '/saveState'
+
+    let body: saveFeeArrangement ={
+        session: {sessionId: sessionId, page: 'feeArrangement'},
+        data: feeArangementData
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data:any){
+        })
+    })
+}
+
+export function getFeeArrangementPage(sessionId: string){
+    let url = '/getPageFields'
+        let body : requestBody ={
+            session:{sessionId: sessionId, page: 'feeArrangement'},
+            data: undefined
+        }
+       let options = {
+            method : 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        }
+        return fetch(url, options).then(function(response: any){
+            console.log('before json parse')
+            return response.json().then(function(data: any){
+                console.log('after json parse')
+                return data.data;
+            })
+        })
 }

@@ -3,7 +3,7 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiaryForm} from './client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiaryForm, feeArrangementForm} from './client/src/helpers/Utils'
 import * as salesforceSchema from './server/utils/salesforce'
 import {queryParameters} from './server/utils/helperSchemas'
 import {transformBeneficiaries} from './server/utils/transformBeneficiaries'
@@ -181,6 +181,12 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
     saveStateHandlers.saveBeneficiaryPage(sessionId, beneficiaryData, res, client);
     return 
   }
+
+  if(page === 'feeArrangement'){
+    let feeArrangementData : feeArrangementForm = packet.data;
+    saveStateHandlers.saveFeeArrangementPage(sessionId, feeArrangementData, res, client);
+    return
+  }
 });
 
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
@@ -224,6 +230,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   if(page === 'beneficiary')
   {
     getPageInfoHandlers.handleBeneficiaryPage(sessionId, res, client);
+    return
+  }
+
+  if(page === 'feeArrangement'){
+    getPageInfoHandlers.handleFeeArrangementPage(sessionId, res, client);
     return
   }
 

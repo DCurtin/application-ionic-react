@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
@@ -7,6 +7,7 @@ import pg from 'pg';
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: welcomePageParameters, res: express.Response, client: pg.Client)
 {
   let welcomePageUpsertQuery : queryParameters = updateWelcomeForm(sessionId, welcomeParameters);
+  console.log(welcomePageUpsertQuery);
   client.query(welcomePageUpsertQuery).then(result=>{
     res.send('ok');
  }).catch(err=>{
@@ -36,7 +37,29 @@ export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: benefici
   //res.send('ok');
 }
 
+export function saveFeeArrangementPage(sessionId: string, feeArrangementForm: feeArrangementForm, res: express.Response, client: pg.Client){
+  let queryString : queryParameters = updateFeeArrangementPage(sessionId, feeArrangementForm);
+  client.query(queryString).then(result=>{
+    res.send('ok');
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).send('failed saving fee arrangements');
+  })
+}
+
 //HELPERS
+function updateFeeArrangementPage(token: string, feeArrangementForm: feeArrangementForm): queryParameters{
+  let upsertFeeArrangementParamters : salesforceSchema.fee_arrangement ={
+    credit_number: feeArrangementForm.cc_number__c,
+    expiration_date: feeArrangementForm.cc_exp_date__c,
+    fee_agreement: feeArrangementForm.fee_schedule__c,
+    payment_method: feeArrangementForm.payment_method__c,
+    token: token
+  }
+
+  return generateQueryString('fee_arrangement', upsertFeeArrangementParamters, 'token')
+}
+
 function updateWelcomeForm(token: string, welcomeParameters: welcomePageParameters): queryParameters{
   let upsertWelcomeParameters : salesforceSchema.body ={
     account_type: welcomeParameters.AccountType,
@@ -49,12 +72,12 @@ function updateWelcomeForm(token: string, welcomeParameters: welcomePageParamete
     offering_id: welcomeParameters.ReferralCode,
     token: token,
     //need to make these nullable and exclude them from this upsert or possibly move them to their own table
-    bank_account: '',
+    bank_account: {},
     case_management: '',
-    credit_card: '',
+    credit_card: {},
     investment_amount:0
   }
-  return generateQueryString('body', updateWelcomeForm, 'token');
+  return generateQueryString('body', upsertWelcomeParameters, 'token');
 }
 
 function updateAppId(token : string, applicantForm : applicantId): queryParameters{
