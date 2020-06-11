@@ -5,6 +5,7 @@ import { addOutline } from 'ionicons/icons';
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
+        account_type__c: 'Traditional IRA',
         existing_employer_plan_roll_overs__c: 0
     });
 
@@ -30,7 +31,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         if (rolloverCount > 0)
         {
             let formRows = [];
-            for (let i = 1; i<rolloverCount + 1; i++){
+            for (let i = 1; i< rolloverCount + 1; i++){
                 formRows.push(
                     <React.Fragment key={i}>
                         <IonItemDivider>
@@ -102,8 +103,52 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonLabel>
-
+                                    Account Type
                                 </IonLabel>
+                                <IonSelect value={formData[`employer_account_type_${i}__c`]} name={`employer_account_type_${i}__c`} onIonChange={updateForm}>
+                                    {formData.account_type__c.includes('Roth') ? (
+                                        <React.Fragment>
+                                            <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
+                                        </React.Fragment>
+                                    ) : (
+                                        <React.Fragment>
+                                            <IonSelectOption value='Traditional IRA'>
+                                                Traditional IRA
+                                            </IonSelectOption>
+                                            <IonSelectOption value='SEP IRA'>
+                                                SEP IRA
+                                            </IonSelectOption>
+                                            <IonSelectOption value='Simple IRA'>
+                                                Simple IRA
+                                            </IonSelectOption>
+                                        </React.Fragment>
+                                    )}
+                                    <IonSelectOption value='Individual(k)'>Individual(k)</IonSelectOption>
+                                    <IonSelectOption value='Profit Sharing Plan'>
+                                        Profit Sharing Plan
+                                    </IonSelectOption>
+                                    <IonSelectOption value='401(k)'>401(k)</IonSelectOption>
+                                    <IonSelectOption value='403(b)'> 403(b)</IonSelectOption>
+                                    <IonSelectOption value='Defined Benefit Plan'>Defined Benefit Plan</IonSelectOption>
+                                </IonSelect>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel> Account Number</IonLabel>
+                                <IonInput name={`employer_account_number_${i}__c`} value={formData[`employer_account_number_${i}__c`]} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonCol size='6'>
+                                <IonLabel>
+                                    Rollover Type
+                                </IonLabel>
+                                <IonSelect value={formData[`employer_rollover_type_${i}__c`]} name={`employer_rollover_type_${i}__c`} onIonChange={updateForm}>
+                                    <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
+                                    <IonSelectOption value='Indirect Rollover'>
+                                        Indirect Rollover
+                                    </IonSelectOption>
+                                </IonSelect>
+                                <em><b>Direct Rollover </b> - Funds are currently in an employer plan.<br/><b>Indirect Rollover</b> - I have or will receive the funds directly from my plan and would like to rollover those funds to my Midland Trust.<br/></em>
                             </IonCol>
                         </IonRow>
                     </React.Fragment>
