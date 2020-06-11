@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
-import { stat } from 'fs';
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
@@ -103,7 +102,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonLabel>
-                                    
+
                                 </IonLabel>
                             </IonCol>
                         </IonRow>
