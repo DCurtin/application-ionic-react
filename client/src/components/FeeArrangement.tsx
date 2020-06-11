@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {SessionApp} from '../helpers/Utils';
+import {SessionApp, feeArrangementForm} from '../helpers/Utils';
 import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
+import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers'
 
 const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-    useEffect(() => {
-        // TO DO : 
-    })
-    const [formData, setFormData] = useState({
+    const history = useHistory();
+    const [formData, setFormData] = useState<feeArrangementForm>({
         initial_investment_type__c: '',
         fee_schedule__c: '',
         payment_method__c:'',
@@ -14,8 +14,36 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         cc_exp_date__c: ''
     });
 
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getFeeArrangementPage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                console.log(data);
+                ImportForm(data);
+            })
+        }
+    },[sessionId])
+
+    
+    function ImportForm(data : any){
+        let importedForm : feeArrangementForm = data
+        setFormData(importedForm);
+    }
+
+    useEffect(()=>{
+      return history.listen(()=>{
+        console.log('saving bene');
+        saveFeeArangementPage(sessionId, formData);
+      })
+    },[formData])
+
     const updateForm = (e:any) => {
-        setFormData({...formData, [e.target.name]:e.target.value});
+        let newValue = e.target.value;
+        setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
     return (
         <IonContent className='ion-padding'>
