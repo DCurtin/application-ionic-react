@@ -93,10 +93,12 @@ function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): q
   let count = 0;
   beneficiaryData.beneficiaries.forEach(bene =>{
     count++;
+    console.log('dob')
+    console.log(bene.beneficiary_dob)
     let beneficiaries : salesforceSchema.beneficiary ={
       address: generateBeneAddress(bene),
       beneficiary_type: bene.beneficiary_type,
-      date_of_birth: bene.beneficiary_dob === '' ? undefined : new Date(bene.beneficiary_dob),
+      date_of_birth: (bene.beneficiary_dob === '' || bene.beneficiary_dob === undefined) ? undefined : new Date(bene.beneficiary_dob),
       email: bene.beneficiary_email,
       first_name: bene.beneficiary_first_name,
       last_name: bene.beneficiary_last_name,

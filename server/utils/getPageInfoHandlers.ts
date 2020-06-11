@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema} from './helperSchemas'
 import express from 'express';
@@ -98,8 +98,55 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
   }
 
   client.query(objectQuery).then( function( result : pg.QueryResult){
-
+    console.log(result)
+  let beneficiaryList : Array<beneficiary> = result.rows;
+  let returnData : beneficiaryPlaceHolder = transformBeneficiaries(beneficiaryList)
+  console.log(returnData)
+  res.json({data:returnData});
   }).catch(err=>{
     res.status(500).send('failed getting bene data');
   })
+}
+
+function transformBeneficiaries(beneficiaryList : Array<beneficiary>) : beneficiaryPlaceHolder{
+  let returnData : any = {};
+  let count = 0;
+  returnData[`beneficiary_count__c`] = beneficiaryList.length,
+  beneficiaryList.forEach(element => {
+    ++count;
+    returnData[`beneficiary_city_${count}__c`]= element.beneficiary_city,
+    returnData[`beneficiary_dob_${count}__c`] = ''
+    returnData[`beneficiary_email_${count}__c`] = ''
+    returnData[`beneficiary_first_name_${count}__c`]= ''
+    returnData[`beneficiary_last_name_${count}__c`]= ''
+    returnData[`beneficiary_phone_${count}__c`] = ''
+    returnData[`beneficiary_relationship_${count}__c`] =''
+    returnData[`beneficiary_share_${count}__c`] = ''
+    returnData[`beneficiary_ssn_${count}__c`] =''
+    returnData[`beneficiary_state_${count}__c`] = ''
+    returnData[`beneficiary_street_${count}__c`] = ''
+    returnData[`beneficiary_token_${count}__c`] =''
+    returnData[`beneficiary_type_${count}__c`] = ''
+    returnData[`beneficiary_zip_${count}__c`] =''
+  })
+
+  return returnData;
+   /*{
+    beneficiary_count__c: beneficiaryList.length,
+    beneficiary_city_1__c: '',
+    beneficiary_dob_1__c: '',
+    beneficiary_email_1__c: '',
+    beneficiary_first_name_1__c: '',
+    beneficiary_last_name_1__c: '',
+    beneficiary_phone_1__c: '',
+    beneficiary_relationship_1__c: '',
+    beneficiary_share_1__c: '',
+    beneficiary_ssn_1__c:'',
+    beneficiary_state_1__c:'',
+    beneficiary_street_1__c:'',
+    beneficiary_token_1__c:'',
+    beneficiary_type_1__c:'',
+    beneficiary_zip_1__c:''
+  }*/
+
 }
