@@ -33,6 +33,14 @@ export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
 }
 
+export function saveTransferPage(sessionId: string, formData: FormData){
+    return makeSaveStateCallout(sessionId, 'transfer', formData)
+}
+
+export function getTransferPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'transfer')
+}
+
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
     let url = '/saveState'
     let body : requestBody= {

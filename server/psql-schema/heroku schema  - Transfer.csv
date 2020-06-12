@@ -9,4 +9,6 @@ delivery_method,text,,
 contact_name,text,,
 contact_phone_number,text,,
 address,json,,
+index,integer,,yes
+key,text,yes,yes
 token,uuid,,yes
