@@ -2,12 +2,40 @@ import React, {useState, useEffect} from 'react';
 import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
 
 const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+    const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
         account_type__c: 'Traditional IRA',
         existing_ira_transfers__c: 0
     })
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getTransferPage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+    },[sessionId])
+
+    
+    function ImportForm(data : any){
+        let importedForm : FormData = data
+        setFormData(importedForm);
+    }
+
+    useEffect(()=>{
+      return history.listen(()=>{
+        console.log('saving bene');
+        saveTransferPage(sessionId, formData);
+      })
+    },[formData])
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
