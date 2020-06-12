@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema} from './helperSchemas'
 import express from 'express';
@@ -6,11 +6,11 @@ import pg from 'pg';
 
 export function handleWelcomePageRequest(sessionId: string, res: express.Response, client: pg.Client)
 {
-    let objectQuery = {
+    let bodyQuery = {
         text : 'SELECT * FROM salesforce.body WHERE token = $1',
         values : [sessionId]
       }
-      client.query(objectQuery).then( function(result:any){
+      client.query(bodyQuery).then( function(result:any){
       //get data from database
       //load into response
       let welcomePage : welcomePageParameters;
@@ -31,11 +31,11 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
 }
 
 export function handleApplicationIdPage(sessionId: string, res: express.Response, client: pg.Client){
-    let objectQuery = {
+    let applicantQuery = {
         text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
         values : [sessionId]
       }
-      client.query(objectQuery).then( function(result:pg.QueryResult ){
+      client.query(applicantQuery).then( function(result:pg.QueryResult ){
         let row : salesforceSchema.applicant = result.rows[0]
         if(row === undefined){
           res.json({data:row});
@@ -84,12 +84,12 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 }
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
-  let objectQuery = {
+  let beneQuery = {
     text: 'SELECT * FROM salesforce.beneficiary WHERE token = $1',
     values: [sessionId]
   }
 
-  client.query(objectQuery).then( function( result : pg.QueryResult){
+  client.query(beneQuery).then( function( result : pg.QueryResult){
   let beneficiaryList : Array<salesforceSchema.beneficiary> = result.rows;
   let returnData : beneficiaryPlaceHolder = transformBeneficiaries(beneficiaryList)
   res.json({data:returnData});
@@ -97,6 +97,74 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
     res.status(500).send('failed getting bene data');
   })
 }
+
+export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
+  let feeArrangementQuery = {
+    text: 'SELECT * FROM salesforce.fee_arrangement WHERE token = $1',
+    values: [sessionId]
+  }
+
+  let bodyQuery = {
+    text: 'SELECT investment_type FROM salesforce.body WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(feeArrangementQuery).then( function( feeArrangementResult : pg.QueryResult){
+    let feeArrangementData : salesforceSchema.fee_arrangement = feeArrangementResult.rows[0];
+    if(feeArrangementData === undefined)
+    {
+      res.send('no rows');
+    }
+
+    client.query(bodyQuery).then( function(bodyResult:pg.QueryResult){
+    let investMentType : string = bodyResult.rows[0]?.investment_type
+
+    let feeArrangementForm : feeArrangementForm ={
+      cc_exp_date__c: feeArrangementData.expiration_date,
+      fee_schedule__c: feeArrangementData.fee_agreement,
+      cc_number__c: feeArrangementData.credit_number,
+      payment_method__c: feeArrangementData.payment_method,
+      initial_investment_type__c: investMentType
+    }
+    res.json({data:feeArrangementForm});
+    })
+  }).catch(err=>{
+    res.status(500).send('failed getting bene data');
+  })
+}
+
+export function handleAccountNotificationPage(sessionId:string, res: express.Response, client: pg.Client){
+  let interestedPartyQuery = {
+    text: 'SELECT * FROM salesforce.interested_party WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(interestedPartyQuery).then(function(result : pg.QueryResult){
+    let interestedPartyInfo : salesforceSchema.interested_party = result.rows[0];
+    let ipAddress : addressSchema = interestedPartyInfo.address as addressSchema
+    let accountNotificationsForm : accountNotificationsForm = {
+      interested_party_access_level__c: interestedPartyInfo.access_level,
+      statement_option__c: interestedPartyInfo.statement_option,
+      interested_party_street__c: ipAddress.address,
+      interested_party_city__c: ipAddress.city,
+      interested_party_state__c: ipAddress.state,
+      interested_party_zip__c: ipAddress.zip,
+      interested_party_company_name__c: interestedPartyInfo.company_name,
+      interested_party_email__c: interestedPartyInfo.email,
+      interested_party_email_notifications__c: interestedPartyInfo.email_notifications,
+      interested_party_phone__c: interestedPartyInfo.phone,
+      interested_party_first_name__c: interestedPartyInfo.first_name,
+      interested_party_last_name__c: interestedPartyInfo.last_name,
+      interested_party_ira_statement__c: interestedPartyInfo.ira_statement,
+      interested_party_online_access__c: interestedPartyInfo.online_access,
+      interested_party_title__c: interestedPartyInfo.title
+    }
+    res.json({data:accountNotificationsForm});
+  })
+}
+
+
+//helpers
 
 function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.beneficiary>) : beneficiaryPlaceHolder{
   let returnData : any = {};
@@ -123,35 +191,4 @@ function transformBeneficiaries(beneficiaryList : Array<salesforceSchema.benefic
 
 
   return returnData;
-}
-
-export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
-  let feeArrangementQuery = {
-    text: 'SELECT * FROM salesforce.fee_arrangement WHERE token = $1',
-    values: [sessionId]
-  }
-
-  let bodyQuery = {
-    text: 'SELECT investment_type FROM salesforce.body WHERE token = $1',
-    values: [sessionId]
-  }
-
-  client.query(feeArrangementQuery).then( function( feeArrangementResult : pg.QueryResult){
-    let feeArrangementData : salesforceSchema.fee_arrangement = feeArrangementResult.rows[0];
-    
-    client.query(bodyQuery).then( function(bodyResult:pg.QueryResult){
-    let investMentType : string = bodyResult.rows[0].investment_type
-
-    let feeArrangementForm : feeArrangementForm ={
-      cc_exp_date__c: feeArrangementData.expiration_date,
-      fee_schedule__c: feeArrangementData.fee_agreement,
-      cc_number__c: feeArrangementData.credit_number,
-      payment_method__c: feeArrangementData.payment_method,
-      initial_investment_type__c: investMentType
-    }
-    res.json({data:feeArrangementForm});
-    })
-  }).catch(err=>{
-    res.status(500).send('failed getting bene data');
-  })
 }

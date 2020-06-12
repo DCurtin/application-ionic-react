@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { SessionApp, states, accountNotificationsForm } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers'
 const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterly', 'Mailed Annually']
 
 const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
@@ -24,7 +25,31 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
         interested_party_ira_statement__c: ''
     })
 
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getAccountNotificationsPage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+    },[sessionId])
 
+    
+    function ImportForm(data : any){
+        let importedForm : accountNotificationsForm = data
+        setFormData(importedForm);
+    }
+
+    useEffect(()=>{
+      return history.listen(()=>{
+        console.log('saving bene');
+        saveAccountNotificationsPage(sessionId, formData);
+      })
+    },[formData])
 
     const updateForm = (e:any) => {
         setFormData(prevState => {
