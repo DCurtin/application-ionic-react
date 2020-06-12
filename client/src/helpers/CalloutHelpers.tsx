@@ -1,6 +1,6 @@
-import {requestBody, applicantId, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
+import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
 
-export function saveAppPage(sessionId: string, formData: applicantId){
+export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
 }
 

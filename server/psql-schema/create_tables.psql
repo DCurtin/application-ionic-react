@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS salesforce;
 DROP TABLE IF EXISTS salesforce.Applicant;
-CREATE TABLE salesforce.Applicant(salutation text,first_name text,middle_name text,last_name text,social_security_number text,date_of_birth text,email text,phone text,marital_status text,alternate_phone text,alternate_phone_type text,preferred_contact_method text,mothers_maiden_name text,statement text,occupation text,home_and_mailing_address_different boolean,has_hsa boolean,is_self_employed boolean,identification json,legal_address json,mailing_address json,token uuid UNIQUE NOT NULL);
+CREATE TABLE salesforce.Applicant(salutation text,first_name text,middle_name text,last_name text,ssn text,dob text,email text,primary_phone text,marital_status text,alternate_phone text,alternate_phone_type text,preferred_contact_method text,mothers_maiden_name text,statement text,occupation text,home_and_mailing_address_different boolean,has_hsa boolean,is_self_employed boolean,identification json,legal_address json,mailing_address json,token uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Beneficiary;
 CREATE TABLE salesforce.Beneficiary(first_name text,middle_name text,last_name text,social_security_number text,date_of_birth text,email text,phone text,beneficiary_type text,relationship text,share_percentage float(2),address json,position integer,bene_uuid text UNIQUE NOT NULL,token uuid NOT NULL);
 DROP TABLE IF EXISTS salesforce.Body;

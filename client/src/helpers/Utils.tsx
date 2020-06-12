@@ -25,40 +25,40 @@ export interface saveWelcomeParameters extends requestBody{
 }
 
 export interface saveApplicationId extends requestBody{
-    data: applicantId
+    data: applicantIdForm
 }
 
-export interface applicantId{
-    firstName: string, 
-    lastName: string, 
-    ssn: string, 
-    email: string, 
-    confirmEmail: string,
-    dob: string, 
-    salutation: string,
-    maritalStatus: string,
-    mothersMaidenName: string,
-    occupation: string,
-    isSelfEmployed: boolean,
-    hasHSA: boolean,
-    idType: string, 
-    idNumber: string,
-    issuedBy:string, 
-    issueDate: string, 
-    expirationDate: string,
-    legalAddress: string, 
-    legalCity: string, 
-    legalState:string,
-    legalZip: string,
-    homeAndMailingAddressDifferent: boolean,
-    mailingAddress: string, 
-    mailingCity: string, 
-    mailingState: string,
-    mailingZip: string, 
-    primaryPhone: string, 
-    preferredContactMethod: string, 
-    alternatePhone: string, 
-    alternatePhoneType: string
+export interface applicantIdForm{
+    is_self_employed: boolean,
+    has_hsa: boolean,
+    home_and_mailing_address_different: boolean,
+    first_name?: string, 
+    last_name?: string, 
+    ssn?: string, 
+    email?: string, 
+    confirm_email?: string,
+    dob?: string, 
+    salutation?: string,
+    marital_status?: string,
+    mothers_maiden_name?: string,
+    occupation?: string,
+    id_type?: string, 
+    id_number?: string,
+    issued_by?:string, 
+    issue_date?: string, 
+    expiration_date?: string,
+    legal_street?: string, 
+    legal_city?: string, 
+    legal_state?:string,
+    legal_zip?: string,
+    mailing_street?: string, 
+    mailing_city?: string, 
+    mailing_state?: string,
+    mailing_zip?: string, 
+    primary_phone?: string, 
+    preferred_contact_method?: string, 
+    alternate_phone?: string, 
+    alternate_phone_type?: string
 }
 
 export interface FormData {

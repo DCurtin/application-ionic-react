@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm, transfer} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantIdForm, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm, transfer} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
@@ -10,7 +10,7 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: welc
   runQuery(welcomePageUpsertQuery, res, client);
 }
 
-export function saveApplicationIdPage(sessionId: string, applicantForm : applicantId, res: express.Response, client: pg.Client){
+export function saveApplicationIdPage(sessionId: string, applicantForm : applicantIdForm, res: express.Response, client: pg.Client){
     let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
     runQuery(appQueryUpsert, res, client);
 }
@@ -115,34 +115,16 @@ function updateWelcomeForm(token: string, welcomeParameters: welcomePageParamete
   return generateQueryString('body', upsertWelcomeParameters, 'token');
 }
 
-function updateAppId(token : string, applicantForm : applicantId): queryParameters{
+function updateAppId(token : string, applicantForm : applicantIdForm): queryParameters{
     let addresses: {'mailing': addressSchema, 'legal': addressSchema} = generateAddress(applicantForm);
     let identification: identificationSchema = generateIdentification(applicantForm);
-    let upsertApplicant : salesforceSchema.applicant ={
-      alternate_phone: applicantForm.alternatePhone,
-      alternate_phone_type: applicantForm.alternatePhoneType,
-      date_of_birth: applicantForm.dob,
-      email: applicantForm.email,
-      first_name: applicantForm.firstName,
-      last_name: applicantForm.lastName,
-      has_hsa: applicantForm.hasHSA,
-      home_and_mailing_address_different: applicantForm.homeAndMailingAddressDifferent,
-      identification: identification,
-      is_self_employed: applicantForm.isSelfEmployed,
-      legal_address: addresses.legal,
-      mailing_address: addresses.mailing,
-      marital_status: applicantForm.maritalStatus,
-      middle_name: '',
-      mothers_maiden_name: applicantForm.mothersMaidenName,
-      occupation: applicantForm.occupation,
-      phone: applicantForm.primaryPhone,
-      preferred_contact_method: applicantForm.preferredContactMethod,
-      salutation: applicantForm.salutation,
-      social_security_number: applicantForm.ssn,
-      statement: applicantForm.salutation,
-      token: token
-    }
-    return generateQueryString('applicant', upsertApplicant, 'token')
+    let upsertApplicantv2 : Partial<salesforceSchema.applicant> = applicantForm
+    console.log(upsertApplicantv2)
+    upsertApplicantv2.mailing_address = addresses.mailing;
+    upsertApplicantv2.legal_address = addresses.legal;
+    upsertApplicantv2.identification = identification;
+    upsertApplicantv2.token = token;
+    return generateQueryString('applicant', upsertApplicantv2, 'token')
 }
 
 function updateBeneficiaries(token: string, beneficiaryData: beneficiaryForm): queryParameters{
@@ -218,18 +200,18 @@ function generateQueryStringFromList(table: string, upsertObjectList : Array<any
   }
 }  
   
-function generateAddress(applicantForm: applicantId): {'mailing': addressSchema, 'legal': addressSchema}{
+function generateAddress(applicantForm: applicantIdForm): {'mailing': addressSchema, 'legal': addressSchema}{
   let resultAddress : {'mailing': addressSchema, 'legal': addressSchema} ={
-    mailing :{address: applicantForm.mailingAddress,
-      city: applicantForm.mailingCity,
-      state: applicantForm.mailingState,
-      zip: applicantForm.mailingZip
+    mailing :{address: applicantForm.mailing_street,
+      city: applicantForm.mailing_city,
+      state: applicantForm.mailing_state,
+      zip: applicantForm.mailing_zip
     },
     legal:{
-      address: applicantForm.legalAddress,
-      city: applicantForm.legalCity,
-      state: applicantForm.legalState,
-      zip: applicantForm.legalZip
+      address: applicantForm.mailing_street,
+      city: applicantForm.mailing_city,
+      state: applicantForm.mailing_state,
+      zip: applicantForm.mailing_zip
     }
   }
   return resultAddress;
@@ -266,13 +248,13 @@ function generateTransferFormAddress(transfer: transfer){
   return resultAddress;
 }
 
-function generateIdentification(applicantForm: applicantId): identificationSchema{
+function generateIdentification(applicantForm: applicantIdForm): identificationSchema{
   let resultId: identificationSchema ={
-    expirationDate: applicantForm.expirationDate,
-    idNumber: applicantForm.idNumber,
-    idType: applicantForm.idType,
-    issueDate: applicantForm.issueDate,
-    issuedBy: applicantForm.issuedBy
+    expirationDate: applicantForm.expiration_date,
+    idNumber: applicantForm.id_number,
+    idType: applicantForm.id_type,
+    issueDate: applicantForm.issue_date,
+    issuedBy: applicantForm.issued_by
   }
 
   return resultId;

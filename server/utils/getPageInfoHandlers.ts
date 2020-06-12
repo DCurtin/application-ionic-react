@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm, accountNotificationsForm, transferForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantIdForm, beneficiary, beneficiaryPlaceHolder, feeArrangementForm, accountNotificationsForm, transferForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema} from './helperSchemas'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
@@ -37,48 +37,34 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
         text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
         values : [sessionId]
       }
-      client.query(applicantQuery).then( function(result:pg.QueryResult ){
-        let row : salesforceSchema.applicant = result.rows[0]
-        if(row === undefined){
-          res.json({data:row});
+      client.query(applicantQuery).then( function(applicantResult:pg.QueryResult ){
+        let applicantInfo : salesforceSchema.applicant = applicantResult.rows[0]
+        if(applicantInfo === undefined){
+          res.json({data:applicantInfo});
           return;
         }
-        let identification : identificationSchema = <identificationSchema>row?.identification;
-        let legalAddress : addressSchema = <addressSchema>row?.legal_address;
-        let mailingAddress: addressSchema = <addressSchema>row?.mailing_address;
+        let identification : identificationSchema = <identificationSchema>applicantInfo?.identification;
+        let legalAddress : addressSchema = <addressSchema>applicantInfo?.legal_address;
+        let mailingAddress: addressSchema = <addressSchema>applicantInfo?.mailing_address;
   
-        let data : applicantId = {
-          isSelfEmployed: row.is_self_employed,
-          hasHSA: row.has_hsa,
-          homeAndMailingAddressDifferent: row.home_and_mailing_address_different,
-          firstName:row.first_name,
-          lastName:row.last_name, 
-          ssn: row.social_security_number, 
-          email: row.email, 
-          confirmEmail: row.email,
-          dob: row.date_of_birth,
-          salutation: row.salutation,
-          maritalStatus: row.marital_status,
-          mothersMaidenName: row.mothers_maiden_name,
-          occupation: row.occupation,
-          idType: identification === null ? '' : identification.idType, 
-          idNumber: identification === null ? '' : identification.idNumber,
-          issuedBy: identification === null ? '' : identification.issuedBy, 
-          issueDate: identification === null ? '' : identification.issueDate,
-          expirationDate: identification === null ? '' : identification.expirationDate,
-          legalAddress: legalAddress === null ? ''  : legalAddress.address,
-          legalCity: legalAddress === null ? ''  : legalAddress.city,
-          legalState: legalAddress === null ? ''  : legalAddress.state,
-          legalZip: legalAddress === null ? ''  : legalAddress.zip,
-          mailingAddress: mailingAddress === null ? ''  : mailingAddress.address,
-          mailingCity: mailingAddress === null ? ''  : mailingAddress.city,
-          mailingState: mailingAddress === null ? ''  : mailingAddress.state,
-          mailingZip: mailingAddress === null ? ''  : mailingAddress.zip,
-          primaryPhone: row.phone,
-          preferredContactMethod: row.preferred_contact_method,
-          alternatePhone: row.alternate_phone,
-          alternatePhoneType: row.alternate_phone_type
-      };  
+        let data : applicantIdForm = applicantInfo as applicantIdForm
+        data.confirm_email = data.email;
+        
+        data.mailing_street = mailingAddress.address
+        data.mailing_city = mailingAddress.city
+        data.mailing_state = mailingAddress.state
+        data.mailing_zip = mailingAddress.zip
+
+        data.legal_street = legalAddress.address
+        data.legal_city = legalAddress.city
+        data.legal_state = legalAddress.state
+        data.legal_zip = legalAddress.zip
+
+        data.id_number = identification.idNumber
+        data.id_type = identification.idType
+        data.issue_date = identification.issueDate
+        data.expiration_date = identification.expirationDate
+
         res.json({'data': data})
       }).catch(err=>{
         res.status(500).send('failed getting apllicant data');
