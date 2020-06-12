@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, initialInvestmentTypes } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
-import { fingerPrint } from 'ionicons/icons';
 
 const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => {   
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
@@ -138,8 +137,8 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                 {showMinCashBalanceCheckbox(formData) && (
                     <IonRow>
                         <IonCol>
-                            <IonCheckbox></IonCheckbox> 
-                            <IonText slot='start'>
+                            <IonCheckbox></IonCheckbox> &nbsp; 
+                            <IonText className='ion-padding-left'>
                                 Midland has a minimum cash balance requirement of $250 which cannot be included in the investment amount. *   
                             </IonText>
                         </IonCol>
