@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "dangerously-set-inner-html": "^2.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -32,7 +33,7 @@
     "build-psql-csv-to-schema": "pwsh.exe .\\server\\psql-schema\\psql_table_creator\\generate_table.ps1 import-table -path server\\psql-schema\\",
     "build-psql-tables": "powershell.exe .\\scripts\\build-psql.ps1",
     "build-salesforce-schema": "powershell.exe .\\scripts\\build-salesforce.ps1",
-    "build-psql" : "npm run build-psql-csv-to-schema && npm run build-psql-tables && npm run build-salesforce-schema",
+    "build-psql": "npm run build-psql-csv-to-schema && npm run build-psql-tables && npm run build-salesforce-schema",
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "node scripts/start-client.js",
     "build": "npm run tsc && node scripts/build.js",
