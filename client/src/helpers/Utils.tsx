@@ -183,7 +183,6 @@ export interface accountNotificationsForm{
 }
 
 export interface transferForm{
-    deliveryMethodField: string, //no __c
     existing_ira_transfers: number,
     account_type: string,
     transfers: Array<transfer>
@@ -198,8 +197,9 @@ export interface transfer{
     ira_city: string,
     ira_state: string,
     ira_zip: string,
-    transfertype: string,
+    transfer_type: string,
     ira_account_type: string,
+    delivery_method: string,
     transfer_assetname1: string, //number mid
     transfer_assetname2: string, //number mid
     transfer_assetname3: string, //number mid
