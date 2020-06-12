@@ -182,4 +182,30 @@ export interface accountNotificationsForm{
     interested_party_ira_statement__c: string
 }
 
+export interface transferForm{
+    deliveryMethodField: string, //no __c
+    existing_ira_transfers: number,
+    account_type: string,
+    transfers: Array<transfer>
+}
+
+export interface transfer{
+    ira_account_number: string,
+    ira_institution_name: string,
+    ira_contact_name: string,
+    ira_contact_phone_number: string,
+    ira_street: string,
+    ira_city: string,
+    ira_state: string,
+    ira_zip: string,
+    transfertype: string,
+    ira_account_type: string,
+    transfer_assetname1: string, //number mid
+    transfer_assetname2: string, //number mid
+    transfer_assetname3: string, //number mid
+    ira_full_or_partial_cash_transfer: string,
+    ira_cash_amount: number,
+    index: number
+}
+
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];
