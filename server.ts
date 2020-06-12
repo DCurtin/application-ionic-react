@@ -250,7 +250,13 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   }
 
   res.status(500).send('no handler for this page');
-  })
+})
+
+app.post('/chargeCreditCard', function(req : express.Request, res : express.Response){
+  let data = 'test';
+  res.json({'data': data});
+  return
+})
 
 var port = process.env.PORT || 3030;
 

@@ -74,7 +74,6 @@ function makeGetPageInfoCallout(sessionId: string, page: string)
 
 export function chargeCreditCard()
 {
-    console.log('chargeCreditCard');
     let url = '/chargeCreditCard'
     let body = {
         creditCardNumber : '',
@@ -85,12 +84,12 @@ export function chargeCreditCard()
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(body)     
     }
-    console.log('chargeCreditCard before fetch call');
     return fetch(url, options).then(function(response: any){
-        console.log('before json parse')
         return response.json().then(function(data: any){
-            console.log('after json parse')
+            console.log('response from server ' + data.data)
             return data.data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
         })
     })
 }
