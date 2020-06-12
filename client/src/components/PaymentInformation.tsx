@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {SessionApp} from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton } from '@ionic/react';
+import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     return (
@@ -21,7 +22,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                     </strong>
                 </IonItemDivider>
                 <IonRow>
-                    <IonButton color="primary">Submit & Proceed</IonButton>
+                    <IonButton color="primary" onClick={chargeCreditCard}>Submit & Proceed</IonButton>
                 </IonRow>
             </IonGrid>
         </IonContent>
