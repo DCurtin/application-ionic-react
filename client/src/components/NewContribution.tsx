@@ -107,9 +107,18 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
+                    <IonCol size='6'>
+                        <IonLabel>Bank Name</IonLabel>
+                        <IonInput value={formData.bank_name__c} onIonChange={updateForm} name='bank_name__c'></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow className='well ion-margin-top'>
                     <IonCol>
-                        <IonLabel>abel</IonLabel>
-                            
+                    <p>Providing Midland with your account information is optional.</p>
+                    <p>If you prefer to mail a check for your contribution, please send to the address below, mark the year in which you wish the contribution to be applied to, and make the check payable to Midland Trust Company FBO your name as it appears on your application.</p>
+                    <p>Midland IRA, Inc. 
+                    <br/>P.O. Box 07520
+                    <br/>Fort Myers, FL 33919</p>
                     </IonCol>
                 </IonRow>
             </IonGrid>
