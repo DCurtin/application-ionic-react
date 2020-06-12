@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
@@ -30,8 +30,34 @@ export function saveAccountNotificationsPage(sessionId: string, accountNotificat
   runQuery(accountNotificationsQueryUpsert, res, client);
 }
 
+export function saveTransferPage(sessionId: string, transferForm: transferForm,  res: express.Response, client: pg.Client)
+{
+  let transferFormQueryUpsert : queryParameters = updateTransfer(sessionId, transferForm)
+  runQuery(transferFormQueryUpsert, res, client);
+}
 //HELPERS
-
+function updateTransfer(token: string, transferForm: transferForm): queryParameters{
+  let upsertTransferList  : Array<salesforceSchema.transfer> = []
+  transferForm.transfers.forEach(element => {
+    let upsertTransfer: salesforceSchema.transfer = {
+      account_number: element.ira_account_number,
+      account_type: element.ira_account_type,
+      amount: element.ira_cash_amount,
+      contact_name: element.ira_contact_name,
+      contact_phone_number: element.ira_contact_phone_number,
+      delivery_method: transferForm.deliveryMethodField,
+      full_or_partial: element.ira_full_or_partial_cash_transfer,
+      funds_delivery_method_to_midland: transferForm.deliveryMethodField,
+      institution_name: element.ira_institution_name,
+      address: {},
+      index: element.index,
+      key: token + element.index,
+      token: token
+    }
+    upsertTransferList.push(upsertTransfer)
+  });
+  return generateQueryStringFromList('transfer', upsertTransferList, 'key');
+}
 
 function updateAccountNotifications(token: string, accountNotificationsForm: accountNotificationsForm): queryParameters
 {
