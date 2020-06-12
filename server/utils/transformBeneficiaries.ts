@@ -17,6 +17,26 @@ export function transformBeneClientToServer(flattenedBenes: beneficiaryPlaceHold
     return formattedBeneficiaries;
 }
 
+function getBeneficiaryByIndex(index:number, flattenedBenes: any) : beneficiary{
+    let castedBene : beneficiary = {
+            beneficiary_street: flattenedBenes[`beneficiary_street_${index}__c`],
+            beneficiary_city:flattenedBenes[`beneficiary_city_${index}__c`],
+            beneficiary_state:flattenedBenes[`beneficiary_state_${index}__c`],
+            beneficiary_zip:flattenedBenes[`beneficiary_zip_${index}__c`],
+            beneficiary_type: flattenedBenes[`beneficiary_type_${index}__c`],
+            beneficiary_dob: flattenedBenes[`beneficiary_dob_${index}__c`],
+            beneficiary_email: flattenedBenes[`beneficiary_email_${index}__c`],
+            beneficiary_first_name: flattenedBenes[`beneficiary_first_name_${index}__c`],
+            beneficiary_last_name: flattenedBenes[`beneficiary_last_name_${index}__c`],
+            beneficiary_phone: flattenedBenes[`beneficiary_phone_${index}__c`],
+            beneficiary_relationship: flattenedBenes[`beneficiary_relationship_${index}__c`],
+            beneficiary_share: flattenedBenes[`beneficiary_share_${index}__c`],
+            beneficiary_ssn: flattenedBenes[`beneficiary_ssn_${index}__c`],
+            beneficiary_token: flattenedBenes[`beneficiary_token_${index}__c`]
+        }
+        return castedBene;
+}
+
 export function transformBeneficiariesServerToClient(beneficiaryList : Array<salesforceSchema.beneficiary>) : beneficiaryPlaceHolder{
     let returnData : any = {};
     let count = 0;
@@ -41,23 +61,3 @@ export function transformBeneficiariesServerToClient(beneficiaryList : Array<sal
     })
     return returnData;
   }
-
-function getBeneficiaryByIndex(index:number, flattenedBenes: any) : beneficiary{
-    let castedBene : beneficiary = {
-            beneficiary_street: flattenedBenes[`beneficiary_street_${index}__c`],
-            beneficiary_city:flattenedBenes[`beneficiary_city_${index}__c`],
-            beneficiary_state:flattenedBenes[`beneficiary_state_${index}__c`],
-            beneficiary_zip:flattenedBenes[`beneficiary_zip_${index}__c`],
-            beneficiary_type: flattenedBenes[`beneficiary_type_${index}__c`],
-            beneficiary_dob: flattenedBenes[`beneficiary_dob_${index}__c`],
-            beneficiary_email: flattenedBenes[`beneficiary_email_${index}__c`],
-            beneficiary_first_name: flattenedBenes[`beneficiary_first_name_${index}__c`],
-            beneficiary_last_name: flattenedBenes[`beneficiary_last_name_${index}__c`],
-            beneficiary_phone: flattenedBenes[`beneficiary_phone_${index}__c`],
-            beneficiary_relationship: flattenedBenes[`beneficiary_relationship_${index}__c`],
-            beneficiary_share: flattenedBenes[`beneficiary_share_${index}__c`],
-            beneficiary_ssn: flattenedBenes[`beneficiary_ssn_${index}__c`],
-            beneficiary_token: flattenedBenes[`beneficiary_token_${index}__c`]
-        }
-        return castedBene;
-}
