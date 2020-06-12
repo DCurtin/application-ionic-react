@@ -94,9 +94,23 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 </IonRow>
                 <IonRow>
                     <IonCol>
-                        Bank ABA/Routing Number
+                        <IonLabel>
+                            Bank ABA/Routing Number
+                        </IonLabel>
+                        <IonInput name='routing_number__c' value={formData.routing_number__c} onIonChange={validateRoutingNumber}></IonInput>
                     </IonCol>
-                    <IonInput name='routing_number__c' value={formData.routing_number__c} onIonChange={validateRoutingNumber}></IonInput>
+                    <IonCol>
+                        <IonLabel>
+                            Account Number
+                        </IonLabel>
+                        <IonInput value={formData.account_number__c} onIonChange={updateForm} name='account_number__c'></IonInput>
+                    </IonCol>
+                </IonRow>
+                <IonRow>
+                    <IonCol>
+                        <IonLabel>abel</IonLabel>
+                            
+                    </IonCol>
                 </IonRow>
             </IonGrid>
         </IonContent>
