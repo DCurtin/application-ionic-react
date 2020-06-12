@@ -39,7 +39,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
-        console.log(formData);
+        console.log(e.target.name + ' ' + newValue);
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 
@@ -58,7 +58,6 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         if (transferCount > 0) {
             let formRows = [];
             for (let i = 1; i < transferCount + 1; i++) {
-                let deliveryMethodField = (i === 1) ? 'delivery_method__c' : `delivery_method_${i}__c` 
                 formRows.push(
                     <React.Fragment key={i}>
                         <IonItemDivider>
@@ -125,12 +124,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Transfer Type 
                                 </IonLabel>
-                                <IonSelect value={formData[`transfertype${i}__c`]} name={`transfertype${i}__c`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`transfer_type_${i}__c`]} name={`transfer_type_${i}__c`} onIonChange={updateForm}>
                                     <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
                                     <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
                                 </IonSelect>
                             </IonCol>
-                            {formData[`transfertype${i}__c`] === 'Cash Transfer' && (
+                            {formData[`transfer_type_${i}__c`] === 'Cash Transfer' && (
                                 <IonCol>
                                     <IonLabel>Account Type</IonLabel>
                                     <IonSelect value={formData[`ira_account_type_${i}__c`]} name={`ira_account_type_${i}__c`} onIonChange={updateForm}>
@@ -146,7 +145,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                     </IonSelect>
                                 </IonCol>
                             )}
-                            {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                            {formData[`transfer_type_${i}__c`] === 'In-Kind Transfer' && (
                                 <IonCol>
                                     <IonLabel>
                                         Holding Name
@@ -155,7 +154,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 </IonCol>
                             )}
                         </IonRow>
-                        {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                        {formData[`transfer_type_${i}__c`] === 'In-Kind Transfer' && (
                             <React.Fragment>
                                 <IonRow>
                                     <IonCol>
@@ -198,7 +197,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 </IonRow>
                             </React.Fragment>
                         )}
-                        {formData[`transfertype${i}__c`] === 'Cash Transfer' && 
+                        {formData[`transfer_type_${i}__c`] === 'Cash Transfer' && 
                         (
                             <React.Fragment>
                                 <IonRow>
@@ -223,7 +222,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 To expedite this transfer request, Midland will send your signed request via fax or scan if acceptable by your current IRA custodian. If your current IRA custodian requires original documents, how do you want this transfer to be delivered?
                                 </IonLabel>
                                 <div className="ion-text-wrap">
-                                    <IonRadioGroup name={deliveryMethodField} value={formData[deliveryMethodField]} onIonChange={updateForm}>
+                                    <IonRadioGroup name={`delivery_method_${i}__c`} value={formData[`delivery_method_${i}__c`]} onIonChange={updateForm}>
                                         <IonLabel>Mail (No charge)</IonLabel>
                                         <IonRadio value='Certified Mail' className='ion-margin-horizontal'>
                                         </IonRadio>
@@ -239,7 +238,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <input type='file'></input>
                             </IonCol>
                         </IonRow>
-                        {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                        {formData[`transfer_type_${i}__c`] === 'In-Kind Transfer' && (
                             <IonRow>
                                 <IonCol>
                                     <b>
