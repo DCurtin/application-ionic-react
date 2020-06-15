@@ -1,11 +1,10 @@
 import React, {useState} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonCol, IonRow, IonButton } from '@ionic/react';
-const InnerHTML = require('dangerously-set-inner-html');
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        const [docusignSignAttempts, setDocusignSignAttempts] = useState(2); 
+        const [docusignSignAttempts, setDocusignSignAttempts] = useState(0); 
 
         return (
         <IonContent className='ion-padding'>
