@@ -42,6 +42,7 @@ export function getTransferPage(sessionId: string){
 }
 
 export function saveContributionPage(sessionId: string, formData: FormData){
+    console.log(formData);
     return makeSaveStateCallout(sessionId, 'contribution', formData)
 }
 

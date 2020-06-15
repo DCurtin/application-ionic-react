@@ -200,7 +200,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'contribution'){
-    let contributionData : applicationInterfaces.contributionForm
+    let contributionData : applicationInterfaces.contributionForm = packet.data;
     saveStateHandlers.saveContributionPage(sessionId, contributionData, res, client);
     return
   }

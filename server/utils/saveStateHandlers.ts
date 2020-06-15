@@ -37,8 +37,10 @@ export function saveTransferPage(sessionId: string, transferForm: transferForm, 
 }
 
 export function saveContributionPage(sessionId: string, controbutionForm: contributionForm,  res: express.Response, client: pg.Client){
-  let accountNotificationsQueryUpsert : queryParameters = updateContributionsPage(sessionId, controbutionForm);
-  runQuery(accountNotificationsQueryUpsert, res, client);
+  let contributionQueryUpsert : queryParameters = updateContributionsPage(sessionId, controbutionForm);
+  console.log(controbutionForm);
+  console.log(contributionQueryUpsert);
+  runQuery(contributionQueryUpsert, res, client);
 }
 //HELPERS
 function updateTransfer(token: string, transferForm: transferForm): queryParameters{
