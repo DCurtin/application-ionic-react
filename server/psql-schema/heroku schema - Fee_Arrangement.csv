@@ -1,6 +1,6 @@
 Identifier,Type,Unique,Required
-fee_agreement,text,,
+fee_schedule,text,,
 payment_method,text,,
-credit_number,text,,
-expiration_date,text,,
+cc_number,text,,
+cc_exp_date,text,,
 token,uuid,yes,yes

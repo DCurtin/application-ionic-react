@@ -2,26 +2,54 @@ import React, {useState, useEffect} from 'react';
 import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
 
 const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+    const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
-        account_type__c: 'Traditional IRA',
-        existing_ira_transfers__c: 0
+        account_type: 'Traditional IRA',
+        existing_transfers: 0
     })
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getTransferPage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+    },[sessionId])
+
+    
+    function ImportForm(data : any){
+        let importedForm : FormData = data
+        setFormData(importedForm);
+    }
+
+    useEffect(()=>{
+      return history.listen(()=>{
+        console.log('saving bene');
+        saveTransferPage(sessionId, formData);
+      })
+    },[formData])
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
-        console.log(formData);
+        console.log(e.target.name + ' ' + newValue);
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 
     const addTransfer = () => {
         setFormData(prevState => {
-            let currentCount = prevState.existing_ira_transfers__c;
+            let currentCount = prevState.existing_transfers;
             let newCount = currentCount < 2 ? currentCount + 1: currentCount; 
             return {
             ...prevState, 
-            existing_ira_transfers__c: newCount
+            existing_transfers: newCount
             }; 
         })
     }
@@ -30,7 +58,6 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         if (transferCount > 0) {
             let formRows = [];
             for (let i = 1; i < transferCount + 1; i++) {
-                let deliveryMethodField = (i === 1) ? 'delivery_method__c' : `delivery_method_${i}__c` 
                 formRows.push(
                     <React.Fragment key={i}>
                         <IonItemDivider>
@@ -45,13 +72,13 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                    Account Number 
                                 </IonLabel>
-                                <IonInput value={formData[`ira_account_number_${i}__c`]} name={`ira_account_number_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`account_number__${i}`]} name={`account_number__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     Institution Name
                                 </IonLabel>
-                                <IonInput value={formData[`ira_institution_name_${i}__c`]} name={`ira_institution_name_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -59,29 +86,29 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Contact Name
                                 </IonLabel>
-                                <IonInput value={formData[`ira_contact_name_${i}__c`]} name={`ira_contact_name_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`contact_name__${i}`]} name={`contact_name__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                 Contact Phone Number
                                 </IonLabel>
-                                <IonInput value={formData[`ira_contact_phone_number_${i}__c`]} name={`ira_contact_phone_number_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`contact_phone_number__${i}`]} name={`contact_phone_number__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol>
                                 <IonLabel>Street</IonLabel>
-                                <IonInput value={formData[`ira_street_${i}__c`]} name={`ira_street_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`mailing_street__${i}`]} name={`mailing_street__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel> City</IonLabel>
-                                <IonInput value={formData[`ira_city_${i}__c`]} name={`ira_city_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`mailing_city__${i}`]} name={`mailing_city__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol>
                                 <IonLabel> State </IonLabel>
-                                <IonSelect value={formData[`ira_state_${i}__c`]} name={`ira_state_${i}__c`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
                                 {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                                 </IonSelect>
                             </IonCol>
@@ -89,7 +116,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Zip
                                 </IonLabel>
-                                <IonInput value={formData[`ira_zip_${i}__c`]} name={`ira_zip_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -97,16 +124,16 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Transfer Type 
                                 </IonLabel>
-                                <IonSelect value={formData[`transfertype${i}__c`]} name={`transfertype${i}__c`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`} onIonChange={updateForm}>
                                     <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
                                     <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
                                 </IonSelect>
                             </IonCol>
-                            {formData[`transfertype${i}__c`] === 'Cash Transfer' && (
+                            {formData[`transfer_type__${i}`] === 'Cash Transfer' && (
                                 <IonCol>
                                     <IonLabel>Account Type</IonLabel>
-                                    <IonSelect value={formData[`ira_account_type_${i}__c`]} name={`ira_account_type_${i}__c`} onIonChange={updateForm}>
-                                        {formData.account_type__c.includes('Roth') ? (
+                                    <IonSelect value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
+                                        {formData.account_type.includes('Roth') ? (
                                             <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
                                         ) : (
                                             <React.Fragment>
@@ -118,22 +145,22 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                     </IonSelect>
                                 </IonCol>
                             )}
-                            {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                            {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
                                 <IonCol>
                                     <IonLabel>
                                         Holding Name
                                     </IonLabel>
-                                    <IonInput name={`transfer${i}assetname1__c`} value={formData[`transfer${i}assetname1__c`]} onIonChange={updateForm}></IonInput>
+                                    <IonInput name={`asset_name_1__${i}`} value={formData[`asset_name_1__${i}`]} onIonChange={updateForm}></IonInput>
                                 </IonCol>
                             )}
                         </IonRow>
-                        {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                        {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
                             <React.Fragment>
                                 <IonRow>
                                     <IonCol>
                                         <IonLabel> Account Type</IonLabel>
-                                        <IonSelect value={formData[`ira_account_type_${i}__c`]} name={`ira_account_type_${i}__c`} onIonChange={updateForm}>
-                                            {formData.account_type__c.includes('Roth') ? (
+                                        <IonSelect value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
+                                            {formData.account_type.includes('Roth') ? (
                                                 <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
                                             ) : (
                                                 <React.Fragment>
@@ -148,7 +175,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                         <IonLabel>
                                             Holding 2 Name (if applicable)
                                         </IonLabel>
-                                        <IonInput value={formData[`transfer${i}assetname2__c`]}name={`transfer${i}assetname2__c`} onIonChange={updateForm}></IonInput>
+                                        <IonInput value={formData[`asset_name_2__${i}`]}name={`asset_name_2__${i}`} onIonChange={updateForm}></IonInput>
                                     </IonCol>
                                 </IonRow>
                                 <IonRow>
@@ -156,7 +183,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                         <IonLabel>
                                             Complete or Partial Transfer
                                         </IonLabel>
-                                        <IonSelect value={formData[`ira_full_or_partial_cash_transfer_${i}__c`]} name={`ira_full_or_partial_cash_transfer_${i}__c`} onIonChange={updateForm}>
+                                        <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm}>
                                             <IonSelectOption value='All Available Cash'> Complete </IonSelectOption>
                                             <IonSelectOption value=''>Partial</IonSelectOption>
                                         </IonSelect>
@@ -165,25 +192,25 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                         <IonLabel>
                                             Holding 3 Name (if applicable)
                                         </IonLabel>
-                                        <IonInput name={`transfer${i}assetname3__c`} value={formData[`transfer${i}assetname3__c`]}></IonInput>
+                                        <IonInput name={`asset_name_3__${i}`} value={formData[`asset_name_3__${i}`]} onIonChange={updateForm}></IonInput>
                                     </IonCol>
                                 </IonRow>
                             </React.Fragment>
                         )}
-                        {formData[`transfertype${i}__c`] === 'Cash Transfer' && 
+                        {formData[`transfer_type__${i}`] === 'Cash Transfer' && 
                         (
                             <React.Fragment>
                                 <IonRow>
                                     <IonCol size='6'>
-                                    <IonSelect value={formData[`ira_full_or_partial_cash_transfer_${i}__c`]} name={`ira_full_or_partial_cash_transfer_${i}__c`} onIonChange={updateForm}>
+                                    <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm}>
                                         <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
                                         <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
                                     </IonSelect>
                                     </IonCol>
-                                    {formData[`ira_full_or_partial_cash_transfer_${i}__c`] == 'Partial Cash Transfer' && (
+                                    {formData[`full_or_partial_cash_transfer__${i}`] == 'Partial Cash Transfer' && (
                                         <IonCol>
                                             <IonLabel>Cash Amount</IonLabel>
-                                            <IonInput value={formData[`ira_cash_amount_${i}__c`]} name={`ira_cash_amount_${i}__c`} onIonChange={updateForm}></IonInput>
+                                            <IonInput value={formData[`cash_amount__${i}`]} name={`cash_amount__${i}`} onIonChange={updateForm}></IonInput>
                                         </IonCol>
                                     )}
                                 </IonRow>
@@ -195,7 +222,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 To expedite this transfer request, Midland will send your signed request via fax or scan if acceptable by your current IRA custodian. If your current IRA custodian requires original documents, how do you want this transfer to be delivered?
                                 </IonLabel>
                                 <div className="ion-text-wrap">
-                                    <IonRadioGroup name={deliveryMethodField} value={formData[deliveryMethodField]} onIonChange={updateForm}>
+                                    <IonRadioGroup name={`delivery_method__${i}`} value={formData[`delivery_method__${i}`]} onIonChange={updateForm}>
                                         <IonLabel>Mail (No charge)</IonLabel>
                                         <IonRadio value='Certified Mail' className='ion-margin-horizontal'>
                                         </IonRadio>
@@ -211,7 +238,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <input type='file'></input>
                             </IonCol>
                         </IonRow>
-                        {formData[`transfertype${i}__c`] === 'In-Kind Transfer' && (
+                        {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
                             <IonRow>
                                 <IonCol>
                                     <b>
@@ -243,11 +270,11 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </ul>
                     </IonCol>
                 </IonRow>
-                    {displayTransferForm(formData.existing_ira_transfers__c)}
+                    {displayTransferForm(formData.existing_transfers)}
                 
                 <IonRow>
                     <IonCol>
-                        {formData.existing_ira_transfers__c < 2 && (
+                        {formData.existing_transfers < 2 && (
                             <IonButton onClick={addTransfer}>
                                 <IonIcon icon={addOutline} slot='start'></IonIcon>
                                 Add Transfer
