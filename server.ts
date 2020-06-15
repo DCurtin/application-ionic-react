@@ -3,12 +3,12 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
-import {saveWelcomeParameters, requestBody, welcomePageParameters, beneficiaryForm, feeArrangementForm, accountNotificationsForm, transferForm} from './client/src/helpers/Utils'
 import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
-
+import * as applicationInterfaces from './client/src/helpers/Utils'
+//{applicationInterfaces.saveWelcomeParameters, applicationInterfaces.requestBody, applicationInterfaces.welcomePageParameters, applicationInterfaces.beneficiaryForm, applicationInterfaces.feeArrangementForm, accountNotificationsForm, transferForm}
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
@@ -103,7 +103,7 @@ app.get("*", function (req : Express.Response, res : express.Response) {
 
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
-  let welcomePageData : saveWelcomeParameters = req.body;
+  let welcomePageData : applicationInterfaces.saveWelcomeParameters = req.body;
   let sessionId : String = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
 
@@ -129,7 +129,7 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   initializeApplication(welcomePageData.data, res, token);
 });
 
-function initializeApplication(welcomePageData : welcomePageParameters, res: express.Response, token : string){
+function initializeApplication(welcomePageData : applicationInterfaces.welcomePageParameters, res: express.Response, token : string){
   //need to resolve offering_id and owner_id
   const insertAppDataQuery = {
     text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
@@ -144,7 +144,7 @@ function initializeApplication(welcomePageData : welcomePageParameters, res: exp
 
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
-  let packet : requestBody = req.body;
+  let packet : applicationInterfaces.requestBody = req.body;
   let sessionId : string = packet.session.sessionId;
   let page : string = packet.session.page;
   console.log('saving state ' + sessionId + ' page ' + page)
@@ -176,28 +176,36 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
 
   if(page === 'beneficiary'){
     //console.log(packet.data)
-    let beneficiaryData : beneficiaryForm = transformBeneClientToServer(packet.data)
+    let beneficiaryData : applicationInterfaces.beneficiaryForm = transformBeneClientToServer(packet.data)
     saveStateHandlers.saveBeneficiaryPage(sessionId, beneficiaryData, res, client);
     return 
   }
 
   if(page === 'feeArrangement'){
-    let feeArrangementData : feeArrangementForm = packet.data;
+    let feeArrangementData : applicationInterfaces.feeArrangementForm = packet.data;
     saveStateHandlers.saveFeeArrangementPage(sessionId, feeArrangementData, res, client);
     return
   }
   
   if(page === 'accountNotification'){
-    let accountNotificationsData : accountNotificationsForm = packet.data;
+    let accountNotificationsData : applicationInterfaces.accountNotificationsForm = packet.data;
     saveStateHandlers.saveAccountNotificationsPage(sessionId, accountNotificationsData, res, client);
     return
   }
   
   if(page === 'transfer'){
-    let transferData : transferForm = transformTransferClientToServer(packet.data);
+    let transferData : applicationInterfaces.transferForm = transformTransferClientToServer(packet.data);
     saveStateHandlers.saveTransferPage(sessionId, transferData, res, client);
     return
   }
+
+  if(page === 'contribution'){
+    let contributionData : applicationInterfaces.contributionForm
+    saveStateHandlers.saveContributionPage(sessionId, contributionData, res, client);
+    return
+  }
+
+  res.status(500).send('no handler for this page');
 });
 
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
@@ -210,7 +218,7 @@ app.post('/saveApplication', function(req : express.Request, res : express.Respo
 })
 
 app.post('/getPageFields', function(req : express.Request, res : express.Response){
-  let requestPacket:requestBody = req.body;
+  let requestPacket:applicationInterfaces.requestBody = req.body;
   let sessionId = requestPacket.session.sessionId;
   let page = requestPacket.session.page;
 
@@ -256,6 +264,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
 
   if(page === 'transfer'){
     getPageInfoHandlers.handleTransferPage(sessionId, res, client);
+    return
+  }
+
+  if(page === 'contribution'){
+    getPageInfoHandlers.handleContributionPage(sessionId, res, client);
     return
   }
 
