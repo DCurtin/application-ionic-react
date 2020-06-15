@@ -97,7 +97,6 @@ export interface feeArrangementForm{
     cc_number: string,
     cc_exp_date: string
 }
-export const initialInvestmentTypes = ['I\'m Not Sure', 'Futures/Forex', 'Closely-Held LLC', 'Private Placement', 'Promissory Note (Unsecured)', 'Promissory Note (Secured by Real Estate)', 'Promissory Note (Secured by Other)', 'Precious Metals', 'Real Estate', 'Other'];
 
 export interface accountNotificationsForm{
     ira_statement_option: string
@@ -142,4 +141,17 @@ export interface transfer{
     index: number
 }
 
+export interface contributionForm{
+    new_contribution_amount: number,
+    tax_year: string,
+    name_on_account: string,
+    bank_account_type: string,
+    routing_number: string,
+    account_number: string,
+    bank_name: string,
+    account_type: 'Traditional IRA'
+}
+
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];
+
+export const initialInvestmentTypes = ['I\'m Not Sure', 'Futures/Forex', 'Closely-Held LLC', 'Private Placement', 'Promissory Note (Unsecured)', 'Promissory Note (Secured by Real Estate)', 'Promissory Note (Secured by Other)', 'Precious Metals', 'Real Estate', 'Other'];

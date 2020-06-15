@@ -41,6 +41,14 @@ export function getTransferPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'transfer')
 }
 
+export function saveContributionPage(sessionId: string, formData: FormData){
+    return makeSaveStateCallout(sessionId, 'contribution', formData)
+}
+
+export function getContributionPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'contribution')
+}
+
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
     let url = '/saveState'
     let body : requestBody= {
