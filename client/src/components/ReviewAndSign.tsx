@@ -1,10 +1,20 @@
 import React, {useState} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonCol, IonRow, IonButton } from '@ionic/react';
+import axios from 'axios';
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         const [docusignSignAttempts, setDocusignSignAttempts] = useState(0); 
+        const getPenSignedDoc = () => {
+            console.log('helllooooo');
+            axios.get('/getPenSignDoc').then(() =>
+                {
+                    console.log('done here');
+                }
+
+            )
+        }
 
         return (
         <IonContent className='ion-padding'>
@@ -28,6 +38,7 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonButton>Proceed to E-Signature</IonButton>
+                        
                             </IonCol>    
                         </IonRow>
                     </React.Fragment>
@@ -59,10 +70,9 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             </span>
                             </IonCol>
                         </IonRow>
-
                         <IonRow>
                             <IonCol>
-                                <IonButton className="btn btn-primary" href="">Download My Signature Document</IonButton>
+                                <IonButton className="btn btn-primary" onClick={getPenSignedDoc}>Download My Signature Document</IonButton>
                             </IonCol>
                         </IonRow>
                     </React.Fragment>
