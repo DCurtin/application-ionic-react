@@ -33,6 +33,28 @@ export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
 }
 
+export function chargeCreditCard()
+{
+    let url = '/chargeCreditCard'
+    let body = {
+        creditCardNumber : '4007000000027',
+        expirationDateString : '10/25'
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)     
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
+            console.log('status from server ' + data.Status)
+            return data.data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
+        })
+    })
+}
+
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
     let url = '/saveState'
     let body : requestBody= {
@@ -70,26 +92,4 @@ function makeGetPageInfoCallout(sessionId: string, page: string)
                 return data.data;
             })
         })
-}
-
-export function chargeCreditCard()
-{
-    let url = '/chargeCreditCard'
-    let body = {
-        creditCardNumber : '',
-        expirationDateString : ''
-    }
-    let options = {
-        method : 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)     
-    }
-    return fetch(url, options).then(function(response: any){
-        return response.json().then(function(data: any){
-            console.log('response from server ' + data.data)
-            return data.data;
-        }).catch(function(error: any) {
-            console.log('error: ' + error);
-        })
-    })
 }

@@ -97,6 +97,33 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 
 });
 
+/*app.post('/chargeCreditCard', function(req : express.Request, res : express.Response){
+  let data = 'test';
+  res.json({'data': data});
+  return
+})*/
+
+app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
+  console.log('Charge credit card on server');
+
+  let applicationId = 'a0J2i000000fMR1EAM';
+  let creditCardNumber = req.body.creditCardNumber;
+  let expirationDateString = req.body.expirationDateString;
+
+  console.log('appId ' + applicationId);
+  console.log('number ' + creditCardNumber);
+  console.log('date ' + expirationDateString);
+  
+  let body = {'creditCardNumber': creditCardNumber, 'expirationDateString': expirationDateString}
+  
+  serverConn.apex.post('/applications/' + applicationId + '/payments', body, function(err : any, data : any) {
+    if (err) { return console.error(err); }
+    console.log("response: ", data);
+    res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
+    return
+  })
+});
+
 app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
@@ -250,12 +277,6 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   }
 
   res.status(500).send('no handler for this page');
-})
-
-app.post('/chargeCreditCard', function(req : express.Request, res : express.Response){
-  let data = 'test';
-  res.json({'data': data});
-  return
 })
 
 var port = process.env.PORT || 3030;
