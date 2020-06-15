@@ -7,11 +7,11 @@ import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHe
 const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<feeArrangementForm>({
-        initial_investment_type__c: '',
-        fee_schedule__c: '',
-        payment_method__c:'',
-        cc_number__c: '', 
-        cc_exp_date__c: ''
+        initial_investment_type: '',
+        fee_schedule: '',
+        payment_method:'',
+        cc_number: '', 
+        cc_exp_date: ''
     });
 
     useEffect(()=>{
@@ -53,7 +53,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <p>
                         When you choose to work with Midland Trust, you can rest assured you are receiving an exceptional value. Our commitment is to provide the absolute best service at the best possible price. Our fees are flat and up-front, so you never have to worry about any hidden fees.
                         </p>
-                        {formData.initial_investment_type__c !== 'Futures/Forex' &&  
+                        {formData.initial_investment_type !== 'Futures/Forex' &&  
                         (<p>
                             Below, you will choose the fee agreement that works best for you: <br/>
                             Option 1 “Asset Based” - Fee based on the number of assets in your account
@@ -79,7 +79,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Select fee agreement
                         </IonLabel>
-                        <IonSelect value={formData.fee_schedule__c} name='fee_schedule__c' onIonChange={updateForm}>
+                        <IonSelect value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm}>
                             <IonSelectOption value='Asset Based ($295)'>
                             Option 1 - Asset Based
                             </IonSelectOption>
@@ -95,24 +95,24 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>
-                            <IonSelect value={formData.payment_method__c} name='payment_method__c' onIonChange={updateForm}>
+                            <IonSelect value={formData.payment_method} name='payment_method' onIonChange={updateForm}>
                                 <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
                                 <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
                             </IonSelect>
                         </IonLabel>
                     </IonCol>
                 </IonRow>
-                {formData.payment_method__c == 'Credit Card' && (
+                {formData.payment_method == 'Credit Card' && (
                     <IonRow>
                         <IonCol>
                             <IonLabel>
                                 Credit Card Number
                             </IonLabel>
-                            <IonInput name='cc_number__c' value={formData.cc_number__c} onIonChange={updateForm}></IonInput>
+                            <IonInput name='cc_number' value={formData.cc_number} onIonChange={updateForm}></IonInput>
                         </IonCol>
                         <IonCol>
                             <IonLabel> Expiration Date</IonLabel>
-                            <IonInput type='date' value={formData.cc_exp_date__c} name='cc_exp_date__c' onIonChange={updateForm}></IonInput>
+                            <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonChange={updateForm}></IonInput>
                         </IonCol>
                     </IonRow>
                 )}
