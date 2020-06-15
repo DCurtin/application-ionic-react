@@ -135,3 +135,15 @@ export function handleTransferPage(sessionId:string, res: express.Response, clie
   })
     
 }
+
+export function handleContributionPage(sessionId: string, res: express.Response, client: pg.Client){
+  let contributionQuery = {
+    text: 'SELECT * FROM salesforce.contribution WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(contributionQuery).then(function(result: pg.QueryResult){
+    let contributionInfo : salesforceSchema.contribution = result.rows[0];
+    res.json({data : contributionInfo});
+  })
+}
