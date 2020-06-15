@@ -1,4 +1,5 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
+import setFormData from '../components/PaymentInformation'
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
@@ -48,7 +49,8 @@ export function chargeCreditCard(formData: FormData)
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
             console.log('status from server ' + data.Status)
-            return data.data;
+            setFormData(formData.creditCardStatus = data.Status);
+            return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);
         })

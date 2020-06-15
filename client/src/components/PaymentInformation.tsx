@@ -5,10 +5,9 @@ import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
-        //creditCardNumber: '4007000000027',
-        //expirationDateString: '10/25'
         creditCardNumber: '',
-        expirationDateString: ''
+        expirationDateString: '',
+        creditCardStatus: ''
     });
 
     const updateForm = (e:any) => {
@@ -38,16 +37,21 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                 <IonRow>
                     <IonItem>
                         <IonLabel>Credit Card Number: </IonLabel>
-                        <IonInput value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
+                        <IonInput name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
                     </IonItem>
                     <IonItem>
                         <IonLabel>Expiration Date: </IonLabel>
-                        <IonInput value={formData.expirationDateString} onIonChange={updateForm}></IonInput>
+                        <IonInput name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
                     </IonItem>
                 </IonRow>
                 <IonRow>
                     <IonButton color="primary" onClick={() => chargeCreditCard(formData)}>Submit & Proceed</IonButton>
                 </IonRow>
+                {formData.creditCardStatus === 'Completed' &&
+                    <IonRow>
+                        Success!
+                    </IonRow>
+                }
             </IonGrid>
         </IonContent>
     );
