@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantIdForm, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm, transfer} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantIdForm, beneficiaryForm, feeArrangementForm, accountNotificationsForm, transferForm, contributionForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
@@ -35,6 +35,11 @@ export function saveTransferPage(sessionId: string, transferForm: transferForm, 
   let transferFormQueryUpsert : queryParameters = updateTransfer(sessionId, transferForm)
   runQuery(transferFormQueryUpsert, res, client);
 }
+
+export function saveContributionPage(sessionId: string, controbutionForm: contributionForm,  res: express.Response, client: pg.Client){
+  let accountNotificationsQueryUpsert : queryParameters = updateContributionsPage(sessionId, controbutionForm);
+  runQuery(accountNotificationsQueryUpsert, res, client);
+}
 //HELPERS
 function updateTransfer(token: string, transferForm: transferForm): queryParameters{
   let upsertTransferList  : Array<salesforceSchema.transfer> = []
@@ -45,6 +50,12 @@ function updateTransfer(token: string, transferForm: transferForm): queryParamet
   return generateQueryStringFromList('transfer', upsertTransferList, 'key');
 }
 
+function updateContributionsPage(token: string,  controbutionForm: contributionForm): queryParameters
+{
+  let upsertContributionParameters: salesforceSchema.contribution ={...controbutionForm, token:token}
+  return generateQueryString('contribution', upsertContributionParameters, 'token')
+}
+
 function updateAccountNotifications(token: string, accountNotificationsForm: accountNotificationsForm): queryParameters
 {
   let upsertAccountNotificationsParameters: salesforceSchema.interested_party ={...accountNotificationsForm, token:token}
@@ -53,7 +64,7 @@ function updateAccountNotifications(token: string, accountNotificationsForm: acc
 
 function updateFeeArrangementPage(token: string, feeArrangementForm: feeArrangementForm): queryParameters{
   let upsertFeeArrangementParamters : Partial<salesforceSchema.fee_arrangement> =
-  {
+  {//need to remove initial investment type, this should really be saved elsewhere or not carried over
     cc_number: feeArrangementForm.cc_number,
     cc_exp_date: feeArrangementForm.cc_exp_date,
     fee_schedule: feeArrangementForm.fee_schedule,
@@ -151,23 +162,6 @@ function generateQueryStringFromList(table: string, upsertObjectList : Array<any
     values: valueList
   }
 }  
-  
-function generateAddress(applicantForm: applicantIdForm): {'mailing': addressSchema, 'legal': addressSchema}{
-  let resultAddress : {'mailing': addressSchema, 'legal': addressSchema} ={
-    mailing :{address: applicantForm.mailing_street,
-      city: applicantForm.mailing_city,
-      state: applicantForm.mailing_state,
-      zip: applicantForm.mailing_zip
-    },
-    legal:{
-      address: applicantForm.mailing_street,
-      city: applicantForm.mailing_city,
-      state: applicantForm.mailing_state,
-      zip: applicantForm.mailing_zip
-    }
-  }
-  return resultAddress;
-}
 
 function runQuery(queryString: queryParameters, res: express.Response, client: pg.Client)
 {
