@@ -8,7 +8,7 @@ import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
-        beneficiary_count__c: 0
+        beneficiary_count: 0
     })
 
     useEffect(()=>{
@@ -39,9 +39,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
     const addBeneficiary = () => {
         setFormData(prevState => {
-            let currentCount = prevState.beneficiary_count__c;
+            let currentCount = prevState.beneficiary_count;
             let newCount = currentCount < 4 ? currentCount +1 : currentCount;  
-         return {...prevState, beneficiary_count__c : newCount}
+         return {...prevState, beneficiary_count : newCount}
         });
     }
 
@@ -69,28 +69,28 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             First Name
                         </IonLabel>
-                        <IonInput name={`beneficiary_first_name_${beneficiaryNumber}__c`} value={formData[`beneficiary_first_name_${beneficiaryNumber}__c`]} onIonChange={updateForm}>
+                        <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]} onIonChange={updateForm}>
                         </IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Last Name</IonLabel>
-                        <IonInput name={`beneficiary_last_name_${beneficiaryNumber}__c`} value={formData[`beneficiary_last_name_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel>Social Security Number</IonLabel>
-                        <IonInput name={`beneficiary_ssn_${beneficiaryNumber}__c`} value={formData[`beneficiary_ssn_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Date of Birth</IonLabel>
-                        <IonInput type='date' name={`beneficiary_dob_${beneficiaryNumber}__c`} value={formData[`beneficiary_dob_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel> Type </IonLabel>
-                        <IonSelect name={`beneficiary_type_${beneficiaryNumber}__c`} value={formData[`beneficiary_type_${beneficiaryNumber}__c`]} onIonChange={updateForm}>
+                        <IonSelect name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm}>
                             <IonSelectOption value='Primary'>Primary</IonSelectOption>
                             <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
                         </IonSelect>
@@ -99,7 +99,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Relationship
                         </IonLabel>
-                        <IonSelect name={`beneficiary_relationship_${beneficiaryNumber}__c`} value={formData[`beneficiary_relationship_${beneficiaryNumber}__c`]}   onIonChange={updateForm}>
+                        <IonSelect name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm}>
                             <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
                             <IonSelectOption value='Parent'>Parent</IonSelectOption>
                             <IonSelectOption value='Child'>Child</IonSelectOption>
@@ -112,7 +112,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Share %</IonLabel>
-                        <IonInput type='number' name={`beneficiary_share_${beneficiaryNumber}__c`} value={formData[`beneficiary_share_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                     <IonCol className='well'>
                        Calculated Share Percentage 
@@ -121,23 +121,23 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Beneficiary Street</IonLabel>
-                        <IonInput name={`beneficiary_street_${beneficiaryNumber}__c`} value={formData[`beneficiary_street_${beneficiaryNumber}__c`]}onIonChange={updateForm}></IonInput>
+                        <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]}onIonChange={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Beneficiary City</IonLabel>
-                        <IonInput name={`beneficiary_city_${beneficiaryNumber}__c`} value={formData[`beneficiary_city_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel>Beneficiary State</IonLabel>
-                        <IonSelect name={`beneficiary_state_${beneficiaryNumber}__c`} value={formData[`beneficiary_state_${beneficiaryNumber}__c`]} onIonChange={updateForm}>
+                        <IonSelect name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
                             {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                         </IonSelect>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Beneficiary Zip</IonLabel>
-                        <IonInput  name={`beneficiary_zip_${beneficiaryNumber}__c`} value={formData[`beneficiary_zip_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -145,13 +145,13 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Phone
                         </IonLabel>
-                        <IonInput  name={`beneficiary_phone_${beneficiaryNumber}__c`} value={formData[`beneficiary_phone_${beneficiaryNumber}__c`]} onIonChange={updateForm}></IonInput>
+                        <IonInput  name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Email
                         </IonLabel>
-                        <IonInput type='email' onIonChange={updateForm}  name={`beneficiary_email_${beneficiaryNumber}__c`} value={formData[`beneficiary_email_${beneficiaryNumber}__c`]}></IonInput>
+                        <IonInput type='email' onIonChange={updateForm}  name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]}></IonInput>
                     </IonCol>
                 </IonRow>
               </React.Fragment>)
@@ -176,10 +176,10 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </p>
                     </IonCol>
                 </IonRow>
-                {displayBeneficiaryForm(formData.beneficiary_count__c)}
+                {displayBeneficiaryForm(formData.beneficiary_count)}
                 <IonRow>
                     <IonCol>
-                        {formData.beneficiary_count__c < 4 && 
+                        {formData.beneficiary_count < 4 && 
                         <IonButton onClick={addBeneficiary}> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
                         }
                     </IonCol>
