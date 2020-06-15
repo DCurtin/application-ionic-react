@@ -12,12 +12,18 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             home_and_mailing_address_different: false
         });
 
+    const [confirmEmail, setConfirmEmail] = useState<string>('')
+
         const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
             setFormData(previousState =>({
             ...previousState,
               [e.target.name]: newValue
             }));
+        }
+
+        const updateConfEmail = (e : any)=>{
+            setConfirmEmail(e.target.value);
         }
     
         useEffect(()=>{
@@ -175,19 +181,19 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Issued By
                         </IonLabel>
-                        <IonInput value={formData.issued_by} onIonInput={updateForm} name='issued_by'></IonInput>
+                        <IonInput value={formData.id_issued_by} onIonInput={updateForm} name='id_issued_by'></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Issue Date
                         </IonLabel>
-                        <IonInput type='date' value={formData.issue_date} onIonInput={updateForm} name='issue_date'></IonInput>
+                        <IonInput type='date' value={formData.id_issued_date} onIonInput={updateForm} name='id_issued_date'></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol size='6'>
                         <IonLabel>Expiration Date</IonLabel>
-                        <IonInput type='date' value={formData.expiration_date} onIonInput={updateForm} name='expiration_date'>
+                        <IonInput type='date' value={formData.id_expiration_date} onIonInput={updateForm} name='id_expiration_date'>
                         </IonInput>
                     </IonCol>
                 </IonRow>
@@ -320,7 +326,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonCol>
                     <IonCol>
                         <IonLabel>Confirm Email</IonLabel>
-                        <IonInput value={formData.confirm_email} name='confirm_email' onIonInput={updateForm}></IonInput>
+                        <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
