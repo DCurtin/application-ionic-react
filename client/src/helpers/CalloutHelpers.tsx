@@ -33,12 +33,12 @@ export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
 }
 
-export function chargeCreditCard()
+export function chargeCreditCard(formData: FormData)
 {
     let url = '/chargeCreditCard'
     let body = {
-        creditCardNumber : '4007000000027',
-        expirationDateString : '10/25'
+        creditCardNumber : formData.creditCardNumber,
+        expirationDateString : formData.expirationDateString
     }
     let options = {
         method : 'POST',

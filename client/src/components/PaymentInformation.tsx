@@ -1,9 +1,23 @@
 import React, {useState, useEffect} from 'react';
-import {SessionApp} from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton } from '@ionic/react';
+import { SessionApp, FormData } from '../helpers/Utils';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonItem, IonLabel, IonInput } from '@ionic/react';
 import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+    const [formData, setFormData] = useState<FormData>({
+        //creditCardNumber: '4007000000027',
+        //expirationDateString: '10/25'
+        creditCardNumber: '',
+        expirationDateString: ''
+    });
+
+    const updateForm = (e:any) => {
+        let newValue = e.target.value;
+        setFormData(prevState => {
+            console.log(prevState);
+            return {...prevState, [e.target.name]:newValue}});
+    }
+    
     return (
         <IonContent className='ion-padding'>
             <IonGrid>
@@ -22,7 +36,17 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                     </strong>
                 </IonItemDivider>
                 <IonRow>
-                    <IonButton color="primary" onClick={chargeCreditCard}>Submit & Proceed</IonButton>
+                    <IonItem>
+                        <IonLabel>Credit Card Number: </IonLabel>
+                        <IonInput value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
+                    </IonItem>
+                    <IonItem>
+                        <IonLabel>Expiration Date: </IonLabel>
+                        <IonInput value={formData.expirationDateString} onIonChange={updateForm}></IonInput>
+                    </IonItem>
+                </IonRow>
+                <IonRow>
+                    <IonButton color="primary" onClick={() => chargeCreditCard(formData)}>Submit & Proceed</IonButton>
                 </IonRow>
             </IonGrid>
         </IonContent>
