@@ -1,6 +1,6 @@
-import {requestBody, applicantId, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
+import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
 
-export function saveAppPage(sessionId: string, formData: applicantId){
+export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
 }
 
@@ -31,6 +31,14 @@ export function saveAccountNotificationsPage(sessionId: string, formData: accoun
 
 export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
+}
+
+export function saveTransferPage(sessionId: string, formData: FormData){
+    return makeSaveStateCallout(sessionId, 'transfer', formData)
+}
+
+export function getTransferPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'transfer')
 }
 
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){

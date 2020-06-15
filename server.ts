@@ -3,10 +3,9 @@ var path = require('path');
 //var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
-import {saveWelcomeParameters, requestBody, welcomePageParameters, beneficiaryForm, feeArrangementForm, accountNotificationsForm} from './client/src/helpers/Utils'
-import * as salesforceSchema from './server/utils/salesforce'
-import {queryParameters} from './server/utils/helperSchemas'
-import {transformBeneficiaries} from './server/utils/transformBeneficiaries'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, beneficiaryForm, feeArrangementForm, accountNotificationsForm, transferForm} from './client/src/helpers/Utils'
+import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
+import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 
@@ -177,7 +176,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
 
   if(page === 'beneficiary'){
     //console.log(packet.data)
-    let beneficiaryData : beneficiaryForm = transformBeneficiaries(packet.data)
+    let beneficiaryData : beneficiaryForm = transformBeneClientToServer(packet.data)
     saveStateHandlers.saveBeneficiaryPage(sessionId, beneficiaryData, res, client);
     return 
   }
@@ -191,6 +190,12 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   if(page === 'accountNotification'){
     let accountNotificationsData : accountNotificationsForm = packet.data;
     saveStateHandlers.saveAccountNotificationsPage(sessionId, accountNotificationsData, res, client);
+    return
+  }
+  
+  if(page === 'transfer'){
+    let transferData : transferForm = transformTransferClientToServer(packet.data);
+    saveStateHandlers.saveTransferPage(sessionId, transferData, res, client);
     return
   }
 });
@@ -246,6 +251,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
 
   if(page === 'accountNotification'){
     getPageInfoHandlers.handleAccountNotificationPage(sessionId, res, client);
+    return
+  }
+
+  if(page === 'transfer'){
+    getPageInfoHandlers.handleTransferPage(sessionId, res, client);
     return
   }
 

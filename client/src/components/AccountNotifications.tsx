@@ -8,21 +8,20 @@ const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterl
 const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<accountNotificationsForm>({
-        statement_option__c: '', 
-        interested_party_email_notifications__c: true,
-        interested_party_access_level__c: '',
-        interested_party_first_name__c: '', 
-        interested_party_last_name__c: '', 
-        interested_party_email__c: '', 
-        interested_party_phone__c:'', 
-        interested_party_street__c: '', 
-        interested_party_city__c: '',
-        interested_party_state__c: '', 
-        interested_party_zip__c: '', 
-        interested_party_company_name__c: '',
-        interested_party_title__c: '', 
-        interested_party_online_access__c: false,
-        interested_party_ira_statement__c: ''
+        statement_option: '', 
+        include_interested_party: false,
+        first_name: '', 
+        last_name: '', 
+        email: '', 
+        phone:'', 
+        mailing_street: '', 
+        mailing_city: '',
+        mailing_state: '', 
+        mailing_zip: '', 
+        company_name: '',
+        title: '', 
+        online_access: false,
+        ira_statement_option: ''
     })
 
     useEffect(()=>{
@@ -83,7 +82,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                         <IonLabel>
                             Paper Statement Options
                         </IonLabel>
-                        <IonSelect name='statement_option__c' value={formData.statement_option__c} onIonChange={updateForm}>
+                        <IonSelect name='ira_statement_option' value={formData.ira_statement_option} onIonChange={updateForm}>
                             {paperStatementOptions.map((statementOption, index) => (
                                 <IonSelectOption key={index} value={statementOption}>
                                     {statementOption == 'e-Statement' ? 'No Paper Statement' : statementOption}
@@ -109,15 +108,15 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                         <IonLabel>
                         Do you want to provide someone else access to your account? *
                         </IonLabel>
-                        <IonSelect value={formData.interested_party_access_level__c} name='interested_party_access_level__c' onIonChange={updateForm}>
-                            <IonSelectOption value='None'>No</IonSelectOption>
-                            <IonSelectOption value='Interested Party'>
+                        <IonSelect value={formData.include_interested_party} name='include_interested_party' onIonChange={updateForm}>
+                            <IonSelectOption value={false}>No</IonSelectOption>
+                            <IonSelectOption value={true}>
                                 Yes
                             </IonSelectOption>
                         </IonSelect>
                     </IonCol>
                 </IonRow>
-                {formData.interested_party_access_level__c == 'Interested Party' && 
+                {formData.include_interested_party == true && 
                 (
                     <React.Fragment>
                         <IonRow>
@@ -125,13 +124,13 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     First Name
                                 </IonLabel>
-                                <IonInput value={formData.interested_party_first_name__c} name='interested_party_first_name__c' onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData.first_name} name='first_name' onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     Last Name
                                 </IonLabel>
-                                <IonInput value={formData.interested_party_last_name__c} name='interested_party_last_name__c' onIonChange={updateForm}>
+                                <IonInput value={formData.last_name} name='last_name' onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                         </IonRow>
@@ -140,23 +139,23 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     Email
                                 </IonLabel>
-                                <IonInput value={formData.interested_party_email__c} name='interested_party_email__c' onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData.email} name='email' onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>Phone</IonLabel>
-                                <IonInput value={formData.interested_party_phone__c} name='interested_party_phone__c' onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData.phone} name='phone' onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol>
                                 <IonLabel>Street</IonLabel>
-                                <IonInput value={formData.interested_party_street__c} name='interested_party_street__c' onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData.mailing_street} name='mailing_street' onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     City
                                 </IonLabel>
-                                <IonInput value={formData.interested_party_city__c} name='interested_party_city__c' onIonChange={updateForm}>
+                                <IonInput value={formData.mailing_city} name='mailing_city' onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                         </IonRow>
@@ -165,7 +164,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     State
                                 </IonLabel>
-                                <IonSelect value={formData.interested_party_state__c} name='interested_party_state__c' onIonChange={updateForm}>
+                                <IonSelect value={formData.mailing_state} name='mailing_state' onIonChange={updateForm}>
                                     {states.map((state, index) => (
                                         <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                         )
@@ -174,7 +173,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                             </IonCol>
                             <IonCol>
                                 <IonLabel> Zip</IonLabel>
-                                <IonInput value={formData.interested_party_zip__c} name='interested_party_zip__c' onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData.mailing_zip} name='mailing_zip' onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -182,20 +181,20 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     Company Name
                                 </IonLabel>
-                                <IonInput value={formData.interested_party_company_name__c} name='interested_party_company_name__c' onIonChange={updateForm}>
+                                <IonInput value={formData.company_name} name='company_name' onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     Title
                                 </IonLabel>
-                                <IonInput value={formData.interested_party_title__c} name='interested_party_title__c' onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData.title} name='title' onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol>
                                 <IonLabel>Online Access</IonLabel>
-                                <IonSelect value={formData.interested_party_online_access__c} name='interested_party_online_access__c' onIonChange={updateForm}>
+                                <IonSelect value={formData.online_access} name='online_access' onIonChange={updateForm}>
                                     <IonSelectOption value={true}>Yes</IonSelectOption>
                                     <IonSelectOption  value={false}>No</IonSelectOption>
                                 </IonSelect>
@@ -204,7 +203,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     Paper Statement Options
                                 </IonLabel>
-                                <IonSelect value={formData.interested_party_ira_statement__c} name='interested_party_ira_statement__c' onIonChange={updateForm}>
+                                <IonSelect value={formData.statement_option} name='statement_option' onIonChange={updateForm}>
                                     {paperStatementOptions.map((statementOption, index) => (
                                         <IonSelectOption value={statementOption} key={index}>{statementOption}</IonSelectOption>
                                     ))}
