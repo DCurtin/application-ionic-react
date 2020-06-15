@@ -4,11 +4,14 @@ full_or_partial,text,,
 institution_name,text,,
 account_type,text,,
 account_number,text,,
-funds_delivery_method_to_midland,text,,
 delivery_method,text,,
 contact_name,text,,
 contact_phone_number,text,,
 address,json,,
+asset_name_1,text,"",""
+asset_name_2,text,"",""
+asset_name_3,text,"",""
+transfer_type,text,"",""
 index,integer,,yes
 key,text,yes,yes
 token,uuid,,yes

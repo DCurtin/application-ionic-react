@@ -1,7 +1,8 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantId, beneficiary, beneficiaryPlaceHolder, feeArrangementForm, accountNotificationsForm, transferForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema} from './helperSchemas'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
+import {transformTransferServerToClient} from '../utils/transformTransfers'
 import express from 'express';
 import pg from 'pg';
 
@@ -161,5 +162,32 @@ export function handleAccountNotificationPage(sessionId:string, res: express.Res
       interested_party_title__c: interestedPartyInfo.title
     }
     res.json({data:accountNotificationsForm});
+  }).catch(err=>{
+    res.status(500).send('failed getting interested party data');
   })
+}
+
+export function handleTransferPage(sessionId:string, res: express.Response, client: pg.Client){
+  let transferQuery = {
+    text: 'SELECT * FROM salesforce.transfer WHERE token = $1',
+    values: [sessionId]
+  }
+
+  let bodyQuery = {
+    text: 'SELECT account_type FROM salesforce.body WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(bodyQuery).then(function(bodyResult : pg.QueryResult){
+    let accountType = bodyResult.rows[0].account_type
+
+    client.query(transferQuery).then(function(result: pg.QueryResult){
+      let transferInfo : Array<salesforceSchema.transfer> = result.rows
+      let returnData = transformTransferServerToClient(transferInfo, accountType)
+      res.json({data:returnData})
+    })
+  }).catch(err=>{
+    res.status(500).send('failed getting transfer data');
+  })
+    
 }

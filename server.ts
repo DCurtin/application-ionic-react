@@ -254,6 +254,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
     return
   }
 
+  if(page === 'transfer'){
+    getPageInfoHandlers.handleTransferPage(sessionId, res, client);
+    return
+  }
+
   res.status(500).send('no handler for this page');
   })
 

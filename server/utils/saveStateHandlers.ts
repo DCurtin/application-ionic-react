@@ -1,4 +1,4 @@
-import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm} from '../../client/src/helpers/Utils'
+import {saveWelcomeParameters, welcomePageParameters, applicantId, beneficiaryForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm, transfer} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
@@ -45,11 +45,14 @@ function updateTransfer(token: string, transferForm: transferForm): queryParamet
       amount: element.ira_cash_amount,
       contact_name: element.ira_contact_name,
       contact_phone_number: element.ira_contact_phone_number,
-      delivery_method: transferForm.deliveryMethodField,
+      delivery_method: element.delivery_method,
       full_or_partial: element.ira_full_or_partial_cash_transfer,
-      funds_delivery_method_to_midland: transferForm.deliveryMethodField,
       institution_name: element.ira_institution_name,
-      address: {},
+      address: generateTransferFormAddress(element),
+      asset_name_1: element.transfer_assetname1,
+      asset_name_2: element.transfer_assetname2,
+      asset_name_3: element.transfer_assetname3,
+      transfer_type: element.transfer_type,
       index: element.index,
       key: token + element.index,
       token: token
@@ -249,6 +252,16 @@ function generateIPAddress(accountNotificationsForm: accountNotificationsForm): 
     city : accountNotificationsForm.interested_party_city__c,
     state : accountNotificationsForm.interested_party_state__c,
     zip : accountNotificationsForm.interested_party_zip__c
+  }
+  return resultAddress;
+}
+
+function generateTransferFormAddress(transfer: transfer){
+  let resultAddress: addressSchema ={
+    address: transfer.ira_street,
+    city: transfer.ira_city,
+    state: transfer.ira_state,
+    zip: transfer.ira_zip
   }
   return resultAddress;
 }
