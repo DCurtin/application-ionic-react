@@ -101,6 +101,36 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 
 });
 
+app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
+  console.log('Charge credit card on server');
+
+  let applicationId = 'a0J2i000000fMR1EAM';
+  
+  let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
+  
+  serverConn.apex.post('/applications/' + applicationId + '/payments', body, function(err : any, data : any) {
+    if (err) { return console.error(err); }
+    console.log("response: ", data);
+    res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
+    return
+  })
+});
+
+app.get('/getESignUrl', (req, res) => {
+  console.log('Get ESignUrl on server');
+
+  let accountNumber = '';
+
+  serverConn.apex.get('/v1/accounts/' + accountNumber + '/esign-url?return-url=http://www.google.com', function(err: any, data: any) {
+    if (err) { return console.error(err); }
+    else {
+      console.log("eSignUrl: ", data.eSignUrl);
+      res.json({eSignUrl: data.eSignUrl}); 
+      return
+    }
+  })
+});
+
 app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
@@ -289,7 +319,7 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   }
 
   res.status(500).send('no handler for this page');
-  })
+})
 
 var port = process.env.PORT || 3030;
 

@@ -33,6 +33,49 @@ export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
 }
 
+export function chargeCreditCard(formData: FormData)
+{
+    let url = '/chargeCreditCard'
+    let body = {
+        creditCardNumber : formData.creditCardNumber,
+        expirationDateString : formData.expirationDateString
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)     
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
+            console.log('status from server ' + data.Status)
+            return data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
+        })
+    })
+}
+
+export function getESignUrl(formData: FormData)
+{
+    let url = '/getESignUrl'
+    let body = {
+        accountNumber : formData.accountNumber
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)     
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
+            console.log('eSignUrl from server ' + data.eSignUrl)
+            return data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
+        })
+    })
+}
+
 export function saveTransferPage(sessionId: string, formData: FormData){
     return makeSaveStateCallout(sessionId, 'transfer', formData)
 }
@@ -75,7 +118,6 @@ function makeSaveStateCallout(sessionId: string, page: string, formData: FormDat
         })
     });
 }
-
 
 function makeGetPageInfoCallout(sessionId: string, page: string)
 {
