@@ -1,7 +1,13 @@
-import React from 'react';
-import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import React, {useState, useEffect} from 'react';
+import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner } from '@ionic/react';
 
 const DocusignReturn: React.FC = () => {
+    const [penSignedDocUrl, setPenSignedDocUrl] = useState(''); 
+    const [showLoadingUrlSpinner, setShowLoadingUrlSpinner] = useState(false); 
+
+    useEffect(() => {
+        
+    })
 
     return (
         <IonPage>
@@ -27,7 +33,17 @@ const DocusignReturn: React.FC = () => {
                 <p>
                     <b>PEN SIGNATURE PACKET PENDING:</b> There are <u>certain documents</u> that require to be <u>pen signed and returned to us</u> by fax, scan or mail. These documents include your account signature card as well as any applicable transfer forms, power of attorney, etc. Please click the button below to download and print the applicable documents for your account.
                 </p>
-                
+                {
+                    showLoadingUrlSpinner ? (<IonSpinner />) : (
+                        <div>
+                            <a href={penSignedDocUrl}>
+                                <IonButton>
+                                    Download My Signature Document
+                                </IonButton>
+                            </a>
+                        </div>
+                    )
+                }
                 
             </IonContent>
         </IonPage>
