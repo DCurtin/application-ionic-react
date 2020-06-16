@@ -2,11 +2,11 @@ import React, {useState, useEffect} from 'react';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner } from '@ionic/react';
 
 const DocusignReturn: React.FC = () => {
-    const [penSignedDocUrl, setPenSignedDocUrl] = useState(''); 
-    const [showLoadingUrlSpinner, setShowLoadingUrlSpinner] = useState(false); 
+    const [signatureCardUrl, setSignatureCardUrl] = useState(''); 
+    const [showLoadingUrlSpinner, setShowLoadingUrlSpinner] = useState(true); 
 
     useEffect(() => {
-        
+        setTimeout(() => { setShowLoadingUrlSpinner(false)}, 2000);
     })
 
     return (
@@ -36,7 +36,7 @@ const DocusignReturn: React.FC = () => {
                 {
                     showLoadingUrlSpinner ? (<IonSpinner />) : (
                         <div>
-                            <a href={penSignedDocUrl}>
+                            <a href={signatureCardUrl}>
                                 <IonButton>
                                     Download My Signature Document
                                 </IonButton>
