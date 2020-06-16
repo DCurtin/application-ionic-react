@@ -130,7 +130,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const displayPage = (pageName:string) => {
-
     if (!currentState.currentPage.url.includes(pageName)) {
       let updatedState = getPageStateFromPage(pageName);
       setCurrentState(updatedState);

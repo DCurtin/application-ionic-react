@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonCol, IonRow, IonButton } from '@ionic/react';
 import axios from 'axios';
@@ -7,7 +7,6 @@ import axios from 'axios';
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         const [docusignSignAttempts, setDocusignSignAttempts] = useState(0); 
         const getPenSignedDoc = () => {
-            console.log('helllooooo');
             axios.get('/getPenSignDoc').then(() =>
                 {
                     console.log('done here');
