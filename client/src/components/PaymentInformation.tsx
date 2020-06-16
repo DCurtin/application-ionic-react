@@ -19,7 +19,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
 
     const processCreditCard = (formData: any) => {
         console.log('starting credit card call');
-        chargeCreditCard(formData).then(function(response: any) {
+        chargeCreditCard(formData,sessionId).then(function(response: any) {
             console.log('response before setFormData ' + response.Status);
             setFormData(response.Status);
             console.log('formData.creditCardStatus ' + formData.creditCardStatus);
