@@ -46,14 +46,18 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                 {formData.creditCardStatus !== 'Completed' &&
                     <>
                         <IonRow>
-                            <IonItem>
-                                <IonLabel>Credit Card Number: </IonLabel>
-                                <IonInput name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
-                            </IonItem>
-                            <IonItem>
-                                <IonLabel>Expiration Date: </IonLabel>
-                                <IonInput name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
-                            </IonItem>
+                            <IonCol>
+                                <IonLabel>
+                                    Credit Card Number
+                                </IonLabel>
+                                <IonInput class='item-input' name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Expiration Date
+                                </IonLabel>
+                                <IonInput class='item-input' name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
+                            </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonButton color="primary" onClick={() => processCreditCard(formData)}>Submit & Proceed</IonButton>
