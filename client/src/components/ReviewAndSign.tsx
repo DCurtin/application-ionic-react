@@ -11,13 +11,13 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         useEffect(() => {
             getESignUrl({}).then((res) =>
             {
-                let url = 'testUrl';
+                let url = '/docusignReturn';
                 console.log('done here');
                 setDocusignUrl(url);
             }
             ).catch(() =>
             {
-                setDocusignUrl('errorUrl')
+                setDocusignUrl('/docusignReturn')
             })
         })
 
