@@ -1,13 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, FormData } from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonItem, IonLabel, IonInput } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonItem, IonLabel, IonInput, IonSpinner } from '@ionic/react';
 import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
         creditCardNumber: '',
         expirationDateString: '',
-        creditCardStatus: ''
+        creditCardStatus: '', 
+        paymentAmount: '', 
+        creditCardStatusDetails: ''
     });
 
     const updateForm = (e:any) => {
@@ -20,9 +22,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
     const processCreditCard = (formData: any) => {
         console.log('starting credit card call');
         chargeCreditCard(formData,sessionId).then(function(response: any) {
-            console.log('response before setFormData ' + response.Status);
-            setFormData(response.Status);
-            console.log('formData.creditCardStatus ' + formData.creditCardStatus);
+            setFormData(prevState => {return {...prevState, creditCardStatus: response.Status, creditCardStatusDetails: response.StatusDetails, paymentAmount: response.PaymentAmount}});
         })
     }
     
@@ -43,22 +43,40 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         </IonText>
                     </strong>
                 </IonItemDivider>
-                <IonRow>
-                    <IonItem>
-                        <IonLabel>Credit Card Number: </IonLabel>
-                        <IonInput name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
-                    </IonItem>
-                    <IonItem>
-                        <IonLabel>Expiration Date: </IonLabel>
-                        <IonInput name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
-                    </IonItem>
-                </IonRow>
-                <IonRow>
-                    <IonButton color="primary" onClick={() => processCreditCard(formData)}>Submit & Proceed</IonButton>
-                </IonRow>
+                {formData.creditCardStatus !== 'Completed' &&
+                    <>
+                        <IonRow>
+                            <IonCol>
+                                <IonLabel>
+                                    Credit Card Number
+                                </IonLabel>
+                                <IonInput class='item-input' name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
+                            </IonCol>
+                            <IonCol>
+                                <IonLabel>
+                                    Expiration Date
+                                </IonLabel>
+                                <IonInput class='item-input' name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow>
+                            <IonButton color="primary" onClick={() => processCreditCard(formData)}>Submit & Proceed</IonButton>
+                        </IonRow>
+                    </>
+                }               
+                {formData.creditCardStatus === 'Pending' &&
+                    <IonSpinner></IonSpinner>
+                }
+                {formData.creditCardStatus === 'Error' &&
+                    <IonRow>
+                        Error - {formData.creditCardStatusDetails}
+                    </IonRow>
+                }
                 {formData.creditCardStatus === 'Completed' &&
                     <IonRow>
-                        Success!
+                        Thank you for your payment of ${formData.paymentAmount}.
+                        {/*on the card ending
+                        in {{application.getLastFourDigitsOfCreditCard()}}.*/}
                     </IonRow>
                 }
             </IonGrid>
