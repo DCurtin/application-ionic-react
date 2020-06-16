@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonCol, IonRow, IonButton } from '@ionic/react';
-import axios from 'axios';
+import {getESignUrl} from '../helpers/CalloutHelpers';
+import axios from 'axios'; 
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
         const [docusignUrl, setDocusignUrl] = useState(''); 
         useEffect(() => {
-            axios.get('/getESignUrl').then(() =>
+            getESignUrl({}).then((res) =>
             {
                 let url = 'testUrl';
                 console.log('done here');
@@ -17,6 +18,12 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             ).catch(() =>
             {
                 setDocusignUrl('errorUrl')
+            })
+        })
+
+        useEffect(() => {
+            axios.get('/getPenSignDoc').then((res) => {
+
             })
         })
 
