@@ -5,6 +5,7 @@ import express from 'express';
 import { Http2SecureServer } from 'http2';
 import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
+import {transformRolloverClientToServer} from './server/utils/transformRollovers'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
@@ -206,8 +207,8 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'rollover'){
-    let rolloverData : applicationInterfaces.rolloverForm = packet.data;
-    saveStateHandlers.saveContributionPage(sessionId, contributionData, res, client);
+    let rolloverData : applicationInterfaces.rolloverForm = transformRolloverClientToServer(packet.data);
+    saveStateHandlers.saveRolloverPage(sessionId, rolloverData, res, client);
     return
   }
 
@@ -275,6 +276,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
 
   if(page === 'contribution'){
     getPageInfoHandlers.handleContributionPage(sessionId, res, client);
+    return
+  }
+  
+  if(page === 'rollover'){
+    getPageInfoHandlers.handleRolloverPage(sessionId, res, client);
     return
   }
 

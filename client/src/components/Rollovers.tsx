@@ -3,6 +3,7 @@ import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
+import {saveRolloverPage, getRolloverPage} from '../helpers/CalloutHelpers'
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const history = useHistory();
@@ -14,7 +15,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     useEffect(()=>{
         if(sessionId !== '')
         {
-            getAppPage(sessionId).then(data =>{
+            getRolloverPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
                     return;
@@ -32,7 +33,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     useEffect(()=>{
       return history.listen(()=>{
           console.log(formData)
-        saveAppPage(sessionId, formData);
+        saveRolloverPage(sessionId, formData);
       })
     },[formData])
 
@@ -71,11 +72,11 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonLabel> Institution Name</IonLabel>
-                                <IonInput name={`employer_institution_name_${i}`} value={formData[`employer_institution_name_${i}`]} onIonChange={updateForm} placeholder='Institution Name'></IonInput>
+                                <IonInput name={`institution_name__${i}`} value={formData[`institution_name__${i}`]} onIonChange={updateForm} placeholder='Institution Name'></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel> Cash Amount (approximate value allowed)</IonLabel>
-                                <IonInput name={`employer_cash_amount_${i}`} value={formData[`employer_cash_amount_${i}`]} onIonChange={updateForm}>
+                                <IonInput name={`cash_amount__${i}`} value={formData[`cash_amount__${i}`]} onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                         </IonRow>
@@ -84,14 +85,14 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Contact Name
                                 </IonLabel>
-                                <IonInput name={`employer_contact_name_${i}`} value={formData[`employer_contact_name_${i}`]} onIonChange={updateForm}>
+                                <IonInput name={`name__${i}`} value={formData[`name__${i}`]} onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     Contact Phone Number
                                 </IonLabel>
-                                <IonInput pattern='/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/' name={`employer_contact_phone_${i}`} value={formData[`employer_contact_phone_${i}`]} placeholder='(555)555-5555'></IonInput>
+                                <IonInput pattern='/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/' name={`phone__${i}`} value={formData[`phone__${i}`]} placeholder='(555)555-5555'></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -99,13 +100,13 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Street
                                 </IonLabel>
-                                <IonInput name={`employer_rollover_street_${i}`} value={formData[`employer_rollover_street_${i}`]} onIonChange={updateForm}></IonInput>
+                                <IonInput name={`mailing_street__${i}`} value={formData[`mailing_street__${i}`]} onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     City
                                 </IonLabel>
-                                <IonInput name={`employer_rollover_city_${i}`} value={formData[`employer_rollover_city_${i}`]} onIonChange={updateForm}></IonInput>
+                                <IonInput name={`mailing_city__${i}`} value={formData[`mailing_city__${i}`]} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -113,7 +114,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     State
                                 </IonLabel>
-                                <IonSelect value={formData[`employer_rollover_state_${i}`]} name={`employer_rollover_state_${i}`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
                                     {states.map((state,index) => (
                                         <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                     ))}
@@ -123,8 +124,8 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Zip
                                 </IonLabel>
-                                <IonInput value={formData[`employer_rollover_zip_${i}
-                                `]} name={`employer_rollover_zip_${i}`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`mailing_zip__${i}
+                                `]} name={`mailing_zip__${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -132,7 +133,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Account Type
                                 </IonLabel>
-                                <IonSelect value={formData[`employer_account_type_${i}`]} name={`employer_account_type_${i}`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
                                     {formData.account_type.includes('Roth') ? (
                                         <React.Fragment>
                                             <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
@@ -161,7 +162,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             </IonCol>
                             <IonCol>
                                 <IonLabel> Account Number</IonLabel>
-                                <IonInput name={`employer_account_number_${i}`} value={formData[`employer_account_number_${i}`]} onIonChange={updateForm}></IonInput>
+                                <IonInput name={`account_number__${i}`} value={formData[`account_number__${i}`]} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -169,7 +170,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Rollover Type
                                 </IonLabel>
-                                <IonSelect value={formData[`employer_rollover_type_${i}`]} name={`employer_rollover_type_${i}`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`rollover_type__${i}`]} name={`rollover_type__${i}`} onIonChange={updateForm}>
                                     <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
                                     <IonSelectOption value='Indirect Rollover'>
                                         Indirect Rollover
