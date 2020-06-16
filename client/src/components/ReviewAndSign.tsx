@@ -1,20 +1,31 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonCol, IonRow, IonButton } from '@ionic/react';
-import axios from 'axios';
+import {getESignUrl} from '../helpers/CalloutHelpers';
+import axios from 'axios'; 
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        const [docusignSignAttempts, setDocusignSignAttempts] = useState(0); 
-        const getPenSignedDoc = () => {
-            console.log('helllooooo');
-            axios.get('/getPenSignDoc').then(() =>
-                {
-                    console.log('done here');
-                }
+        const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
+        const [docusignUrl, setDocusignUrl] = useState(''); 
+        useEffect(() => {
+            getESignUrl(sessionId).then((data) =>
+            {
+                let url = data.eSignUrl;
+                console.log('done here');
+                setDocusignUrl(url);
+            }
+            ).catch(() =>
+            {
+                setDocusignUrl('/docusignReturn')
+            })
+        },[sessionId])
 
-            )
-        }
+        useEffect(() => {
+            axios.get('/getPenSignDoc').then((res) => {
+
+            })
+        },[])
 
         return (
         <IonContent className='ion-padding'>
@@ -37,7 +48,11 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonRow>
                         <IonRow>
                             <IonCol>
-                                <IonButton>Proceed to E-Signature</IonButton>
+                            <a className="btn btn-primary" href={docusignUrl === '' ? undefined: docusignUrl}>
+                                <IonButton disabled={docusignUrl === ''}>
+                                {docusignUrl === '' ? 'loading...' : 'Proceed to E-Signature'}
+                                </IonButton>
+                            </a>
                         
                             </IonCol>    
                         </IonRow>
@@ -72,7 +87,11 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonRow>
                         <IonRow>
                             <IonCol>
-                                <IonButton className="btn btn-primary" onClick={getPenSignedDoc}>Download My Signature Document</IonButton>
+                                <a className="btn btn-primary" href={docusignUrl}>
+                                    <IonButton>
+                                    Download My Signature Document
+                                    </IonButton>
+                                </a>
                             </IonCol>
                         </IonRow>
                     </React.Fragment>

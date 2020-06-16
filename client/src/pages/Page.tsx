@@ -130,7 +130,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const displayPage = (pageName:string) => {
-
     if (!currentState.currentPage.url.includes(pageName)) {
       let updatedState = getPageStateFromPage(pageName);
       setCurrentState(updatedState);
@@ -160,7 +159,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'PaymentInformation':
         return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId}/>
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId}/>;
       default: 
         return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
     }
