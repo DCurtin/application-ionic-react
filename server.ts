@@ -9,6 +9,7 @@ import {transformRolloverClientToServer} from './server/utils/transformRollovers
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
+import * as salesforceSchema from './server/utils/salesforce'
 import jsforce, {Connection as jsfConnection} from 'jsforce'
 //{applicationInterfaces.saveWelcomeParameters, applicationInterfaces.requestBody, applicationInterfaces.welcomePageParameters, applicationInterfaces.beneficiaryForm, applicationInterfaces.feeArrangementForm, accountNotificationsForm, transferForm}
 const { v4: uuidv4 } = require('uuid');
@@ -103,32 +104,76 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
   console.log('Charge credit card on server');
-
   let applicationId = 'a0J2i000000fMR1EAM';
+  let sessionId = req.body.sessionId;
+
+  if(sessionId === '' || sessionId === undefined){
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return;
+  }
   
-  let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
   
-  serverConn.apex.post('/applications/' + applicationId + '/payments', body, function(err : any, data : any) {
-    if (err) { return console.error(err); }
-    console.log("response: ", data);
-    res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
-    return
-  })
+  client.query(sessionQuery).then(function(result:pg.QueryResult){
+    if(result.rowCount == 0)
+    {
+      console.log('no application')
+      res.status(500).send('no application');
+      return;
+    }
+    let application_session : salesforceSchema.application_session = result.rows[0];
+
+    let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
+  
+    serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
+      if (err) { return console.error(err); }
+      console.log("response: ", data);
+      res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
+      return
+    })
+  }).catch()
 });
 
-app.get('/getESignUrl', (req, res) => {
+app.post('/getESignUrl', (req, res) => {
   console.log('Get ESignUrl on server');
+  let sessionId = req.body.sessionId;
 
-  let accountNumber = '';
+  if(sessionId === '' || sessionId === undefined){
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return
+  }
+  
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
 
-  serverConn.apex.get('/v1/accounts/' + accountNumber + '/esign-url?return-url=http://www.google.com', function(err: any, data: any) {
-    if (err) { return console.error(err); }
-    else {
-      console.log("eSignUrl: ", data.eSignUrl);
-      res.json({eSignUrl: data.eSignUrl}); 
-      return
+  
+  client.query(sessionQuery).then(function(result:pg.QueryResult){
+    if(result.rowCount == 0)
+    {
+      console.log('no application')
+      res.status(500).send('no application');
+      return;
     }
+    let application_session : salesforceSchema.application_session = result.rows[0];
+    console.log('account num ' + application_session.account_number)
+
+    serverConn.apex.get('/v1/accounts/' + application_session.account_number + '/esign-url?return-url=http://www.google.com', function(err: any, data: any) {
+      if (err) { return console.error(err); }
+      else {
+        console.log("eSignUrl: ", data.eSignUrl);
+        res.json({eSignUrl: data.eSignUrl}); 
+        return
+      }
+    })
   })
+
 });
 
 app.get("*", function (req : Express.Response, res : express.Response) {
