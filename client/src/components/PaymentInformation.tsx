@@ -16,6 +16,15 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
             console.log(prevState);
             return {...prevState, [e.target.name]:newValue}});
     }
+
+    const processCreditCard = (formData: any) => {
+        console.log('starting credit card call');
+        chargeCreditCard(formData).then(function(response: any) {
+            console.log('response before setFormData ' + response.Status);
+            setFormData(response.Status);
+            console.log('formData.creditCardStatus ' + formData.creditCardStatus);
+        })
+    }
     
     return (
         <IonContent className='ion-padding'>
@@ -45,7 +54,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                     </IonItem>
                 </IonRow>
                 <IonRow>
-                    <IonButton color="primary" onClick={() => chargeCreditCard(formData)}>Submit & Proceed</IonButton>
+                    <IonButton color="primary" onClick={() => processCreditCard(formData)}>Submit & Proceed</IonButton>
                 </IonRow>
                 {formData.creditCardStatus === 'Completed' &&
                     <IonRow>

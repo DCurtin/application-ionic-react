@@ -1,5 +1,4 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
-import setFormData from '../components/PaymentInformation'
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
@@ -49,7 +48,27 @@ export function chargeCreditCard(formData: FormData)
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
             console.log('status from server ' + data.Status)
-            setFormData(formData.creditCardStatus = data.Status);
+            return data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
+        })
+    })
+}
+
+export function getESignUrl(formData: FormData)
+{
+    let url = '/getESignUrl'
+    let body = {
+        accountNumber : formData.accountNumber
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)     
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
+            console.log('eSignUrl from server ' + data.eSignUrl)
             return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);
