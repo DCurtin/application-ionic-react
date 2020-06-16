@@ -152,6 +152,26 @@ export interface contributionForm{
     account_type: 'Traditional IRA'
 }
 
+export interface rolloverForm{
+    account_type: string,
+    existing_employer_plan_roll_overs: number,
+    rollovers: Array<rollover>
+}
+
+export interface rollover{
+    'employer_institution_name': string,
+    'employer_cash_amount': string,
+    'employer_contact_name' : string,
+    'employer_contact_phone': string,
+    'employer_rollover_street': string,
+    'employer_rollover_city': string,
+    'employer_rollover_state': string,
+    'employer_rollover_zip': string,
+    'employer_account_type': string,
+    'employer_account_number': string,
+    'employer_rollover_type': string
+}
+
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
 export const initialInvestmentTypes = ['I\'m Not Sure', 'Futures/Forex', 'Closely-Held LLC', 'Private Placement', 'Promissory Note (Unsecured)', 'Promissory Note (Secured by Real Estate)', 'Promissory Note (Secured by Other)', 'Precious Metals', 'Real Estate', 'Other'];

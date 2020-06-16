@@ -2,20 +2,47 @@ import React, {useState, useEffect} from 'react';
 import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+    const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
-        account_type__c: 'Traditional IRA',
-        existing_employer_plan_roll_overs__c: 0
+        account_type: 'Traditional IRA',
+        existing_employer_plan_roll_overs: 0
     });
+
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getAppPage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+        console.log(sessionId + 'this is my sessionId');
+    },[sessionId])
+
+    function ImportForm(data : any){
+        setFormData(data);
+    }
+    
+    useEffect(()=>{
+      return history.listen(()=>{
+          console.log(formData)
+        saveAppPage(sessionId, formData);
+      })
+    },[formData])
 
     const addRollover = () => {
         setFormData(prevState => {
-            let currentCount = prevState.existing_employer_plan_roll_overs__c;
+            let currentCount = prevState.existing_employer_plan_roll_overs;
             let newCount = currentCount < 2 ? currentCount + 1 : currentCount;
             return {
                 ...prevState,
-                existing_employer_plan_roll_overs__c: newCount
+                existing_employer_plan_roll_overs: newCount
             };
         })
     }
@@ -44,11 +71,11 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonLabel> Institution Name</IonLabel>
-                                <IonInput name={`employer_institution_name_${i}__c`} value={formData[`employer_institution_name_${i}__c`]} onIonChange={updateForm} placeholder='Institution Name'></IonInput>
+                                <IonInput name={`employer_institution_name_${i}`} value={formData[`employer_institution_name_${i}`]} onIonChange={updateForm} placeholder='Institution Name'></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel> Cash Amount (approximate value allowed)</IonLabel>
-                                <IonInput name={`employer_cash_amount_${i}__c`} value={formData[`employer_cash_amount_${i}__c`]} onIonChange={updateForm}>
+                                <IonInput name={`employer_cash_amount_${i}`} value={formData[`employer_cash_amount_${i}`]} onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                         </IonRow>
@@ -57,14 +84,14 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Contact Name
                                 </IonLabel>
-                                <IonInput name={`employer_contact_name_${i}__c`} value={formData[`employer_contact_name_${i}__c`]} onIonChange={updateForm}>
+                                <IonInput name={`employer_contact_name_${i}`} value={formData[`employer_contact_name_${i}`]} onIonChange={updateForm}>
                                 </IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     Contact Phone Number
                                 </IonLabel>
-                                <IonInput pattern='/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/' name={`employer_contact_phone_${i}__c`} value={formData[`employer_contact_phone_${i}__c`]} placeholder='(555)555-5555'></IonInput>
+                                <IonInput pattern='/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/' name={`employer_contact_phone_${i}`} value={formData[`employer_contact_phone_${i}`]} placeholder='(555)555-5555'></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -72,13 +99,13 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Street
                                 </IonLabel>
-                                <IonInput name={`employer_rollover_street_${i}__c`} value={formData[`employer_rollover_street_${i}__c`]} onIonChange={updateForm}></IonInput>
+                                <IonInput name={`employer_rollover_street_${i}`} value={formData[`employer_rollover_street_${i}`]} onIonChange={updateForm}></IonInput>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>
                                     City
                                 </IonLabel>
-                                <IonInput name={`employer_rollover_city_${i}__c`} value={formData[`employer_rollover_city_${i}__c`]} onIonChange={updateForm}></IonInput>
+                                <IonInput name={`employer_rollover_city_${i}`} value={formData[`employer_rollover_city_${i}`]} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -86,7 +113,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     State
                                 </IonLabel>
-                                <IonSelect value={formData[`employer_rollover_state_${i}__c`]} name={`employer_rollover_state_${i}__c`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`employer_rollover_state_${i}`]} name={`employer_rollover_state_${i}`} onIonChange={updateForm}>
                                     {states.map((state,index) => (
                                         <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                     ))}
@@ -96,8 +123,8 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Zip
                                 </IonLabel>
-                                <IonInput value={formData[`employer_rollover_zip_${i}__c
-                                `]} name={`employer_rollover_zip_${i}__c`} onIonChange={updateForm}></IonInput>
+                                <IonInput value={formData[`employer_rollover_zip_${i}
+                                `]} name={`employer_rollover_zip_${i}`} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -105,8 +132,8 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Account Type
                                 </IonLabel>
-                                <IonSelect value={formData[`employer_account_type_${i}__c`]} name={`employer_account_type_${i}__c`} onIonChange={updateForm}>
-                                    {formData.account_type__c.includes('Roth') ? (
+                                <IonSelect value={formData[`employer_account_type_${i}`]} name={`employer_account_type_${i}`} onIonChange={updateForm}>
+                                    {formData.account_type.includes('Roth') ? (
                                         <React.Fragment>
                                             <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
                                         </React.Fragment>
@@ -134,7 +161,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             </IonCol>
                             <IonCol>
                                 <IonLabel> Account Number</IonLabel>
-                                <IonInput name={`employer_account_number_${i}__c`} value={formData[`employer_account_number_${i}__c`]} onIonChange={updateForm}></IonInput>
+                                <IonInput name={`employer_account_number_${i}`} value={formData[`employer_account_number_${i}`]} onIonChange={updateForm}></IonInput>
                             </IonCol>
                         </IonRow>
                         <IonRow>
@@ -142,7 +169,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Rollover Type
                                 </IonLabel>
-                                <IonSelect value={formData[`employer_rollover_type_${i}__c`]} name={`employer_rollover_type_${i}__c`} onIonChange={updateForm}>
+                                <IonSelect value={formData[`employer_rollover_type_${i}`]} name={`employer_rollover_type_${i}`} onIonChange={updateForm}>
                                     <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
                                     <IonSelectOption value='Indirect Rollover'>
                                         Indirect Rollover
@@ -172,7 +199,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         As an option you are welcome to provide Midland with your account information to deduct your contribution below, but if mailing a check to our office, please send to the address below and mark the year in which you wish the contribution to be applied to.
                     </IonCol>
                 </IonRow>
-                {displayRolloverForm(formData.existing_employer_plan_roll_overs__c)}
+                {displayRolloverForm(formData.existing_employer_plan_roll_overs)}
                 <IonRow>
                     <IonCol>
                     <IonButton onClick={addRollover}>

@@ -205,6 +205,12 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
     return
   }
 
+  if(page === 'rollover'){
+    let rolloverData : applicationInterfaces.rolloverForm = packet.data;
+    saveStateHandlers.saveContributionPage(sessionId, contributionData, res, client);
+    return
+  }
+
   res.status(500).send('no handler for this page');
 });
 

@@ -1,6 +1,5 @@
 import {transferForm, transfer} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from '../utils/salesforce'
-import {addressSchema} from '../utils/helperSchemas'
 
 export function transformTransferClientToServer(transferFlattened: any): transferForm{
     let transferForm : transferForm ={
@@ -11,7 +10,7 @@ export function transformTransferClientToServer(transferFlattened: any): transfe
     let transferCount : number = transferForm.existing_transfers;
     console.log('existing '+transferFlattened['existing_transfers'])
 
-    for(let index = 1; index < (transferCount + 1); ++index){
+    for(let index = 1; index <= transferCount; ++index){
         let castedTransfer : transfer ={
             account_number: transferFlattened[`account_number__${index}`],
             account_type: transferFlattened[`account_type__${index}`],
