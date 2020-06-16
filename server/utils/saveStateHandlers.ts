@@ -3,6 +3,7 @@ import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
 import pg from 'pg';
+import { text } from 'body-parser';
 
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: applicationInterfaces.welcomePageParameters, res: express.Response, client: pg.Client)
 {

@@ -173,6 +173,26 @@ export interface rollover{
     'index': number
 }
 
+export interface initialInvestmentForm{
+    initial_investment_type ?: string,
+        initial_investment_name?: string,
+        investment_contact_person?: string,
+        investment_contact_person_phone?: null, 
+        investment_amount?: string, 
+        ira_full_or_partial_cash_transfer_1?: string, 
+        ira_full_or_partial_cash_transfer_2?: string,
+        transfertype1?: string, 
+        transfertype2?:string, 
+        existing_ira_transfer?: false,
+        existing_employer_plan_rollover?: false, 
+        new_ira_contribution?: false,
+        ira_cash_amount_1?: string,
+        ira_cash_amount_2: string, 
+        employer_cash_amount_1: string, 
+        employer_cash_amount_2: string,
+        new_contribution_amount: number
+}
+
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
 export const initialInvestmentTypes = ['I\'m Not Sure', 'Futures/Forex', 'Closely-Held LLC', 'Private Placement', 'Promissory Note (Unsecured)', 'Promissory Note (Secured by Real Estate)', 'Promissory Note (Secured by Other)', 'Precious Metals', 'Real Estate', 'Other'];
