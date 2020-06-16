@@ -1,8 +1,8 @@
-import {saveWelcomeParameters, requestBody, welcomePageParameters, saveApplicationId, applicantIdForm, beneficiary, feeArrangementForm, accountNotificationsForm, transferForm} from '../../client/src/helpers/Utils'
+import {welcomePageParameters, applicantIdForm, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
-import {addressSchema, identificationSchema} from './helperSchemas'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
 import {transformTransferServerToClient} from '../utils/transformTransfers'
+import {transformRolloverServerToClient} from '../utils/transformRollovers'
 import express from 'express';
 import pg from 'pg';
 
@@ -134,4 +134,29 @@ export function handleTransferPage(sessionId:string, res: express.Response, clie
     res.status(500).send('failed getting transfer data');
   })
     
+}
+
+export function handleContributionPage(sessionId: string, res: express.Response, client: pg.Client){
+  let contributionQuery = {
+    text: 'SELECT * FROM salesforce.contribution WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(contributionQuery).then(function(result: pg.QueryResult){
+    let contributionInfo : salesforceSchema.contribution = result.rows[0];
+    res.json({data : contributionInfo});
+  })
+}
+
+export function handleRolloverPage(sessionId: string, res: express.Response, client: pg.Client){
+  let rolloverQuery = {
+    text: 'SELECT * FROM salesforce.rollover WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(rolloverQuery).then(function(result: pg.QueryResult){
+    let rolloverInfo : Array<salesforceSchema.rollover> = result.rows;
+    let returnData = transformRolloverServerToClient(rolloverInfo, 'Traditional IRA')
+    res.json({data : returnData});
+  })
 }

@@ -1,6 +1,0 @@
-Identifier,Type,Unique,required
-amount,float(2),,
-method,text,,
-tax_year,text,,
-bank_account,json,,
-token,uuid,,yes
