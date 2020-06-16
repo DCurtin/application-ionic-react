@@ -55,11 +55,11 @@ export function chargeCreditCard(formData: FormData)
     })
 }
 
-export function getESignUrl(formData: FormData)
+export function getESignUrl(sessionId: string)
 {
     let url = '/getESignUrl'
     let body = {
-        accountNumber : formData.accountNumber
+        sessionId: sessionId
     }
     let options = {
         method : 'POST',

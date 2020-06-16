@@ -9,7 +9,7 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
         const [docusignUrl, setDocusignUrl] = useState(''); 
         useEffect(() => {
-            getESignUrl({}).then((res) =>
+            getESignUrl(sessionId).then((res) =>
             {
                 let url = '/docusignReturn';
                 console.log('done here');
