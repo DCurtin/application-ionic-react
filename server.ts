@@ -10,7 +10,7 @@ import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
 import * as salesforceSchema from './server/utils/salesforce'
-import jsforce, {Connection as jsfConnection} from 'jsforce'
+import jsforce, {Connection as jsfConnection} from 'jsforce';
 //{applicationInterfaces.saveWelcomeParameters, applicationInterfaces.requestBody, applicationInterfaces.welcomePageParameters, applicationInterfaces.beneficiaryForm, applicationInterfaces.feeArrangementForm, accountNotificationsForm, transferForm}
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
