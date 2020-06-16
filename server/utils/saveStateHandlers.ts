@@ -24,7 +24,18 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
       if(appSessionResult.rowCount == 0)
       {
         console.log('found no app')
-        serverConn.sobject("Online_Application__c").create({'First_Name__c': applicantForm.first_name, 'Last_Name__c':applicantForm.last_name, 'Token__c':sessionId}).then((result:any)=>{
+        serverConn.sobject("Online_Application__c").create({'First_Name__c': applicantForm.first_name, 
+        'Last_Name__c':applicantForm.last_name, 
+        'Token__c':sessionId, 
+        'IntegrationOwner__c':'0052i000000Mz0CAAS', 
+        'Expiration_Date__c':'2025-10-10', 
+        'Account_Type__c':'Traditional IRA', 
+        'Email__c': applicantForm.email,
+        'Legal_Address__c': applicantForm.legal_street,
+        'legal_City__c':applicantForm.legal_city,
+        'legal_State__c':applicantForm.legal_state,
+        'legal_Zip__c':applicantForm.legal_zip      
+      }).then((result:any)=>{
           serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
             //console.log(queryResult);
             console.log(queryResult['First_Name__c']);
