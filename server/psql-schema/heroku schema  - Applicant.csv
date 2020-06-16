@@ -29,5 +29,6 @@ id_expiration_date,text,,
 home_and_mailing_address_different,boolean,,
 has_hsa,boolean,,
 is_self_employed,boolean,,
-application_id,text,"",""
+application_id,text,,
+account_number,text,,
 token,uuid,yes,yes

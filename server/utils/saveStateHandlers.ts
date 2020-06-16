@@ -3,6 +3,7 @@ import * as salesforceSchema from './salesforce'
 import {addressSchema, identificationSchema, queryParameters} from './helperSchemas';
 import express from 'express';
 import pg from 'pg';
+import {Connection as jsfConection, RecordResult} from 'jsforce'
 import { text } from 'body-parser';
 
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: applicationInterfaces.welcomePageParameters, res: express.Response, client: pg.Client)
@@ -11,9 +12,43 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: appl
   runQuery(welcomePageUpsertQuery, res, client);
 }
 
-export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, client: pg.Client){
-    let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
-    runQuery(appQueryUpsert, res, client);
+export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, client: pg.Client, serverConn: Partial<jsfConection>){
+    //query for application_session
+    //if none exists
+    //insert on SF and create a new application_session
+    let sessionQuery = {
+      text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+      values: [sessionId]
+    }
+    client.query(sessionQuery).then( function(appSessionResult:pg.QueryResult){
+      if(appSessionResult.rowCount == 0)
+      {
+        console.log('found no app')
+        serverConn.sobject("Online_Application__c").create({'First_Name__c': applicantForm.first_name, 'Last_Name__c':applicantForm.last_name, 'Token__c':sessionId}).then((result:any)=>{
+          serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
+            //console.log(queryResult);
+            console.log(queryResult['First_Name__c']);
+            console.log(queryResult['AccountNew__c']);
+            let sessionInsert : queryParameters = {
+              text:'INSERT INTO salesforce.application_session(account_number,application_id,token) VALUES($1,$2,$3)',
+              values:[queryResult['AccountNew__c'], result.id, sessionId]
+            }
+            client.query(sessionInsert).then(result=>{
+              let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
+              runQuery(appQueryUpsert, res, client);
+            })
+          })
+        }).catch(err=>{
+          console.log('failed to start session');
+          res.status(500).send('failed to start session');
+        });
+        //insert salesforce app
+      }else
+      {
+        let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
+        runQuery(appQueryUpsert, res, client);
+      }
+    })
 }
 
 export function saveBeneficiaryPage(sessionId: string, beneficiaryForm: applicationInterfaces.beneficiaryForm, res: express.Response, client: pg.Client){

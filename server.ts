@@ -9,16 +9,18 @@ import {transformRolloverClientToServer} from './server/utils/transformRollovers
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
+import jsforce, {Connection as jsfConnection} from 'jsforce'
 //{applicationInterfaces.saveWelcomeParameters, applicationInterfaces.requestBody, applicationInterfaces.welcomePageParameters, applicationInterfaces.beneficiaryForm, applicationInterfaces.feeArrangementForm, accountNotificationsForm, transferForm}
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
 var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcome@localhost';
-import pg, { Client } from 'pg'
+import pg, { Client, Connection } from 'pg'
 var client  = new pg.Client(connectionString);
-var jsforce = require('jsforce');
-var serverConn = new jsforce.Connection({
+//var jsforce = require('jsforce');
+
+var serverConn :Partial<jsfConnection> = new jsforce.Connection({
   oauth2 : {
     // you can change loginUrl to connect to sandbox or prerelease env.
     loginUrl : 'https://test.salesforce.com',
@@ -36,11 +38,13 @@ var qaPw = process.env.qaUserPw || 'test';
 if(qaUser === 'test' || qaPw === 'test')
 {
   serverConn = {
-    accessToken: 'test_conn'
+    accessToken: 'test_conn', 
+
   }
 }else{
-  serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
+  serverConn.login(process.env.qaUserId, process.env.qaUserPw).then(function(userInfo : any) {
     console.log('token: ' + serverConn.accessToken)
+  }).catch((err)=>{
     if (err) {
       console.log(err);
       return console.log('fail');
@@ -171,7 +175,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'appId'){
-    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client);
+    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn);
     return
   }
 
