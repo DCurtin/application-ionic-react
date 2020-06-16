@@ -33,10 +33,11 @@ export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
 }
 
-export function chargeCreditCard(formData: FormData)
+export function chargeCreditCard(formData: FormData, sessionId: string)
 {
     let url = '/chargeCreditCard'
     let body = {
+        sessionId: sessionId,
         creditCardNumber : formData.creditCardNumber,
         expirationDateString : formData.expirationDateString
     }
@@ -59,7 +60,7 @@ export function getESignUrl(sessionId: string)
 {
     let url = '/getESignUrl'
     let body = {
-        sessionId: sessionId
+        sessionId : sessionId
     }
     let options = {
         method : 'POST',
@@ -82,6 +83,24 @@ export function saveTransferPage(sessionId: string, formData: FormData){
 
 export function getTransferPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'transfer')
+}
+
+export function saveContributionPage(sessionId: string, formData: FormData){
+    console.log(formData);
+    return makeSaveStateCallout(sessionId, 'contribution', formData)
+}
+
+export function getContributionPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'contribution')
+}
+
+export function saveRolloverPage(sessionId: string, formData: FormData){
+    console.log(formData);
+    return makeSaveStateCallout(sessionId, 'rollover', formData)
+}
+
+export function getRolloverPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'rollover')
 }
 
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){

@@ -1,0 +1,4 @@
+Identifier,Type,Unique,Required
+account_number,text,yes,yes
+application_id,text,yes,yes
+token,uuid,yes,yes

@@ -1,18 +1,21 @@
-import React, {useState} from 'react';
-import { SessionApp } from '../helpers/Utils';
+import React, {useState, useEffect} from 'react';
+import { SessionApp, contributionForm } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
 import moment from 'moment'; 
+import { useHistory } from 'react-router-dom';
+import {getContributionPage, saveContributionPage} from '../helpers/CalloutHelpers'
 
 const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-    const [formData, setFormData] = useState({
-        new_contribution_amount__c: '', 
-        tax_year__c: '',
-        account_name__c: '', 
-        bank_account_type__c: '', 
-        routing_number__c: '', 
-        account_number__c: '', 
-        bank_name__c: '', 
-        account_type__c: 'Traditional IRA'
+    const history = useHistory();
+    const [formData, setFormData] = useState<contributionForm>({
+        new_contribution_amount: 0, 
+        tax_year: '',
+        name_on_account: '', 
+        bank_account_type: '', 
+        routing_number: '', 
+        account_number: '', 
+        bank_name: '', 
+        account_type: 'Traditional IRA'
     });
 
     const updateForm = (e:any) => {
@@ -39,6 +42,33 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         return showTaxYearInput; 
     }
 
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getContributionPage(sessionId).then(data =>{
+                if(data === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+        console.log(sessionId + 'this is my sessionId');
+    },[sessionId])
+
+    function ImportForm(data : any){
+        let importedForm : contributionForm = data;
+        console.log(importedForm);
+        setFormData(importedForm);
+    }
+    
+    useEffect(()=>{
+      return history.listen(()=>{
+          console.log(formData)
+          saveContributionPage(sessionId, formData);
+      })
+    },[formData])
+
     return (
         <IonContent className='ion-padding'>
             <IonGrid>
@@ -59,14 +89,14 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Amount
                         </IonLabel>
-                        <IonInput name='new_contribution_amount__c' value={formData.new_contribution_amount__c} onIonChange={updateForm}></IonInput>
+                        <IonInput name='new_contribution_amount' value={formData.new_contribution_amount} onIonChange={updateForm}></IonInput>
                     </IonCol>
-                    {showTaxYearInput(formData.account_type__c) && (
+                    {showTaxYearInput(formData.account_type) && (
                         <IonCol>
                             <IonLabel>
                                 Tax Year
                             </IonLabel>
-                            <IonSelect value={formData.tax_year__c} name='tax_year__c' onIonChange={updateForm}>
+                            <IonSelect value={formData.tax_year} name='tax_year' onIonChange={updateForm}>
                                 <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
                                 <IonSelectOption value='Last Year'>
                                     Last Year
@@ -80,13 +110,13 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Name on Account
                         </IonLabel>
-                        <IonInput value={formData.account_name__c} name='account_name__c' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.name_on_account} name='name_on_account' onIonChange={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Bank Account Type
                         </IonLabel>
-                        <IonSelect value={formData.bank_account_type__c} name='bank_account_type__c' onIonChange={updateForm}>
+                        <IonSelect value={formData.bank_account_type} name='bank_account_type' onIonChange={updateForm}>
                             <IonSelectOption value='Checkings'>Checkings</IonSelectOption>
                             <IonSelectOption value='Savings'>Savings </IonSelectOption>
                         </IonSelect>
@@ -97,19 +127,19 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Bank ABA/Routing Number
                         </IonLabel>
-                        <IonInput name='routing_number__c' value={formData.routing_number__c} onIonChange={validateRoutingNumber}></IonInput>
+                        <IonInput name='routing_number' value={formData.routing_number} onIonChange={validateRoutingNumber}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Account Number
                         </IonLabel>
-                        <IonInput value={formData.account_number__c} onIonChange={updateForm} name='account_number__c'></IonInput>
+                        <IonInput value={formData.account_number} onIonChange={updateForm} name='account_number'></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol size='6'>
                         <IonLabel>Bank Name</IonLabel>
-                        <IonInput value={formData.bank_name__c} onIonChange={updateForm} name='bank_name__c'></IonInput>
+                        <IonInput value={formData.bank_name} onIonChange={updateForm} name='bank_name'></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow className='well ion-margin-top'>

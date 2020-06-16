@@ -9,9 +9,9 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
         const [docusignUrl, setDocusignUrl] = useState(''); 
         useEffect(() => {
-            getESignUrl(sessionId).then((res) =>
+            getESignUrl(sessionId).then((data) =>
             {
-                let url = '/docusignReturn';
+                let url = data.eSignUrl;
                 console.log('done here');
                 setDocusignUrl(url);
             }
@@ -19,13 +19,13 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             {
                 setDocusignUrl('/docusignReturn')
             })
-        })
+        },[sessionId])
 
         useEffect(() => {
             axios.get('/getPenSignDoc').then((res) => {
 
             })
-        })
+        },[])
 
         return (
         <IonContent className='ion-padding'>
@@ -48,9 +48,9 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonRow>
                         <IonRow>
                             <IonCol>
-                            <a className="btn btn-primary" href={docusignUrl}>
-                                <IonButton>
-                                Proceed to E-Signature 
+                            <a className="btn btn-primary" href={docusignUrl === '' ? undefined: docusignUrl}>
+                                <IonButton disabled={docusignUrl === ''}>
+                                {docusignUrl === '' ? 'loading...' : 'Proceed to E-Signature'}
                                 </IonButton>
                             </a>
                         
