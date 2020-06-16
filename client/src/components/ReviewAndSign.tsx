@@ -5,15 +5,20 @@ import axios from 'axios';
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        const [docusignSignAttempts, setDocusignSignAttempts] = useState(0); 
-        const getPenSignedDoc = () => {
-            axios.get('/getPenSignDoc').then(() =>
-                {
-                    console.log('done here');
-                }
-
-            )
-        }
+        const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
+        const [docusignUrl, setDocusignUrl] = useState(''); 
+        useEffect(() => {
+            axios.get('/getESignUrl').then(() =>
+            {
+                let url = 'testUrl';
+                console.log('done here');
+                setDocusignUrl(url);
+            }
+            ).catch(() =>
+            {
+                setDocusignUrl('errorUrl')
+            })
+        })
 
         return (
         <IonContent className='ion-padding'>
@@ -36,7 +41,11 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonRow>
                         <IonRow>
                             <IonCol>
-                                <IonButton>Proceed to E-Signature</IonButton>
+                            <a className="btn btn-primary" href={docusignUrl}>
+                                <IonButton>
+                                Proceed to E-Signature 
+                                </IonButton>
+                            </a>
                         
                             </IonCol>    
                         </IonRow>
@@ -71,7 +80,11 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         </IonRow>
                         <IonRow>
                             <IonCol>
-                                <IonButton className="btn btn-primary" onClick={getPenSignedDoc}>Download My Signature Document</IonButton>
+                                <a className="btn btn-primary" href={docusignUrl}>
+                                    <IonButton>
+                                    Download My Signature Document
+                                    </IonButton>
+                                </a>
                             </IonCol>
                         </IonRow>
                     </React.Fragment>

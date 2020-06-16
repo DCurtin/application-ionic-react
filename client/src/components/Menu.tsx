@@ -39,9 +39,10 @@ interface session{
 const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
   console.log('menu ' + sessionId);
+  console.log(location);
 
   return (
-    <IonMenu contentId="main" type="overlay">
+    <IonMenu contentId="main" type="overlay" hidden={location.pathname.includes('docusign')}>
       <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
           {menuSections.map((appSection, index) => {
