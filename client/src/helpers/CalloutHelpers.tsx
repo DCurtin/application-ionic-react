@@ -1,4 +1,5 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
+import { FromTo } from 'moment';
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
@@ -101,6 +102,14 @@ export function saveRolloverPage(sessionId: string, formData: FormData){
 
 export function getRolloverPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'rollover')
+}
+
+export function getInitialInvestmentPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'initial_investment');
+}
+
+export function saveInitialInvestmentPage(sessionId: string, formData: FormData){
+    return makeSaveStateCallout(sessionId, 'initial_investment', formData)
 }
 
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
