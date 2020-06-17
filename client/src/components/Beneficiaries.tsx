@@ -90,7 +90,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel> Type </IonLabel>
-                        <IonSelect name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm}>
                             <IonSelectOption value='Primary'>Primary</IonSelectOption>
                             <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
                         </IonSelect>
@@ -99,7 +99,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Relationship
                         </IonLabel>
-                        <IonSelect name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm}>
                             <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
                             <IonSelectOption value='Parent'>Parent</IonSelectOption>
                             <IonSelectOption value='Child'>Child</IonSelectOption>
@@ -131,7 +131,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Beneficiary State</IonLabel>
-                        <IonSelect name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
                             {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                         </IonSelect>
                     </IonCol>

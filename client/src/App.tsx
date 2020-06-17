@@ -37,7 +37,9 @@ const App: React.FC = () => {
     newContribution: false,
     initialInvestment: false,
     is401k: false
-  })
+  });
+  const [isValid, setIsValid] = useState(false);
+
 
   useEffect(()=>{
     let appSections:AppSection[] = generateAppPages(menuParams)

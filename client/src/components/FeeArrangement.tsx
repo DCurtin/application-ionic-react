@@ -79,7 +79,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Select fee agreement
                         </IonLabel>
-                        <IonSelect value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm}>
                             <IonSelectOption value='Asset Based ($295)'>
                             Option 1 - Asset Based
                             </IonSelectOption>
@@ -95,7 +95,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>
-                            <IonSelect value={formData.payment_method} name='payment_method' onIonChange={updateForm}>
+                            <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method' onIonChange={updateForm}>
                                 <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
                                 <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
                             </IonSelect>

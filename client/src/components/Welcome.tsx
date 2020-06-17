@@ -189,7 +189,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected}>
+                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}
@@ -236,7 +236,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                        <IonSelect interface='action-sheet' value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
                             {initialInvestmentTypes.map((investmentType, index) => (
                             <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                             ))}

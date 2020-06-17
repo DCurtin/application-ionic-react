@@ -96,7 +96,7 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             <IonLabel>
                                 Tax Year
                             </IonLabel>
-                            <IonSelect value={formData.tax_year} name='tax_year' onIonChange={updateForm}>
+                            <IonSelect interface='action-sheet' value={formData.tax_year} name='tax_year' onIonChange={updateForm}>
                                 <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
                                 <IonSelectOption value='Last Year'>
                                     Last Year
@@ -116,7 +116,7 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Bank Account Type
                         </IonLabel>
-                        <IonSelect value={formData.bank_account_type} name='bank_account_type' onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' value={formData.bank_account_type} name='bank_account_type' onIonChange={updateForm}>
                             <IonSelectOption value='Checkings'>Checkings</IonSelectOption>
                             <IonSelectOption value='Savings'>Savings </IonSelectOption>
                         </IonSelect>

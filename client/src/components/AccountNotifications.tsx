@@ -82,7 +82,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                         <IonLabel>
                             Paper Statement Options
                         </IonLabel>
-                        <IonSelect name='ira_statement_option' value={formData.ira_statement_option} onIonChange={updateForm}>
+                        <IonSelect name='ira_statement_option' value={formData.ira_statement_option} onIonChange={updateForm} interface='action-sheet'>
                             {paperStatementOptions.map((statementOption, index) => (
                                 <IonSelectOption key={index} value={statementOption}>
                                     {statementOption == 'e-Statement' ? 'No Paper Statement' : statementOption}
@@ -108,7 +108,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                         <IonLabel>
                         Do you want to provide someone else access to your account? *
                         </IonLabel>
-                        <IonSelect value={formData.include_interested_party} name='include_interested_party' onIonChange={updateForm}>
+                        <IonSelect value={formData.include_interested_party} name='include_interested_party' onIonChange={updateForm} interface='action-sheet'>
                             <IonSelectOption value={false}>No</IonSelectOption>
                             <IonSelectOption value={true}>
                                 Yes
@@ -164,7 +164,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     State
                                 </IonLabel>
-                                <IonSelect value={formData.mailing_state} name='mailing_state' onIonChange={updateForm}>
+                                <IonSelect value={formData.mailing_state} name='mailing_state' onIonChange={updateForm} interface='action-sheet'>
                                     {states.map((state, index) => (
                                         <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                         )
@@ -194,7 +194,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                         <IonRow>
                             <IonCol>
                                 <IonLabel>Online Access</IonLabel>
-                                <IonSelect value={formData.online_access} name='online_access' onIonChange={updateForm}>
+                                <IonSelect value={formData.online_access} name='online_access' onIonChange={updateForm} interface='action-sheet'>
                                     <IonSelectOption value={true}>Yes</IonSelectOption>
                                     <IonSelectOption  value={false}>No</IonSelectOption>
                                 </IonSelect>
@@ -203,7 +203,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
                                 <IonLabel>
                                     Paper Statement Options
                                 </IonLabel>
-                                <IonSelect value={formData.statement_option} name='statement_option' onIonChange={updateForm}>
+                                <IonSelect value={formData.statement_option} name='statement_option' onIonChange={updateForm} interface='action-sheet'>
                                     {paperStatementOptions.map((statementOption, index) => (
                                         <IonSelectOption value={statementOption} key={index}>{statementOption}</IonSelectOption>
                                     ))}

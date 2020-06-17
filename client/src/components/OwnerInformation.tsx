@@ -71,7 +71,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Salutation *
                         </IonLabel>
-                        <IonSelect name="salutation" value={formData.salutation} onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name="salutation" value={formData.salutation} onIonChange={updateForm}>
                             <IonSelectOption value="Mr.">Mr.</IonSelectOption>
                             <IonSelectOption value="Ms.">Ms.</IonSelectOption>
                             <IonSelectOption value="Mrs.">Mrs.</IonSelectOption>
@@ -110,7 +110,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Marital Status
                         </IonLabel>
-                        <IonSelect name='marital_status' onIonChange={updateForm} value={formData.marital_status}>
+                        <IonSelect interface='action-sheet' name='marital_status' onIonChange={updateForm} value={formData.marital_status}>
                             <IonSelectOption value="Single">Single</IonSelectOption>
                             <IonSelectOption value="Married">Married</IonSelectOption>
                             <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
@@ -124,7 +124,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Occupation</IonLabel>
-                        <IonSelect name='occupation' onIonChange={updateForm} value={formData.occupation}>
+                        <IonSelect interface='action-sheet' name='occupation' onIonChange={updateForm} value={formData.occupation}>
                             <IonSelectOption value="Accountant">Accountant
                             </IonSelectOption>
                             <IonSelectOption value="Attorney">Attorney</IonSelectOption>
@@ -165,7 +165,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                       <IonLabel>Proof of Identification</IonLabel>
-                        <IonSelect value={formData.id_type} onIonChange={updateForm} name='id_type'>
+                        <IonSelect interface='action-sheet' value={formData.id_type} onIonChange={updateForm} name='id_type'>
                             <IonSelectOption value={`Driver's License`}>Driver's License</IonSelectOption>
                             <IonSelectOption value='Passport'>Passport</IonSelectOption>
                             <IonSelectOption value='Other'>Other</IonSelectOption>
@@ -240,7 +240,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Physical State
                         </IonLabel>
-                        <IonSelect onIonChange={updateForm} value={formData.legal_state} name='legal_state'>
+                        <IonSelect interface='action-sheet' onIonChange={updateForm} value={formData.legal_state} name='legal_state'>
                             {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
                         </IonSelect>
                     </IonCol>
@@ -283,7 +283,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     <IonRow>
                         <IonCol>
                             <IonLabel>Mailing State</IonLabel>
-                            <IonSelect name='mailing_state' value={formData.mailing_state} onIonChange={updateForm}>
+                            <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} onIonChange={updateForm}>
                             {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
                             </IonSelect>
                         </IonCol>
@@ -309,7 +309,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Preferred Contact Method
                         </IonLabel>
-                        <IonSelect value={formData.preferred_contact_method} name='preferred_contact_method' onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' value={formData.preferred_contact_method} name='preferred_contact_method' onIonChange={updateForm}>
                             <IonSelectOption value='Email'>Email</IonSelectOption>
                             <IonSelectOption value='Mail'>Mail</IonSelectOption>
                             <IonSelectOption value='Phone (Home)'>Phone (Home)</IonSelectOption>
@@ -341,7 +341,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonCol>
                     <IonCol>
                         <IonLabel>Alternate Phone Type</IonLabel>
-                        <IonSelect value={formData.alternate_phone_type} name='alternate_phone_type' onIonChange={updateForm}>
+                        <IonSelect value={formData.alternate_phone_type} interface='action-sheet' name='alternate_phone_type' onIonChange={updateForm}>
                             <IonSelectOption value='Home'>Home</IonSelectOption>
                             <IonSelectOption value='Mobile'>Mobile</IonSelectOption>
                             <IonSelectOption value='Office'>Office</IonSelectOption>
