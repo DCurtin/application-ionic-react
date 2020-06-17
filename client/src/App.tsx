@@ -38,13 +38,12 @@ const App: React.FC = () => {
     initialInvestment: false,
     is401k: false
   });
-  const [isValid, setIsValid] = useState(false);
 
 
   useEffect(()=>{
     let appSections:AppSection[] = generateAppPages(menuParams)
     setAppSections(appSections);    
-  },[menuParams,sessionId])
+  },[menuParams,sessionId]);
 
   return (
     <IonApp>

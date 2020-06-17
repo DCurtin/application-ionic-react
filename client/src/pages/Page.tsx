@@ -59,6 +59,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
+  const [isFormDataValid, setIsFormDataValid] = useState(false); 
+
   useEffect(function(){
     let formParams : MenuParameters = {
       initialInvestment : false,
@@ -166,6 +168,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
   }
 
+  const goToNextPage = () => {
+    if (isFormDataValid) {
+      let path = currentState.nextPage?.url;
+      if (path){
+        history.push(path);
+      }
+    }
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -180,7 +191,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
         </IonToolbar>
         <IonButtons>
             <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
-            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
+            <IonButton onClick={goToNextPage}>Next</IonButton>
         </IonButtons>
       </IonHeader>
 
