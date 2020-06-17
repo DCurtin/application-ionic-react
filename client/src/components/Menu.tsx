@@ -30,7 +30,7 @@ interface session{
 
 const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
-
+  let appPages = menuSections.flatMap(menuSection => menuSection.pages);
   return (
     <IonMenu contentId="main" type="overlay" hidden={location.pathname.includes('docusign')}>
       <IonContent forceOverscroll={true}>
@@ -42,7 +42,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
                  {menuSection.pages.map((appPage, index) => {
                     return (
                       <IonMenuToggle key={index} autoHide={false}>
-                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink(location.search, appPage.url, sessionId)} routerDirection="none" lines="none" detail={false}>
+                        <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink( appPage.url, appPages)} routerDirection="none" lines="none" detail={false}>
                           <IonIcon slot="start" icon={appPage.iosIcon} />
                           <IonLabel className='ion-text-wrap'>{appPage.title}</IonLabel>
                         </IonItem>
@@ -65,24 +65,20 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   );
 };
 
-function getLink(location:string, url:string, sessionId:string){
-  /*console.log(location);
-  if(location.includes('id'))
-  {
-    var parameters = location.replace('?','').split('&');
-    var id = parameters.find(e=>{return e.includes('id')});
-    if(id === undefined){
-      return url
-    }else{
-      return url + '?' + id;
+function getLink( url:string, appPagesInOrder:Array<AppPage>){
+  let appPagesArr = [...appPagesInOrder];
+  let currentPageIndex = appPagesArr.findIndex(appPage => (appPage.url === url));
+  // if (currentPage)
+  //if welcome page and isNotValid stay on Welcome Page
+  if (currentPageIndex >= 0 && !appPagesArr[currentPageIndex].isValid){
+    let lastValidPageIndex = appPagesArr.reverse().findIndex(appPage => appPage.isValid);
+
+    if (lastValidPageIndex == -1) {
+      url = appPagesInOrder[0].url;  
+    } else {
+      url = appPagesInOrder[appPagesInOrder.length-lastValidPageIndex].url;
     }
   }
-
-  if(sessionId !== '')
-  {
-    return url +'?id=' +sessionId
-  }*/
-
   return url;
   //appPage.url
 }

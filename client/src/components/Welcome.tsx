@@ -5,7 +5,6 @@ import './Welcome.css';
 import {useHistory} from 'react-router-dom';
 
 import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes} from "../helpers/Utils";
-import { Interface } from 'readline';
 
 interface InitSessionApp extends SessionApp {
     initialValues: welcomePageParameters,

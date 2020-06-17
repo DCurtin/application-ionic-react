@@ -39,7 +39,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
-  })
+  });
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',

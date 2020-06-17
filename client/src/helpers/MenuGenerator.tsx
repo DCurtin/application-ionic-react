@@ -16,7 +16,7 @@ export interface AppPage {
       url: '/page/Welcome',
       iosIcon: alertCircleOutline,
       mdIcon: alertCircleSharp,
-      isValid: false,
+      isValid: true,
     },
 
     'Disclosures':{
