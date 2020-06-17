@@ -1,4 +1,5 @@
 import {Menu} from './components/Menu';
+import Resume from './pages/Resume'
 import Page from './pages/Page';
 import React, { useState, useEffect } from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
@@ -53,6 +54,7 @@ const App: React.FC = () => {
             <Route path='/docusignReturn' exact>
               <DocusignReturn/>
             </Route>
+            <Route path="/resume" render={(props) => <Resume {...props} setSessionId={setSessionId}/>}/>
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>
