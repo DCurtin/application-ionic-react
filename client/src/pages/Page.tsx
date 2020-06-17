@@ -73,6 +73,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     formParams.rolloverForm = welcomePageFields.RolloverEmployer;
     formParams.newContribution = welcomePageFields.CashContribution;
     formParams.planInfo = welcomePageFields.AccountType.includes('SEP');
+    formParams.is401k = welcomePageFields.AccountType.includes('401k');
 
     formParams.initialInvestment = (welcomePageFields.InitialInvestment !== "I'm Not Sure" && welcomePageFields.InitialInvestment !== '')
     
