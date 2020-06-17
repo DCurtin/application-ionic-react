@@ -1,30 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, initialInvestmentTypes } from '../helpers/Utils';
+import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters} from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 
 const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => {   
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
 
-    const [formData, setFormData] = useState({
-        initial_investment_type__c : 'Futures/Forex',
-        initial_investment_name__c: '',
-        investment_contact_person__c: '',
-        investment_contact_person_phone__c: null, 
-        investment_amount__c: '', 
-        ira_full_or_partial_cash_transfer_1__c: '', 
-        ira_full_or_partial_cash_transfer_2__c: '',
-        transfertype1__c: '', 
-        transfertype2__c:'', 
-        existing_ira_transfer__c: false,
-        existing_employer_plan_rollover__c: false, 
-        new_ira_contribution__c: false,
-        ira_cash_amount_1__c: '',
-        ira_cash_amount_2__c: '', 
-        employer_cash_amount_1__c: '', 
-        employer_cash_amount_2__c: '',
-        new_contribution_amount__c: ''
+    const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({
+        initial_investment_type : 'Futures/Forex'
     });
     
+    const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
     useEffect(() => {
         // TO DO: Grab initial investment type fields from saved application 
     })
@@ -34,8 +19,12 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 
-    const displayEntityNameLabel = (investmentType:string) => {
+    const displayEntityNameLabel = (investmentType?:string) => {
         let entityNameLabel = 'Entity Name';
+        if(investmentType === undefined){
+            return entityNameLabel;
+        }
+
         if (investmentType.includes('Note')){
             entityNameLabel = 'Borrower Name';
         } else if (investmentType === 'Real Estate'){
@@ -50,32 +39,32 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
 
     const showMinCashBalanceCheckbox = (formData:any) => {
         let showMinCashBalanceCheckbox = false; 
-        if (formData.initial_investment_type__c == 'Futures/Forex'){
+        if (formData.initial_investment_type == 'Futures/Forex'){
             showMinCashBalanceCheckbox = true;
         }
 
-        if (formData.ira_full_or_partial_cash_transfer_1__c == 'All Available Cash' || formData.ira_full_or_partial_cash_transfer_2__c == 'All Available Cash' || formData.transfertype1__c == 'In-Kind Transfer' || formData.transfertype2__c == 'In-Kind Transfer'){
+        if (conditionalParameters?.ira_full_or_partial_cash_transfer_1 == 'All Available Cash' || conditionalParameters?.ira_full_or_partial_cash_transfer_2 == 'All Available Cash' || conditionalParameters?.transfertype1 == 'In-Kind Transfer' || conditionalParameters?.transfertype2 == 'In-Kind Transfer'){
             showMinCashBalanceCheckbox = true;
         }
 
-        if (formData.existing_ira_transfer__c && !formData.existing_employer_plan_rollover__c && !formData.new_ira_contribution__c) {
+        if (conditionalParameters?.existing_ira_transfer && !conditionalParameters?.existing_employer_plan_rollover && !conditionalParameters?.new_ira_contribution) {
             showMinCashBalanceCheckbox = true;
         }
         
         return showMinCashBalanceCheckbox;
     }
 
-    const showNotEnoughProjectedCashWarning = (formData:any) => {
+    const showNotEnoughProjectedCashWarning = (formData:initialInvestmentConditionalParameters) => {
         let showNotEnoughProjectedCashWarning = false; 
-        let transfer1Amount = formData.ira_cash_amount_1__c ? +formData.ira_cash_amount_1__c : 0;
-        let transfer2Amount = formData.ira_cash_amount_2__c ? +formData.ira_cash_amount_2__c : 0; 
-        let rollover1Amount = formData.employer_cash_amount_1__c ? +formData.employer_cash_amount_1__c : 0; 
-        let rollover2Amount = formData.employer_cash_amount_2__c ? +formData.employer_cash_amount_2__c : 0; 
-        let contributionAmount = formData.new_contribution_amount__c ? +formData.new_contribution_amount__c : 0; 
+        let transfer1Amount = formData.ira_cash_amount_1 ? +formData.ira_cash_amount_1 : 0;
+        let transfer2Amount = formData.ira_cash_amount_2 ? +formData.ira_cash_amount_2 : 0; 
+        let rollover1Amount = formData.employer_cash_amount_1 ? +formData.employer_cash_amount_1 : 0; 
+        let rollover2Amount = formData.employer_cash_amount_2 ? +formData.employer_cash_amount_2 : 0; 
+        let contributionAmount = formData.new_contribution_amount ? +formData.new_contribution_amount : 0; 
         
         let projectedAvailableCash = transfer1Amount + transfer2Amount + rollover1Amount + rollover2Amount + contributionAmount;
 
-        if (!showMinCashBalanceCheckbox(formData) && (projectedAvailableCash < (formData.investment_amount__c + 250))) {
+        if (!showMinCashBalanceCheckbox(formData) && (projectedAvailableCash < (formData.investment_amount + 250))) {
             showNotEnoughProjectedCashWarning = true; 
         }
         
@@ -103,15 +92,15 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         <IonLabel>
                             What type of asset?
                         </IonLabel>
-                        <IonSelect value={formData.initial_investment_type__c} name='initial_investment_type__c' onIonChange={updateForm}>
+                        <IonSelect value={formData.initial_investment_type} name='initial_investment_type' onIonChange={updateForm}>
                             {investmentTypesArr.map((investmentType, index) => (
                                 <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                             ))}
                         </IonSelect>
                     </IonCol>
                     <IonCol>
-                            <IonLabel>{displayEntityNameLabel(formData.initial_investment_type__c)}</IonLabel>
-                            <IonInput name='initial_investment_name__c' value={formData.initial_investment_name__c}></IonInput>
+                            <IonLabel>{displayEntityNameLabel(formData.initial_investment_type)}</IonLabel>
+                            <IonInput name='initial_investment_name' value={formData.initial_investment_name}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -119,19 +108,19 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         <IonLabel>
                             Contact Person
                         </IonLabel>
-                        <IonInput name='investment_contact_person__c' value={formData.investment_contact_person__c} onIonChange={updateForm}></IonInput>
+                        <IonInput name='investment_contact_person' value={formData.investment_contact_person} onIonChange={updateForm}></IonInput>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Contact Phone
                         </IonLabel>
-                        <IonInput name='investment_contact_person_phone__c' value={formData.investment_contact_person_phone__c} onIonChange={updateForm} placeholder='(555)555-5555'></IonInput>
+                        <IonInput name='investment_contact_person_phone' value={formData.investment_contact_person_phone} onIonChange={updateForm} placeholder='(555)555-5555'></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol size='6'>
                         <IonLabel>Investment Amount</IonLabel>
-                        <IonInput value={formData.investment_amount__c} name='investment_amount__c' onIonChange={updateForm}></IonInput>
+                        <IonInput value={formData.investment_amount} name='investment_amount' onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 {showMinCashBalanceCheckbox(formData) && (
