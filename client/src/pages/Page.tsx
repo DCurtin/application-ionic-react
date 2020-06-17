@@ -1,8 +1,7 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonItem, IonButton, IonList } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton } from '@ionic/react';
 import {AppPage} from '../components/Menu';
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
-import ExploreContainer from '../components/ExploreContainer';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import './Page.css';
@@ -20,7 +19,9 @@ import AccountNotifications from '../components/AccountNotifications';
 import Transfers from '../components/Transfers';
 import Rollovers from '../components/Rollovers';
 import InitialInvestment from '../components/InitialInvestment';
+import NewContribution from '../components/NewContribution';
 import PaymentInformation from '../components/PaymentInformation';
+import ReviewAndSign from '../components/ReviewAndSign';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -129,7 +130,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const displayPage = (pageName:string) => {
-
     if (!currentState.currentPage.url.includes(pageName)) {
       let updatedState = getPageStateFromPage(pageName);
       setCurrentState(updatedState);
@@ -153,11 +153,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'RolloverPlan':
         return <Rollovers sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId}/>
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId}/>;
+      case 'NewContribution':
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'PaymentInformation':
         return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId}/>;
-      default:
-        return <ExploreContainer name={pageName} currentState={currentState}/>
+      case 'ReviewAndSign':
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId}/>;
+      default: 
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
     }
   }
 

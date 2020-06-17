@@ -25,6 +25,7 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import './theme/apptheme.css';
+import DocusignReturn from './pages/DocusignReturn';
 
 const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('');
@@ -49,6 +50,9 @@ const App: React.FC = () => {
           <Menu sessionId={sessionId} menuSections={appSections}/>
           <IonRouterOutlet id="main">
             <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={appSections}  setMenuParams={setMenuParams}/>} /> 
+            <Route path='/docusignReturn' exact>
+              <DocusignReturn/>
+            </Route>
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>

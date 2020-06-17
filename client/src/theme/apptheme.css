@@ -6,3 +6,15 @@
 .ios ion-toolbar {
     background-color: #1A1B3F;
 }
+
+ion-input{
+    border-radius: 10px;
+    padding-right: 30px;
+    font-size: 0.9em;
+    border: 1px solid #f1f1f1;
+}
+
+ion-select {
+    border-radius:10px;
+    border: 1px solid #f1f1f1;
+}

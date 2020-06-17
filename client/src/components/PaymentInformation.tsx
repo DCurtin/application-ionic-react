@@ -21,8 +21,8 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
     }
 
     const processCreditCard = (formData: any) => {
-        setFormData(prevState => {return {...prevState, creditCardStatus: 'Pending'}});
-        chargeCreditCard(formData).then(function(response: any) {
+        console.log('starting credit card call');
+        chargeCreditCard(formData,sessionId).then(function(response: any) {
             setFormData(prevState => {return {...prevState, creditCardStatus: response.Status, creditCardStatusDetails: response.StatusDetails, paymentAmount: response.PaymentAmount}});
         })
     }
