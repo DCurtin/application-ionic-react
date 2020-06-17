@@ -6,6 +6,7 @@ export interface AppPage {
     iosIcon: string;
     mdIcon: string;
     title: string;
+    isValid: boolean;
   }
 
   var appPagesMap: {[key :string]: AppPage} = {
@@ -14,7 +15,8 @@ export interface AppPage {
       title: 'Welcome to Midland Trust!',
       url: '/page/Welcome',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false,
     },
 
     'Disclosures':{
@@ -22,84 +24,96 @@ export interface AppPage {
       title: 'Disclosures',
       url: '/page/Disclosures',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'OwnerInformation':{
       header: 'Open Account',
       title: 'Owner Information',
       url: '/page/OwnerInformation',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'PlanInformation':{
       header: 'Open Account',
       title: 'Plan Information',
       url: '/page/PlanInformation',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'Beneficiaries':{
       header: 'Open Account',
       title: 'Beneficiaries',
       url: '/page/Beneficiaries',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'FeeArrangement':{
       header: 'Open Account',
       title: 'Fee Arrangement',
       url: '/page/FeeArrangement',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'AccountNotifications':{
       header: 'Open Account',
       title: 'Account Notifications',
       url: '/page/AccountNotifications',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'TransferFromIRA':{
       header: 'Fund Account',
       title: 'Transfer From Existing IRA',
       url: '/page/TransferIRA',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'RolloverPlan':{
       header: 'Fund Account',
       title: 'Rollover from Existing Employer Plan',
       url: '/page/RolloverPlan',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'NewContribution':{
       header: 'Fund Account',
       title: 'New Contribution',
       url: '/page/NewContribution',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'InvestmentDetails':{
       header: 'Make Investment',
       title: 'Investment Details',
       url: '/page/InvestmentDetails',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'PaymentInformation':{
       header: 'Finishing Up',
       title: 'Payment Information',
       url: '/page/PaymentInformation',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     },
     'ReviewAndSign':{
       header: 'Finishing Up',
       title: 'Review and Sign',
       url: '/page/ReviewAndSign',
       iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      mdIcon: alertCircleSharp,
+      isValid: false
     }
 };
 
@@ -116,13 +130,13 @@ let appPages: AppPage[] = Object.values(appPagesMap);
   }
 
     
-export  interface AppSection {
+export  interface MenuSection {
     header: string;
     pages: AppPage[]
   }
 
   function generateAppPages(menuParams:MenuParameters){
-    let appSections:AppSection[] = [];
+    let appSections:MenuSection[] = [];
     
     appSections.push(generateWelcomeSection());
 

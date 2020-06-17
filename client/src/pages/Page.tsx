@@ -1,5 +1,4 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton } from '@ionic/react';
-import {AppPage} from '../components/Menu';
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
@@ -9,7 +8,7 @@ import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {AppSection, MenuParameters} from '../helpers/MenuGenerator'
+import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator'
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -32,7 +31,7 @@ export interface userState {
 export interface session{
   sessionId: string,
   setSessionId: Function,
-  menuSections: AppSection[],
+  menuSections: MenuSection[],
   setMenuParams: Function
 }
 
@@ -58,8 +57,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     currentPage: appPages[0],
     nextPage: appPages[1]
   });
-
-  const [isFormDataValid, setIsFormDataValid] = useState(false); 
 
   useEffect(function(){
     let formParams : MenuParameters = {
@@ -169,7 +166,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const goToNextPage = () => {
-    if (isFormDataValid) {
+    if (currentState.currentPage.isValid) {
       let path = currentState.nextPage?.url;
       if (path){
         history.push(path);

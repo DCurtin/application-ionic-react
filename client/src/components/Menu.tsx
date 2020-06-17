@@ -15,14 +15,7 @@ import {
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Menu.css';
-
-export interface AppPage {
-  header?: string;
-  url: string;
-  iosIcon: string;
-  mdIcon: string;
-  title: string;
-}
+import { AppPage } from '../helpers/MenuGenerator';
 
 interface AppSection {
   header: string;
@@ -42,11 +35,11 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
     <IonMenu contentId="main" type="overlay" hidden={location.pathname.includes('docusign')}>
       <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
-          {menuSections.map((appSection, index) => {
+          {menuSections.map((menuSection, index) => {
             return (
               <React.Fragment key={index}>
-                <IonListHeader>{appSection.header}</IonListHeader>
-                 {appSection.pages.map((appPage, index) => {
+                <IonListHeader>{menuSection.header}</IonListHeader>
+                 {menuSection.pages.map((appPage, index) => {
                     return (
                       <IonMenuToggle key={index} autoHide={false}>
                         <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink(location.search, appPage.url, sessionId)} routerDirection="none" lines="none" detail={false}>
