@@ -34,12 +34,15 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
         'Legal_Address__c': applicantForm.legal_street,
         'legal_City__c':applicantForm.legal_city,
         'legal_State__c':applicantForm.legal_state,
-        'legal_Zip__c':applicantForm.legal_zip      
+        'legal_Zip__c':applicantForm.legal_zip,
+        'SSN__c':applicantForm.ssn
       }).then((result:any)=>{
+        console.log(' getting fields')
           serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
             //console.log(queryResult);
             console.log(queryResult['First_Name__c']);
             console.log(queryResult['AccountNew__c']);
+            console.log(queryResult['SSN__c'])
             let sessionInsert : queryParameters = {
               text:'INSERT INTO salesforce.application_session(account_number,application_id,token) VALUES($1,$2,$3)',
               values:[queryResult['AccountNew__c'], result.id, sessionId]
@@ -83,18 +86,30 @@ export function saveTransferPage(sessionId: string, transferForm: applicationInt
   runQuery(transferFormQueryUpsert, res, client);
 }
 
-export function saveContributionPage(sessionId: string, controbutionForm: applicationInterfaces.contributionForm,  res: express.Response, client: pg.Client){
-  let contributionQueryUpsert : queryParameters = updateContributionsPage(sessionId, controbutionForm);
-  console.log(controbutionForm);
+export function saveContributionPage(sessionId: string, contributionForm: applicationInterfaces.contributionForm,  res: express.Response, client: pg.Client){
+  let contributionQueryUpsert : queryParameters = updateContributionsPage(sessionId, contributionForm);
+  console.log(contributionForm);
   console.log(contributionQueryUpsert);
   runQuery(contributionQueryUpsert, res, client);
 }
 
-export function saveRolloverPage(sessionId: string, controbutionForm: applicationInterfaces.rolloverForm,  res: express.Response, client: pg.Client){
-  let rolloverQueryUpsert : queryParameters = updateRolloverPage(sessionId, controbutionForm);
+export function saveRolloverPage(sessionId: string, contributionForm: applicationInterfaces.rolloverForm,  res: express.Response, client: pg.Client){
+  let rolloverQueryUpsert : queryParameters = updateRolloverPage(sessionId, contributionForm);
   runQuery(rolloverQueryUpsert, res, client);
 }
+
+export function saveInitialInvestment(sessionId: string, initialInvestmentForm: applicationInterfaces.initialInvestmentForm,  res: express.Response, client: pg.Client){
+  let initialInvestmentUpsert :queryParameters = updateInitialInvestmentPage(sessionId, initialInvestmentForm);
+  runQuery(initialInvestmentUpsert, res, client);
+}
 //HELPERS
+function updateInitialInvestmentPage(token: string,  initialInvestmentForm: applicationInterfaces.initialInvestmentForm,): queryParameters
+{
+  console.log(initialInvestmentForm)
+  let upsertInitialInvestmentParameters: Partial<salesforceSchema.initial_investment> ={...initialInvestmentForm, token:token}
+  return generateQueryString('initial_investment', upsertInitialInvestmentParameters, 'token')
+}
+
 function updateRolloverPage(token: string, rolloverForm: applicationInterfaces.rolloverForm): queryParameters{
   let upsertTransferList  : Array<salesforceSchema.rollover> = []
   rolloverForm.rollovers.forEach((element : applicationInterfaces.rollover) => {
@@ -113,9 +128,9 @@ function updateTransfer(token: string, transferForm: applicationInterfaces.trans
   return generateQueryStringFromList('transfer', upsertTransferList, 'key');
 }
 
-function updateContributionsPage(token: string,  controbutionForm: applicationInterfaces.contributionForm): queryParameters
+function updateContributionsPage(token: string,  contributionForm: applicationInterfaces.contributionForm): queryParameters
 {
-  let upsertContributionParameters: salesforceSchema.contribution ={...controbutionForm, token:token}
+  let upsertContributionParameters: salesforceSchema.contribution ={...contributionForm, token:token}
   return generateQueryString('contribution', upsertContributionParameters, 'token')
 }
 
