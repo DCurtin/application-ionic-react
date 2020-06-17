@@ -112,30 +112,53 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
     res.status(500).send('no session id');
     return;
   }
-  
-  let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
-    values: [sessionId]
+
+  let paymentQuery = {
+    text: 'SELECT * FROM salesforce.payment WHERE token = $1 AND status= $2',
+    values: [sessionId, 'Completed']
   }
   
-  client.query(sessionQuery).then(function(result:pg.QueryResult){
-    if(result.rowCount == 0)
-    {
-      console.log('no application')
-      res.status(500).send('no application');
-      return;
-    }
-    let application_session : salesforceSchema.application_session = result.rows[0];
-
-    let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
-  
-    serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
-      if (err) { return console.error(err); }
-      console.log("response: ", data);
-      res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
+  //may want to move this to another end point that triggered when the user lands on payment info 
+  //could also call this endpoint and supply a null parameter for creditcard/
+  client.query(paymentQuery).then(function(paymentResult: pg.QueryResult)
+  {
+    if(paymentResult.rowCount > 0){
+      let completedPayment = paymentResult.rows[0]
+      res.json({Status: completedPayment.Status, statusdetails: completedPayment.statusdetails, PaymentAmount: completedPayment.paymentamount});
       return
-    })
-  }).catch()
+    }
+    let sessionQuery = {
+      text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+      values: [sessionId]
+    }
+    
+    client.query(sessionQuery).then(function(result:pg.QueryResult){
+      if(result.rowCount == 0)
+      {
+        console.log('no application')
+        res.status(500).send('no application');
+        return;
+      }
+      let application_session : salesforceSchema.application_session = result.rows[0];
+
+      let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
+    
+      serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
+        if (err) { return console.error(err); }
+        console.log("response: ", data);
+        if(data.status === 'Completed')
+        {
+          let insertString = 'INSERT INTO salesforce.payment(statusdetails, status, paymentamount, discountamount, token) VALUES($1, $2, $3, $4, $5)';
+          let queryInsert = {text: insertString, values: [data.StatusDetails, data.Status, data.PaymentAmount, data.DiscountAmount]}
+
+          client.query(queryInsert);
+        }
+
+        res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount});
+        return
+      })
+    }).catch()
+  })
 });
 
 app.post('/getESignUrl', (req, res) => {
@@ -292,6 +315,12 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
     return
   }
 
+  if(page === 'initial_investment'){
+    let initInvestmentData : applicationInterfaces.initialInvestmentForm = packet.data;
+    saveStateHandlers.saveInitialInvestment(sessionId, initInvestmentData, res, client);
+    return
+  }
+
   res.status(500).send('no handler for this page');
 });
 
@@ -361,6 +390,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   
   if(page === 'rollover'){
     getPageInfoHandlers.handleRolloverPage(sessionId, res, client);
+    return
+  }
+
+  if(page === 'initial_investment'){
+    getPageInfoHandlers.handleInitialInvestmentPage(sessionId, res, client);
     return
   }
 
