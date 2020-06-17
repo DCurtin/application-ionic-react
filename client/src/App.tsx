@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
-import generateAppPages, { AppSection, MenuParamters} from './helpers/MenuGenerator';
+import generateAppPages, { AppSection, MenuParameters} from './helpers/MenuGenerator';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -30,12 +30,13 @@ import DocusignReturn from './pages/DocusignReturn';
 const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('');
   const [appSections, setAppSections] = useState<AppSection[]>([]);
-  const[menuParams, setMenuParams] = useState<MenuParamters>({
+  const[menuParams, setMenuParams] = useState<MenuParameters>({
     planInfo: false,
     transferForm: false,
     rolloverForm: false,
     newContribution: false,
-    initialInvestment: false
+    initialInvestment: false,
+    is401k: false
   })
 
   useEffect(()=>{

@@ -9,7 +9,7 @@ import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
+import {AppSection, MenuParameters} from '../helpers/MenuGenerator'
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -60,14 +60,14 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   });
 
   useEffect(function(){
-    let formParams : MenuParamters = {
+    let formParams : MenuParameters = {
       initialInvestment : false,
       newContribution : false,
       planInfo : false,
       rolloverForm : false,
-      transferForm : false
+      transferForm : false,
+      is401k: false
     }
-    console.log('use effect on page');
     
     formParams.transferForm = welcomePageFields.TransferIra;
     formParams.rolloverForm = welcomePageFields.RolloverEmployer;

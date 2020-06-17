@@ -106,12 +106,13 @@ export interface AppPage {
 let appPages: AppPage[] = Object.values(appPagesMap);
   
 
-  export interface MenuParamters{
+  export interface MenuParameters{
     planInfo: Boolean,
     transferForm: Boolean,
     rolloverForm: Boolean,
     newContribution: Boolean,
-    initialInvestment: Boolean
+    initialInvestment: Boolean,
+    is401k: Boolean
   }
 
     
@@ -120,7 +121,7 @@ export  interface AppSection {
     pages: AppPage[]
   }
 
-  function generateAppPages(menuParams:MenuParamters){
+  function generateAppPages(menuParams:MenuParameters){
     let appSections:AppSection[] = [];
     
     appSections.push(generateWelcomeSection());
@@ -165,7 +166,7 @@ export  interface AppSection {
     }
   }
 
-  function generateFundAccountSection(menuParams:MenuParamters){
+  function generateFundAccountSection(menuParams:MenuParameters){
     let pages: AppPage[] = [];
     if(menuParams.transferForm){
         pages.push(appPagesMap['TransferFromIRA'])
