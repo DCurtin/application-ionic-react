@@ -1,4 +1,4 @@
-import {welcomePageParameters, applicantIdForm, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
+import {welcomePageParameters, applicantIdForm, feeArrangementForm, accountNotificationsForm, initialInvestmentConditionalParameters, rollover, transfer, contributionForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
 import {transformTransferServerToClient} from '../utils/transformTransfers'
@@ -159,4 +159,74 @@ export function handleRolloverPage(sessionId: string, res: express.Response, cli
     let returnData = transformRolloverServerToClient(rolloverInfo, 'Traditional IRA')
     res.json({data : returnData});
   })
+}
+
+export function handleInitialInvestmentPage(sessionId: string, res: express.Response, client: pg.Client){
+  let initialInvestmentQuery = {
+    text: 'SELECT * FROM salesforce.initial_investment WHERE token = $1',
+    values: [sessionId]
+  }
+  let rolloverQuery = {
+    text: 'SELECT * FROM salesforce.rollover WHERE token = $1',
+    values: [sessionId]
+  }
+  let transferQuery = {
+    text: 'SELECT * FROM salesforce.transfer WHERE token = $1 AND transfer_type= $2',
+    values: [sessionId, 'cash Transfer']
+  }
+  let contributionQuery = {
+    text: 'SELECT * FROM salesforce.contribution WHERE token = $1',
+    values: [sessionId]
+  }
+
+  
+  //need to get other info
+
+  client.query(initialInvestmentQuery).then(function(result: pg.QueryResult){
+    if(result.rowCount == 0){
+      res.json({data : {formData: undefined, parameters : undefined}})
+    }
+
+    client.query(rolloverQuery).then((rolloverResult:pg.QueryResult)=>{
+      client.query(transferQuery).then((transferResult:pg.QueryResult)=>{
+        client.query(contributionQuery).then((contributionResult:pg.QueryResult)=>{
+          let initialInvestmentInfo : salesforceSchema.initial_investment = result.rows[0];
+          console.log(initialInvestmentInfo)
+          res.json({data : {formData: initialInvestmentInfo, parameters : gatherInitialInvestmentParameters(rolloverResult, transferResult, contributionResult) }});
+        })
+      })
+    })
+  })
+}
+
+function gatherInitialInvestmentParameters(rolloverResult:pg.QueryResult, transferResult:pg.QueryResult, contributionResult:pg.QueryResult){
+  let initialInvestmentParams : Partial<initialInvestmentConditionalParameters> = {}
+  if(rolloverResult.rowCount > 0){
+    let rollovers : Array<rollover> = rolloverResult.rows;
+    initialInvestmentParams.existing_employer_plan_rollover = true;
+    initialInvestmentParams.employer_cash_amount_1 = rollovers[0].cash_amount;
+    initialInvestmentParams.employer_cash_amount_2 = rollovers[1]?.cash_amount;
+  }
+
+  if(transferResult.rowCount > 0){
+    let transfers : Array<transfer> = transferResult.rows
+    initialInvestmentParams.existing_ira_transfer = true
+    initialInvestmentParams.ira_full_or_partial_cash_transfer_1 = transfers[0].full_or_partial_cash_transfer
+    initialInvestmentParams.ira_full_or_partial_cash_transfer_2 = transfers[1]?.full_or_partial_cash_transfer
+    
+    initialInvestmentParams.transfer_type_1 = transfers[0].transfer_type;
+    initialInvestmentParams.transfer_type_2 = transfers[1]?.transfer_type;
+    
+    initialInvestmentParams.ira_cash_amount_1 = transfers[0].cash_amount;
+    initialInvestmentParams.ira_cash_amount_2 = transfers[1]?.cash_amount;
+  }
+
+  if(contributionResult.rowCount > 0)
+  {
+    let contribution : contributionForm = contributionResult.rows[0]
+    initialInvestmentParams.new_ira_contribution = true;
+    initialInvestmentParams.new_contribution_amount = contribution.new_contribution_amount
+  }
+
+  return initialInvestmentParams
 }
