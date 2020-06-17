@@ -39,10 +39,9 @@ if(qaUser === 'test' || qaPw === 'test')
   }
 }else{
   serverConn.login(process.env.qaUserId, process.env.qaUserPw, function(err : any, userInfo : any) {
-    console.log('token: ' + serverConn.accessToken)
     if (err) {
       console.log(err);
-      return console.log('fail');
+      return console.log('Failed to authenticate to Salesforce');
     }
   })
 }
