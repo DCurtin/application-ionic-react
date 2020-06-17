@@ -1,4 +1,4 @@
-import {alertCircleOutline,alertCircleSharp, archiveOutline, archiveSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+import {alertCircleOutline,alertCircleSharp, checkboxOutline, checkboxSharp } from 'ionicons/icons';
 
 export interface AppPage {
     header?: string;
@@ -13,37 +13,37 @@ export interface AppPage {
       header: 'Getting Started',
       title: 'Welcome to Midland Trust!',
       url: '/page/Welcome',
-      iosIcon: mailOutline,
-      mdIcon: mailSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
 
     'Disclosures':{
       header: 'Getting Started',
       title: 'Disclosures',
       url: '/page/Disclosures',
-      iosIcon: paperPlaneOutline,
-      mdIcon: paperPlaneSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'OwnerInformation':{
       header: 'Open Account',
       title: 'Owner Information',
       url: '/page/OwnerInformation',
-      iosIcon: heartOutline,
-      mdIcon: heartSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'PlanInformation':{
       header: 'Open Account',
       title: 'Plan Information',
       url: '/page/PlanInformation',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'Beneficiaries':{
       header: 'Open Account',
       title: 'Beneficiaries',
       url: '/page/Beneficiaries',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'FeeArrangement':{
       header: 'Open Account',
@@ -56,50 +56,50 @@ export interface AppPage {
       header: 'Open Account',
       title: 'Account Notifications',
       url: '/page/AccountNotifications',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'TransferFromIRA':{
       header: 'Fund Account',
       title: 'Transfer From Existing IRA',
       url: '/page/TransferIRA',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'RolloverPlan':{
       header: 'Fund Account',
       title: 'Rollover from Existing Employer Plan',
       url: '/page/RolloverPlan',
-      iosIcon: trashOutline,
-      mdIcon: trashSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'NewContribution':{
       header: 'Fund Account',
       title: 'New Contribution',
       url: '/page/NewContribution',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'InvestmentDetails':{
       header: 'Make Investment',
       title: 'Investment Details',
       url: '/page/InvestmentDetails',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'PaymentInformation':{
       header: 'Finishing Up',
       title: 'Payment Information',
       url: '/page/PaymentInformation',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     },
     'ReviewAndSign':{
       header: 'Finishing Up',
       title: 'Review and Sign',
       url: '/page/ReviewAndSign',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp
     }
 };
 
