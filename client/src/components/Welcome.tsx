@@ -8,7 +8,7 @@ import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestm
 
 interface InitSessionApp extends SessionApp {
     initialValues: welcomePageParameters,
-    setInitialValues: Function,
+    setInitialValues: Function
 }
 
 const Welcome: React.FC<InitSessionApp> = props => {
@@ -21,7 +21,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
         'Inherited IRA - Roth'
     ]
 
-    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
+    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
         props.setInitialValues(
@@ -122,7 +122,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
             )
         }
     }
-
 
     useEffect(()=>{
         //save state on page change

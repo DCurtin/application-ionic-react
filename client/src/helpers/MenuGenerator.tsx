@@ -1,4 +1,4 @@
-import {alertCircleOutline,alertCircleSharp, checkboxOutline, checkboxSharp } from 'ionicons/icons';
+import {alertCircleOutline,alertCircleSharp, checkmarkCircleOutline, checkmarkCircleSharp } from 'ionicons/icons';
 
 export interface AppPage {
     header?: string;
@@ -14,9 +14,9 @@ export interface AppPage {
       header: 'Getting Started',
       title: 'Welcome to Midland Trust!',
       url: '/page/Welcome',
-      iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp,
-      isValid: true,
+      iosIcon: checkmarkCircleOutline,
+      mdIcon: checkmarkCircleSharp,
+      isValid: false,
     },
 
     'Disclosures':{

@@ -41,7 +41,7 @@ const App: React.FC = () => {
 
 
   useEffect(()=>{
-    let menuSections:MenuSection[] = generateAppPages(menuParams)
+    let menuSections:MenuSection[] = generateAppPages(menuParams);
     setMenuSections(menuSections);    
   },[menuParams,sessionId]);
 
@@ -51,7 +51,7 @@ const App: React.FC = () => {
         <IonSplitPane contentId="main">
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuParams={setMenuParams}/>} /> 
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams}/>} /> 
             <Route path='/docusignReturn' exact>
               <DocusignReturn/>
             </Route>

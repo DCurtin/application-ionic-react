@@ -68,8 +68,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
 function getLink( url:string, appPagesInOrder:Array<AppPage>){
   let appPagesArr = [...appPagesInOrder];
   let currentPageIndex = appPagesArr.findIndex(appPage => (appPage.url === url));
-  // if (currentPage)
-  //if welcome page and isNotValid stay on Welcome Page
+  
   if (currentPageIndex >= 0 && !appPagesArr[currentPageIndex].isValid){
     let lastValidPageIndex = appPagesArr.reverse().findIndex(appPage => appPage.isValid);
 
@@ -80,7 +79,6 @@ function getLink( url:string, appPagesInOrder:Array<AppPage>){
     }
   }
   return url;
-  //appPage.url
 }
 
 export {Menu };

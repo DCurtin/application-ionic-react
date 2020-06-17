@@ -1,5 +1,5 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton } from '@ionic/react';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
@@ -21,6 +21,8 @@ import InitialInvestment from '../components/InitialInvestment';
 import NewContribution from '../components/NewContribution';
 import PaymentInformation from '../components/PaymentInformation';
 import ReviewAndSign from '../components/ReviewAndSign';
+import { attachProps } from '@ionic/react/dist/types/components/utils';
+import { checkmarkCircleSharp, checkmarkCircle } from 'ionicons/icons';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -32,14 +34,17 @@ export interface session{
   sessionId: string,
   setSessionId: Function,
   menuSections: MenuSection[],
-  setMenuParams: Function
+  setMenuParams: Function,
+  setMenuSections: Function
 }
 
-const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuParams}) => {
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams,}) => {
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
   });
+
+  const welcomePageRef = useRef<HTMLIonContentElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',
@@ -166,11 +171,33 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const goToNextPage = () => {
+    validateFields();
     if (currentState.currentPage.isValid) {
       let path = currentState.nextPage?.url;
       if (path){
         history.push(path);
       }
+    }
+  }
+
+  const validateFields = () => {
+    let isValid = false; 
+    if (currentState.currentPage.url.includes('Welcome')) {
+      isValid = ( welcomePageFields.AccountType !== '' && welcomePageFields.InitialInvestment !== '');
+    }
+
+    if (isValid){
+      let menuSectionsArr = [...menuSections];
+      let currentPage  = {...currentState.currentPage};
+      let newPage = {...currentPage, isValid: isValid, iosIcon:checkmarkCircle, mdIcon: checkmarkCircleSharp}
+      let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header === currentPage.header); 
+      let currentMenuSection = menuSectionsArr[currentMenuSectionIndex];
+      let menuSectionPagesArr = [...menuSectionsArr[currentMenuSectionIndex].pages];
+      let currentPageIndex = menuSectionPagesArr.findIndex(appPage => appPage.url === currentPage.url);
+      menuSectionPagesArr.splice(currentPageIndex, 1, newPage);
+      let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
+      menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
+      setMenuSections(menuSectionsArr);
     }
   }
 
