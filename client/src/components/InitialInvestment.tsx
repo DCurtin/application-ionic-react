@@ -1,18 +1,47 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters} from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
+import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers'
 
-const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => {   
+const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+    const history = useHistory();
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
 
     const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({
         initial_investment_type : 'Futures/Forex'
     });
-    
     const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
-    useEffect(() => {
-        // TO DO: Grab initial investment type fields from saved application 
-    })
+
+
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
+            getInitialInvestmentPage(sessionId).then(data =>{
+                if(data.formData === undefined || data.parameters === undefined)
+                {
+                    return;
+                }
+                ImportForm(data);
+            })
+        }
+    },[sessionId])
+
+    
+    function ImportForm(data : any){
+        let conditionalParameters : initialInvestmentConditionalParameters = data.parameters;
+        let formData : initialInvestmentForm = data.formData;
+        console.log(data);
+        setFormData(formData);
+        setconditionalParameters(conditionalParameters)
+    }
+
+    useEffect(()=>{
+      return history.listen(()=>{
+        console.log('saving bene');
+        saveInitialInvestmentPage(sessionId, formData);
+      })
+    },[formData])
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
@@ -43,7 +72,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
             showMinCashBalanceCheckbox = true;
         }
 
-        if (conditionalParameters?.ira_full_or_partial_cash_transfer_1 == 'All Available Cash' || conditionalParameters?.ira_full_or_partial_cash_transfer_2 == 'All Available Cash' || conditionalParameters?.transfertype1 == 'In-Kind Transfer' || conditionalParameters?.transfertype2 == 'In-Kind Transfer'){
+        if (conditionalParameters?.ira_full_or_partial_cash_transfer_1 == 'All Available Cash' || conditionalParameters?.ira_full_or_partial_cash_transfer_2 == 'All Available Cash' || conditionalParameters?.transfer_type_1 == 'In-Kind Transfer' || conditionalParameters?.transfer_type_2 == 'In-Kind Transfer'){
             showMinCashBalanceCheckbox = true;
         }
 
@@ -54,8 +83,12 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
         return showMinCashBalanceCheckbox;
     }
 
-    const showNotEnoughProjectedCashWarning = (formData:initialInvestmentConditionalParameters) => {
+    const showNotEnoughProjectedCashWarning = ( investmentAmount ?: number, formData?:initialInvestmentConditionalParameters) => {
         let showNotEnoughProjectedCashWarning = false; 
+
+        if(formData === undefined || investmentAmount === undefined){
+            return showNotEnoughProjectedCashWarning;
+        }
         let transfer1Amount = formData.ira_cash_amount_1 ? +formData.ira_cash_amount_1 : 0;
         let transfer2Amount = formData.ira_cash_amount_2 ? +formData.ira_cash_amount_2 : 0; 
         let rollover1Amount = formData.employer_cash_amount_1 ? +formData.employer_cash_amount_1 : 0; 
@@ -64,7 +97,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
         
         let projectedAvailableCash = transfer1Amount + transfer2Amount + rollover1Amount + rollover2Amount + contributionAmount;
 
-        if (!showMinCashBalanceCheckbox(formData) && (projectedAvailableCash < (formData.investment_amount + 250))) {
+        if (!showMinCashBalanceCheckbox(formData) && (projectedAvailableCash < (investmentAmount + 250))) {
             showNotEnoughProjectedCashWarning = true; 
         }
         
@@ -100,7 +133,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                     </IonCol>
                     <IonCol>
                             <IonLabel>{displayEntityNameLabel(formData.initial_investment_type)}</IonLabel>
-                            <IonInput name='initial_investment_name' value={formData.initial_investment_name}></IonInput>
+                            <IonInput name='initial_investment_name' value={formData.initial_investment_name} onIonChange={updateForm}></IonInput>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -133,7 +166,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         </IonCol>
                     </IonRow>
                 )}
-                {showNotEnoughProjectedCashWarning(formData) &&
+                {showNotEnoughProjectedCashWarning(formData.investment_amount, conditionalParameters) &&
                 (
                     <IonRow className='well'>
                         <IonCol>
