@@ -1,1 +1,7 @@
 Identifier,Type,Unique,Required
+initial_investment_type,text,"",""
+initial_investment_name,text,"",""
+investment_contact_person,text,"",""
+investment_contact_person_phone,text,"",""
+investment_amount,float(2),"",""
+token,uuid,yes,yes

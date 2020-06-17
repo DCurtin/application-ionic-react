@@ -15,5 +15,7 @@ DROP TABLE IF EXISTS salesforce.Contribution;
 CREATE TABLE salesforce.Contribution(new_contribution_amount float(2),tax_year text,name_on_account text,bank_account_type text,routing_number text,account_number text,bank_name text,account_type text,token uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Fee_Arrangement;
 CREATE TABLE salesforce.Fee_Arrangement(fee_schedule text,payment_method text,cc_number text,cc_exp_date text,token uuid UNIQUE NOT NULL);
+DROP TABLE IF EXISTS salesforce.Initial_Investment;
+CREATE TABLE salesforce.Initial_Investment(initial_investment_type text,initial_investment_name text,investment_contact_person text,investment_contact_person_phone text,investment_amount float(2),token uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Interested_Party;
 CREATE TABLE salesforce.Interested_Party(first_name text,last_name text,email text,phone text,title text,company_name text,ira_statement_option text,statement_option text,mailing_street text,mailing_city text,mailing_state text,mailing_zip text,online_access boolean,include_interested_party boolean,token uuid UNIQUE NOT NULL);
