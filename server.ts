@@ -152,10 +152,12 @@ app.post('/getESignUrl', (req, res) => {
       return;
     }
     let application_session : salesforceSchema.application_session = result.rows[0];
-    console.log('account num ' + application_session.account_number)
+    
     let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3030'
-    console.log(returnurl);
-    serverConn.apex.get('/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/docusignReturn`, function(err: any, data: any) {
+    let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/docusignReturn`;
+    console.log(endpoint);
+
+    serverConn.apex.get(endpoint, function(err: any, data: any) {
       if (err) { return console.error(err); }
       else {
         console.log("eSignUrl: ", data.eSignUrl);
