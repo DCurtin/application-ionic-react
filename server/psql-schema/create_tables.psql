@@ -10,7 +10,7 @@ CREATE TABLE salesforce.Rollover(cash_amount float(2),institution_name text,acco
 DROP TABLE IF EXISTS salesforce.Transfer;
 CREATE TABLE salesforce.Transfer(account_number text,institution_name text,contact_name text,contact_phone_number text,mailing_street text,mailing_city text,mailing_state text,mailing_zip text,account_type text,transfer_type text,delivery_method text,asset_name_1 text,asset_name_2 text,asset_name_3 text,full_or_partial_cash_transfer text,cash_amount float(2),index integer NOT NULL,key text UNIQUE NOT NULL,token uuid NOT NULL);
 DROP TABLE IF EXISTS salesforce.Application_Session;
-CREATE TABLE salesforce.Application_Session(account_number text UNIQUE NOT NULL,application_id text UNIQUE NOT NULL,token uuid UNIQUE NOT NULL);
+CREATE TABLE salesforce.Application_Session(account_number text UNIQUE NOT NULL,application_id text UNIQUE NOT NULL,intervalId  NOT NULL,active boolean NOT NULL,token uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Contribution;
 CREATE TABLE salesforce.Contribution(new_contribution_amount float(2),tax_year text,name_on_account text,bank_account_type text,routing_number text,account_number text,bank_name text,account_type text,token uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Fee_Arrangement;
