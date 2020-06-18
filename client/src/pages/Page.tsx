@@ -38,12 +38,17 @@ export interface session{
   setMenuSections: Function
 }
 
-const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams,}) => {
+interface PageRef {
+  validatePage: Function;
+}
+
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams}) => {
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
   });
 
+  const disclosureRef = useRef<PageRef>(null);
   const ownerInformationPageRef = useRef<HTMLIonContentElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
@@ -62,6 +67,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     currentPage: appPages[0],
     nextPage: appPages[1]
   });
+
 
   useEffect(function(){
     let formParams : MenuParameters = {
@@ -144,7 +150,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'Welcome': 
         return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Disclosures':
-        return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
+        return <Disclosures selectedAccountType={welcomePageFields.AccountType} ref={disclosureRef}/>;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Beneficiaries':
@@ -170,26 +176,28 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
   }
 
+
   const goToNextPage = () => {
     validateFields();
-    if (currentState.currentPage.isValid) {
-      let path = currentState.nextPage?.url;
-      if (path){
-        history.push(path);
-      }
-    }
   }
 
   const validateFields = () => {
-    let isValid = false; 
+    let isPageValid = false;
     if (currentState.currentPage.url.includes('Welcome')) {
-      isValid = ( welcomePageFields.AccountType !== '' && welcomePageFields.InitialInvestment !== '');
+      isPageValid = ( welcomePageFields.AccountType !== '' && welcomePageFields.InitialInvestment !== '');
+    } else if (currentState.currentPage.url.includes('Disclosures')) {
+      isPageValid = disclosureRef?.current?.validatePage(); 
     }
 
-    if (isValid){
-      let menuSectionsArr = [...menuSections];
+    if (isPageValid){
       let currentPage  = {...currentState.currentPage};
-      let newPage = {...currentPage, isValid: isValid, iosIcon:checkmarkCircle, mdIcon: checkmarkCircleSharp}
+      let newPage = {...currentPage, isValid: isPageValid, iosIcon:checkmarkCircle, mdIcon: checkmarkCircleSharp};
+      setCurrentState(prevState => (
+      {...prevState,
+        currentPage: newPage
+      }));
+
+      let menuSectionsArr = [...menuSections];
       let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header === currentPage.header); 
       let currentMenuSection = menuSectionsArr[currentMenuSectionIndex];
       let menuSectionPagesArr = [...menuSectionsArr[currentMenuSectionIndex].pages];
@@ -198,7 +206,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
       menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
       setMenuSections(menuSectionsArr);
-      // set menu Se
+
+      let path = currentState.nextPage?.url;
+      if (path){
+        history.push(path);
+      }
     }
   }
 

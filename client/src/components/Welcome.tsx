@@ -24,12 +24,22 @@ const Welcome: React.FC<InitSessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        props.setInitialValues(
-            {
-                ...props.initialValues,
-                AccountType: event.detail.value
-            }
-        )
+        if (event.detail.value.includes('Inherited')) {
+            props.setInitialValues(
+                {...props.initialValues,
+                AccountType: event.detail.value,
+                RolloverEmployer: false, 
+                CashContribution: false
+                }
+            )
+        } else {
+            props.setInitialValues(
+                {
+                    ...props.initialValues,
+                    AccountType: event.detail.value
+                }
+            )
+        }
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
@@ -74,11 +84,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
         }
 
         if (accountType.includes('Inherited')) {
-            props.setInitialValues({
-                ...props.initialValues,
-                RolloverEmployer: false,
-                CashContribution: false
-            })
             return Object.entries({...fundingOptions});
         }
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
@@ -98,8 +103,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
     }
 
     const handleChecked = (event: CustomEvent) => {
-        console.log(event.detail.value);
-        console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
             props.setInitialValues(
                 {
@@ -129,12 +132,9 @@ const Welcome: React.FC<InitSessionApp> = props => {
     }
 
     useEffect(()=>{
-        //save state on page change
         return history.listen(()=>{
             //save initial data
-            //return session id
-            console.log('saving welcome page');
-            
+            //return session id            
             var url = '/startApplication'
             if(props.sessionId !== ''){
                 url = '/saveState'
