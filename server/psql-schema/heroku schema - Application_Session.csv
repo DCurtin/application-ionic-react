@@ -1,6 +1,6 @@
 Identifier,Type,Unique,Required
 account_number,text,yes,yes
 application_id,text,yes,yes
-intervalId,"","",yes
-active,boolean,"",yes
+interval_Id,text,"",yes
+active,boolean,,yes
 token,uuid,yes,yes
