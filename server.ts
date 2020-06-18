@@ -103,8 +103,6 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 });
 
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
-  console.log('Charge credit card on server');
-  let applicationId = 'a0J2i000000fMR1EAM';
   let sessionId = req.body.sessionId;
 
   if(sessionId === '' || sessionId === undefined){
