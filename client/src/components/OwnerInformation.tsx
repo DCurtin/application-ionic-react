@@ -3,9 +3,17 @@ import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelec
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers'
+import { MenuSection } from '../helpers/MenuGenerator';
+import { checkmarkCircleSharp, checkmarkCircle } from 'ionicons/icons';
 
-const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+interface PageInterface extends SessionApp {
+    menuSections: Array<MenuSection>;
+    setMenuSections:Function
+}
+
+const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, menuSections, setMenuSections}) => {
     const history = useHistory();
+    const [isValid, setIsValid] = useState(false);
     const [formData, setFormData] = useState<applicantIdForm>({
             is_self_employed: false,
             has_hsa: false,
@@ -37,7 +45,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     ImportForm(data);
                 })
             }
-            console.log(sessionId + 'this is my sessionId');
         },[sessionId])
     
         function ImportForm(data : any){
@@ -52,6 +59,25 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             saveAppPage(sessionId, formData);
           })
         },[formData])
+
+        useEffect(() => {
+            if (formData.first_name && formData.first_name !== '') {
+                let menuSectionsArr = [...menuSections];
+                let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header == 'Open Account');
+                let currentPageIndex = menuSectionsArr[currentMenuSectionIndex].pages.findIndex(appPage => appPage.title === 'Owner Information');
+                let validatedPage = {...menuSectionsArr[currentMenuSectionIndex].pages[currentPageIndex], isValid: true, iosIcon:checkmarkCircle, mdIcon: checkmarkCircleSharp};
+                let currentMenuSection = {...menuSectionsArr[currentMenuSectionIndex]};
+                let currentSectionPages = [...currentMenuSection.pages];
+                currentSectionPages.splice(currentPageIndex, 1, validatedPage);
+                let newMenuSection = {
+                   ...currentMenuSection,
+                   pages: currentSectionPages
+                };
+                menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection); 
+                console.log(menuSectionsArr);
+                setMenuSections(menuSectionsArr);
+            }
+        }, [formData])
 
     return (
         <IonContent className="ion-padding">
