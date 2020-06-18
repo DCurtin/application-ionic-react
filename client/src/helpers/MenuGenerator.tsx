@@ -14,8 +14,8 @@ export interface AppPage {
       header: 'Getting Started',
       title: 'Welcome to Midland Trust!',
       url: '/page/Welcome',
-      iosIcon: checkmarkCircleOutline,
-      mdIcon: checkmarkCircleSharp,
+      iosIcon: alertCircleOutline,
+      mdIcon: alertCircleSharp,
       isValid: false,
     },
 

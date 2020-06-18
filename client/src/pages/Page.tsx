@@ -198,6 +198,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
       menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
       setMenuSections(menuSectionsArr);
+      // set menu Se
     }
   }
 
