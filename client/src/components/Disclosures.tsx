@@ -1,34 +1,21 @@
-import React, {useRef, useState, useImperativeHandle, Ref} from 'react';
+import React, {useState, useEffect} from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
 
-interface Props {
-    selectedAccountType: string;
-}
-
-interface PageRef {
-    validatePage: Function;
-}
-
-const Disclosures = React.forwardRef((props:Props, ref: Ref<PageRef>) => {
+const Disclosures: React.FC<{selectedAccountType: string; updateMenuSections: (isValid:boolean) => void }> = props => {
     let disclosurePDF = props.selectedAccountType.includes('Roth') ? 'https://www.midlandira.com/wp-content/uploads/2015/12/ROTH-IRA-5305-RA.pdf' : 'https://www.midlandira.com/wp-content/uploads/2015/12/Traditional-IRA-5305-A.pdf';
-    const disclosureRef= useRef<HTMLIonContentElement>(null);
-    
-    const [hasReviewedDisclosures, setHasReviewedDisclosures] = useState(false);
+    const [hasReadDisclosures, setHasReadDisclosures] = useState(false); 
 
-    const handleReviewedDisclosuresCheck = (e: any) => {
-        let isChecked = e.target.checked; 
-        setHasReviewedDisclosures(isChecked);
+    const handleHasReadDisclosureChange = (e:any) => {
+        setHasReadDisclosures(e.target.checked);
     }
 
-    useImperativeHandle(ref, () => ({validatePage}));
+    useEffect(() => {
+        props.updateMenuSections(hasReadDisclosures)
+    }, [hasReadDisclosures])
 
-    const validatePage = () =>{
-        return (hasReviewedDisclosures);
-    }
- 
-    
+
     return (
-        <IonContent className="ion-padding" ref={disclosureRef}>
+        <IonContent className="ion-padding">
             <IonGrid>
                 <IonRow className="well">
                     <IonCol>
@@ -51,12 +38,12 @@ const Disclosures = React.forwardRef((props:Props, ref: Ref<PageRef>) => {
                             Click here to download your complete account disclosure.
                             </a> 
                         </p>
-                        <IonCheckbox checked={hasReviewedDisclosures} onIonChange={handleReviewedDisclosuresCheck}></IonCheckbox> &nbsp; I have reviewed these disclosures and agree to all terms and conditions herein 
+                        <IonCheckbox checked={hasReadDisclosures} onIonChange={handleHasReadDisclosureChange}></IonCheckbox> &nbsp; I have reviewed these disclosures and agree to all terms and conditions herein 
                     </IonCol>
                 </IonRow>
             </IonGrid>
         </IonContent>
     )
-});
+}
 
 export default Disclosures;

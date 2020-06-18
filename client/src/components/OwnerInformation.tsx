@@ -7,11 +7,10 @@ import { MenuSection } from '../helpers/MenuGenerator';
 import { checkmarkCircleSharp, checkmarkCircle } from 'ionicons/icons';
 
 interface PageInterface extends SessionApp {
-    menuSections: Array<MenuSection>;
-    setMenuSections:Function
+    updateMenuSections:Function
 }
 
-const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, menuSections, setMenuSections}) => {
+const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, updateMenuSections}) => {
     const history = useHistory();
     const [isValid, setIsValid] = useState(false);
     const [formData, setFormData] = useState<applicantIdForm>({
@@ -62,22 +61,16 @@ const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, men
 
         useEffect(() => {
             if (formData.first_name && formData.first_name !== '') {
-                let menuSectionsArr = [...menuSections];
-                let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header == 'Open Account');
-                let currentPageIndex = menuSectionsArr[currentMenuSectionIndex].pages.findIndex(appPage => appPage.title === 'Owner Information');
-                let validatedPage = {...menuSectionsArr[currentMenuSectionIndex].pages[currentPageIndex], isValid: true, iosIcon:checkmarkCircle, mdIcon: checkmarkCircleSharp};
-                let currentMenuSection = {...menuSectionsArr[currentMenuSectionIndex]};
-                let currentSectionPages = [...currentMenuSection.pages];
-                currentSectionPages.splice(currentPageIndex, 1, validatedPage);
-                let newMenuSection = {
-                   ...currentMenuSection,
-                   pages: currentSectionPages
-                };
-                menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection); 
-                console.log(menuSectionsArr);
-                setMenuSections(menuSectionsArr);
+                setIsValid(true);
+            } else {
+                setIsValid(false);
             }
-        }, [formData])
+        }, [formData]);
+
+        useEffect(() => { 
+            updateMenuSections(isValid);
+        }, [isValid])
+
 
     return (
         <IonContent className="ion-padding">

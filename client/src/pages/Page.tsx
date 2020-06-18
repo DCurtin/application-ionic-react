@@ -21,8 +21,7 @@ import InitialInvestment from '../components/InitialInvestment';
 import NewContribution from '../components/NewContribution';
 import PaymentInformation from '../components/PaymentInformation';
 import ReviewAndSign from '../components/ReviewAndSign';
-import { attachProps } from '@ionic/react/dist/types/components/utils';
-import { checkmarkCircleSharp, checkmarkCircle } from 'ionicons/icons';
+import { checkmarkCircleSharp, checkmarkCircle, alertCircleOutline, alertCircleSharp } from 'ionicons/icons';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -149,9 +148,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'Welcome': 
         return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Disclosures':
-        return <Disclosures selectedAccountType={welcomePageFields.AccountType} ref={disclosureRef}/>;
+        return <Disclosures selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections} setMenuSections={setMenuSections}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'Beneficiaries':
         return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'FeeArrangement':
@@ -184,30 +183,35 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     let isPageValid = false;
     if (currentState.currentPage.url.includes('Welcome')) {
       isPageValid = ( welcomePageFields.AccountType !== '' && welcomePageFields.InitialInvestment !== '');
-    } else if (currentState.currentPage.url.includes('Disclosures')) {
-      isPageValid = disclosureRef?.current?.validatePage(); 
-    } else {
+      updateMenuSections(isPageValid);
+      
+    }
+    else {
       isPageValid = currentState.currentPage.isValid;
     }
 
     if (isPageValid){
-      let currentPage  = {...currentState.currentPage};
-      let newPage = {...currentPage, isValid: isPageValid, iosIcon:checkmarkCircle, mdIcon: checkmarkCircleSharp};
-      let menuSectionsArr = [...menuSections];
-      let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header === currentPage.header); 
-      let currentMenuSection = menuSectionsArr[currentMenuSectionIndex];
-      let menuSectionPagesArr = [...menuSectionsArr[currentMenuSectionIndex].pages];
-      let currentPageIndex = menuSectionPagesArr.findIndex(appPage => appPage.url === currentPage.url);
-      menuSectionPagesArr.splice(currentPageIndex, 1, newPage);
-      let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
-      menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
-      setMenuSections(menuSectionsArr);
-
       let path = currentState.nextPage?.url;
       if (path){
         history.push(path);
       }
     }
+  }
+
+  const updateMenuSections = (isPageValid:boolean) => {
+    let currentPage  = {...currentState.currentPage};
+    let iosIcon = isPageValid ? checkmarkCircle : alertCircleOutline;
+    let mdIcon = isPageValid ? checkmarkCircleSharp : alertCircleSharp;
+    let newPage = {...currentPage, isValid: isPageValid, iosIcon:iosIcon, mdIcon: mdIcon};
+    let menuSectionsArr = [...menuSections];
+    let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header === currentPage.header); 
+    let currentMenuSection = menuSectionsArr[currentMenuSectionIndex];
+    let menuSectionPagesArr = [...menuSectionsArr[currentMenuSectionIndex].pages];
+    let currentPageIndex = menuSectionPagesArr.findIndex(appPage => appPage.url === currentPage.url);
+    menuSectionPagesArr.splice(currentPageIndex, 1, newPage);
+    let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
+    menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
+    setMenuSections(menuSectionsArr);
   }
 
   return (
