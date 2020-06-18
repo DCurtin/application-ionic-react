@@ -44,7 +44,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     return e.pages
   });
 
-  const welcomePageRef = useRef<HTMLIonContentElement>(null);
+  const ownerInformationPageRef = useRef<HTMLIonContentElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',

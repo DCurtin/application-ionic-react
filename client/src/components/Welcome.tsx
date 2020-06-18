@@ -74,6 +74,11 @@ const Welcome: React.FC<InitSessionApp> = props => {
         }
 
         if (accountType.includes('Inherited')) {
+            props.setInitialValues({
+                ...props.initialValues,
+                RolloverEmployer: false,
+                CashContribution: false
+            })
             return Object.entries({...fundingOptions});
         }
         return Object.entries({...fundingOptions, 'RolloverEmployer':'Rollover from an employer plan', 'CashContribution':'Make a new cash contribution'});
