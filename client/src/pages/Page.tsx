@@ -146,31 +146,31 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'Disclosures':
         return <Disclosures selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections} />;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'AccountNotifications':
-        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'TransferIRA':
-        return <Transfers sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'RolloverPlan':
-        return <Rollovers sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'NewContribution':
-        return <NewContribution sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'PaymentInformation':
-        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       default: 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
     }
   }
 
@@ -180,7 +180,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const validateFields = () => {
-    let isPageValid = false;
+    let isPageValid;
     if (currentState.currentPage.url.includes('Welcome')) {
       isPageValid = ( welcomePageFields.AccountType !== '' && welcomePageFields.InitialInvestment !== '');
       updateMenuSections(isPageValid);

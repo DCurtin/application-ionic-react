@@ -1,18 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
-import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers'
-import { MenuSection } from '../helpers/MenuGenerator';
-import { checkmarkCircleSharp, checkmarkCircle } from 'ionicons/icons';
+import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
-interface PageInterface extends SessionApp {
-    updateMenuSections:Function
-}
-
-const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, updateMenuSections}) => {
+const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections}) => {
     const history = useHistory();
     const [isValid, setIsValid] = useState(false);
+    const isInitialRender = useRef(true);
     const [formData, setFormData] = useState<applicantIdForm>({
             is_self_employed: false,
             has_hsa: false,
@@ -54,22 +49,24 @@ const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, upd
         
         useEffect(()=>{
           return history.listen(()=>{
-              console.log(formData)
             saveAppPage(sessionId, formData);
           })
         },[formData])
 
+        useEffect(() => { 
+            if (isInitialRender.current) {
+                isInitialRender.current = false; 
+                return; 
+            } else {
+                updateMenuSections(isValid);
+            }
+        }, [isValid]);
+
         useEffect(() => {
             if (formData.first_name && formData.first_name !== '') {
                 setIsValid(true);
-            } else {
-                setIsValid(false);
-            }
+            } 
         }, [formData]);
-
-        useEffect(() => { 
-            updateMenuSections(isValid);
-        }, [isValid])
 
 
     return (

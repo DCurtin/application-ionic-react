@@ -5,11 +5,12 @@ import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
-const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count: 0
     })
+    const [isValid, setIsValid] = useState(true); 
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -24,6 +25,14 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     },[sessionId])
 
+    useEffect(() => {
+        updateMenuSections(isValid);
+    }, [isValid]);
+
+    useEffect(() => {
+        setIsValid(true);
+    }, [])
+
     
     function ImportForm(data : any){
         let importedForm : FormData = data
@@ -35,7 +44,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         console.log('saving bene');
         saveBenePage(sessionId, formData);
       })
-    },[formData])
+    },[formData]);
 
     const addBeneficiary = () => {
         setFormData(prevState => {
