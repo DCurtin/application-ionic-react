@@ -9,6 +9,7 @@ import {transformRolloverClientToServer} from './server/utils/transformRollovers
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
+import {queryParameters} from './server/utils/helperSchemas';
 import * as salesforceSchema from './server/utils/salesforce'
 import jsforce, {Connection as jsfConnection} from 'jsforce'
 //{applicationInterfaces.saveWelcomeParameters, applicationInterfaces.requestBody, applicationInterfaces.welcomePageParameters, applicationInterfaces.beneficiaryForm, applicationInterfaces.feeArrangementForm, accountNotificationsForm, transferForm}
@@ -18,8 +19,11 @@ var router = require('express').Router();
 var bodyParser = require('body-parser');
 var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcome@localhost';
 import pg, { Client, Connection } from 'pg'
+import { create } from 'domain';
 var client  = new pg.Client(connectionString);
 //var jsforce = require('jsforce');
+
+var userInstances: Array<any> = []
 
 var serverConn :Partial<jsfConnection> = new jsforce.Connection({
   oauth2 : {
@@ -204,6 +208,83 @@ app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
+//need to move to generic location
+interface resume{
+  last_name:string,
+  last_4_ssn:string,
+  date_of_birth:string,
+  email:string
+}
+interface resumeRequest{
+  appExternalId: string
+  data: resume
+}
+
+app.post('/resume', (req: express.Request, res: express.Response)=>{
+  let authParams : resumeRequest = req.body;
+  let options :jsforce.ExecuteOptions ={}
+  let token = '3eb81a23-5dfd-418f-a954-9d7320afdf18'
+
+  interface salesforceResumeResponse{
+    attributes:{
+      type:string,
+      url:string
+    }
+    Id:string,
+    AccountNew__c:string,
+    Last_Name__c:string,
+    Email__c:string,
+    SSN__c:string,
+    DOB__c:string,
+    heroku_token__c:string
+  }
+  serverConn.sobject('Online_Application__C').findOne({heroku_token__c:token}, ['Id','AccountNew__c','Last_Name__c','Email__c', 'SSN__c', 'DOB__c', 'heroku_token__c']).execute(options,(err, record : any)=>{
+    console.log(record);
+    let salesforceOnlineApp:salesforceResumeResponse= record
+    //let lastFourSocial = onlineAppResponse.SSN__c.substring()
+    
+    let lastFourSocial = salesforceOnlineApp.SSN__c?.match(/\d{4}/)
+    if(lastFourSocial === null || lastFourSocial === undefined){
+      console.group('failed, application likely does not have ssn')
+      res.status(500).send('failed to authenticate');  
+    }
+
+    console.log(lastFourSocial)
+    let dateOfBirthsMatch = authParams.data.date_of_birth === salesforceOnlineApp.DOB__c;
+    let emailsMatch = authParams.data.email.toLowerCase() === salesforceOnlineApp.Email__c.toLowerCase()
+    let lastNamesMatch = authParams.data.last_name.toLowerCase() === salesforceOnlineApp.Last_Name__c.toLowerCase()
+    let lastFourSocialMatch = authParams.data.last_4_ssn === lastFourSocial[0]
+
+    if(dateOfBirthsMatch && emailsMatch && lastNamesMatch && lastFourSocialMatch)
+    {
+      create
+      console.log('success')
+      createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, res)
+      return
+    }
+    console.group('fail')
+    res.status(500).send('failed to authenticate');
+  })
+})
+
+function createAppSession(accountNumber: string, applicationId: string, res: express.Response){
+  var token = uuidv4();
+  let sessionInsert : queryParameters = {
+    text:'INSERT INTO salesforce.application_session(account_number, application_id, token) VALUES($1,$2,$3)',
+    values:[accountNumber, applicationId, token]
+  }
+  client.query(sessionInsert).then((result:pg.QueryResult)=>{
+    setInterval((token)=>{
+      console.log(`check for activity: ${token}`)
+    },5000,token)
+    res.json({sessionId:token})
+    return
+  }).catch(err=>{
+    console.log(err)
+    console.log('failed to insert session')
+    res.status(500).send('Could not create session');
+  })
+}
 
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
