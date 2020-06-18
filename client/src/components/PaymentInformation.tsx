@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, FormData } from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonItem, IonLabel, IonInput, IonSpinner } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonItem, IonLabel, IonInput, IonLoading } from '@ionic/react';
 import {chargeCreditCard} from '../helpers/CalloutHelpers'
+import '@ionic/react/css/float-elements.css';
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const [formData, setFormData] = useState<FormData>({
@@ -20,7 +21,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
     }
 
     const processCreditCard = (formData: any) => {
-        console.log('starting credit card call');
+        setFormData(prevState => {return {...prevState, creditCardStatus: 'Pending'}});
         chargeCreditCard(formData,sessionId).then(function(response: any) {
             setFormData(prevState => {return {...prevState, creditCardStatus: response.Status, creditCardStatusDetails: response.StatusDetails, paymentAmount: response.PaymentAmount}});
         })
@@ -60,13 +61,13 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonButton color="primary" onClick={() => processCreditCard(formData)}>Submit & Proceed</IonButton>
+                            <IonCol class="ion-float-right">
+                                <IonButton color="primary" onClick={() => processCreditCard(formData)}>Submit & Proceed</IonButton>
+                            </IonCol>
                         </IonRow>
                     </>
                 }               
-                {formData.creditCardStatus === 'Pending' &&
-                    <IonSpinner></IonSpinner>
-                }
+                <IonLoading isOpen={formData.creditCardStatus === 'Pending'} message={'Applying Payment...'}></IonLoading>
                 {formData.creditCardStatus === 'Error' &&
                     <IonRow>
                         Error - {formData.creditCardStatusDetails}

@@ -1,6 +1,5 @@
 require("dotenv").config();
 var path = require('path');
-//var express = require('express');
 import express from 'express';
 import { Http2SecureServer } from 'http2';
 import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
@@ -12,7 +11,6 @@ import * as applicationInterfaces from './client/src/helpers/Utils'
 import {queryParameters} from './server/utils/helperSchemas';
 import * as salesforceSchema from './server/utils/salesforce'
 import jsforce, {Connection as jsfConnection} from 'jsforce'
-//{applicationInterfaces.saveWelcomeParameters, applicationInterfaces.requestBody, applicationInterfaces.welcomePageParameters, applicationInterfaces.beneficiaryForm, applicationInterfaces.feeArrangementForm, accountNotificationsForm, transferForm}
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
@@ -21,7 +19,6 @@ var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcom
 import pg, { Client, Connection } from 'pg'
 import { create } from 'domain';
 var client  = new pg.Client(connectionString);
-//var jsforce = require('jsforce');
 
 var userInstances: Array<any> = []
 
@@ -29,22 +26,19 @@ var serverConn :Partial<jsfConnection> = new jsforce.Connection({
   oauth2 : {
     // you can change loginUrl to connect to sandbox or prerelease env.
     loginUrl : 'https://test.salesforce.com',
-    //loginUrl : 'https://dcurtin-iraonline.cs17.force.com/client',
     clientId : process.env.QAServer_id || 'test',
     clientSecret : process.env.QAServer_sec || 'test',
     redirectUri : process.env.QAServer_url || 'test'
   }
 });
-//+ process.env.UserToken
+
 var qaUser = process.env.qaUserId || 'test';
 var qaPw = process.env.qaUserPw || 'test';
 
-//need to setup for local testing
 if(qaUser === 'test' || qaPw === 'test')
 {
   serverConn = {
     accessToken: 'test_conn', 
-
   }
 }else{
   serverConn.login(process.env.qaUserId, process.env.qaUserPw).then(function(userInfo : any) {
@@ -72,7 +66,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
-
 
 app.use(function(req : express.Request, res : express.Response, next : express.NextFunction) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -107,8 +100,6 @@ app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
 });
 
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
-  console.log('Charge credit card on server');
-  let applicationId = 'a0J2i000000fMR1EAM';
   let sessionId = req.body.sessionId;
 
   if(sessionId === '' || sessionId === undefined){
@@ -180,7 +171,6 @@ app.post('/getESignUrl', (req, res) => {
     values: [sessionId]
   }
 
-  
   client.query(sessionQuery).then(function(result:pg.QueryResult){
     if(result.rowCount == 0)
     {
@@ -201,7 +191,6 @@ app.post('/getESignUrl', (req, res) => {
       }
     })
   })
-
 });
 
 app.get("*", function (req : Express.Response, res : express.Response) {
@@ -326,7 +315,6 @@ function initializeApplication(welcomePageData : applicationInterfaces.welcomePa
     res.json({'sessionId': token});
   });
 }
-
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : applicationInterfaces.requestBody = req.body;
