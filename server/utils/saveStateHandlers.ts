@@ -26,7 +26,7 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
         console.log('found no app')
         serverConn.sobject("Online_Application__c").create({'First_Name__c': applicantForm.first_name, 
         'Last_Name__c':applicantForm.last_name, 
-        'Token__c':sessionId, 
+        'heroku_token__c':sessionId, 
         'IntegrationOwner__c':'0052i000000Mz0CAAS', 
         'Expiration_Date__c':'2025-10-10', 
         'Account_Type__c':'Traditional IRA', 
