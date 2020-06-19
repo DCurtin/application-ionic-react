@@ -77,6 +77,27 @@ export function getESignUrl(sessionId: string)
     })
 }
 
+export function getPenSignDocuments(sessionId: string)
+{
+    let url = '/getPenSignDocs'
+    let body = {
+        sessionId : sessionId
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)     
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
+            console.log('getPenSignDocs successful in callout helpers')
+            return data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
+        })
+    })
+}
+
 export function saveTransferPage(sessionId: string, formData: FormData){
     return makeSaveStateCallout(sessionId, 'transfer', formData)
 }

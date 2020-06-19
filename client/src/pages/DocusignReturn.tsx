@@ -1,7 +1,18 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import { SessionApp } from '../helpers/Utils';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import {getPenSignDocuments} from '../helpers/CalloutHelpers'
+import { useParams } from 'react-router';
 
-const DocusignReturn: React.FC = () => {
+const DocusignReturn: React.FC<SessionApp> = () => {
+    const {sessionId} = useParams<{ sessionId: string;}>();
+
+    useEffect(()=>{
+        console.log('sessionId on client: ' + sessionId);
+        getPenSignDocuments(sessionId).then(function(response: any) {
+            console.log('pen sign docs successful on client');
+        })   
+    })
 
     return (
         <IonPage>
