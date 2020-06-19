@@ -50,7 +50,9 @@ const App: React.FC = () => {
           <Menu sessionId={sessionId} menuSections={appSections}/>
           <IonRouterOutlet id="main">
             <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={appSections}  setMenuParams={setMenuParams}/>} /> 
-            <Route path='/docusignReturn/:sessionId' render={(props) => <DocusignReturn {...props} sessionId={sessionId} setSessionId={setSessionId}/>} /> 
+            <Route path='/docusignReturn/:sessionId'>
+              <DocusignReturn/>
+            </Route>
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>
