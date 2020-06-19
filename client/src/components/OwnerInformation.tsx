@@ -48,6 +48,9 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
         }
         
         useEffect(()=>{
+            if (formData.first_name && formData.first_name !== '') {
+                setIsValid(true);
+            } 
           return history.listen(()=>{
             saveAppPage(sessionId, formData);
           })
@@ -62,11 +65,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
             }
         }, [isValid]);
 
-        useEffect(() => {
-            if (formData.first_name && formData.first_name !== '') {
-                setIsValid(true);
-            } 
-        }, [formData]);
+        // useEffect(() => {
+        //     if (formData.first_name && formData.first_name !== '') {
+        //         setIsValid(true);
+        //     } 
+        // }, [formData]);
 
 
     return (
