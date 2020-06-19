@@ -11,16 +11,16 @@ import * as applicationInterfaces from './client/src/helpers/Utils'
 import {queryParameters} from './server/utils/helperSchemas';
 import * as salesforceSchema from './server/utils/salesforce'
 import jsforce, {Connection as jsfConnection} from 'jsforce'
+import pg, { Client, Connection } from 'pg'
+import { create } from 'domain';
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
 var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcome@localhost';
-import pg, { Client, Connection } from 'pg'
-import { create } from 'domain';
 var client  = new pg.Client(connectionString);
 
-var userInstances: Array<any> = []
+var userInstances: any = {}
 
 var serverConn :Partial<jsfConnection> = new jsforce.Connection({
   oauth2 : {
@@ -212,7 +212,7 @@ interface resumeRequest{
 app.post('/resume', (req: express.Request, res: express.Response)=>{
   let authParams : resumeRequest = req.body;
   let options :jsforce.ExecuteOptions ={}
-  let token = '3eb81a23-5dfd-418f-a954-9d7320afdf18'
+  let token = authParams.appExternalId
 
   interface salesforceResumeResponse{
     attributes:{
@@ -257,21 +257,43 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
 })
 
 function createAppSession(accountNumber: string, applicationId: string, res: express.Response){
-  var token = uuidv4();
+  var token : string = uuidv4();
   let time = Date.now()
+  let intervalRef = setInterval(()=>{
+    console.log(`check for activity: ${token}`)
+    let query:{text:string, values:Array<string>} = {
+      text:'SELECT * FROM salesforce.application_session WHERE token = $1',
+      values:[token]
+    }
+    client.query(query).then((result:pg.QueryResult)=>{
+      let time = Date.now()
+      let appSession: salesforceSchema.application_session = result.rows[0]
+      let elapsedTime = (time - appSession.last_active)
+      console.log(`elapsed time: ${elapsedTime} token: ${token}`)
+      if(elapsedTime > 30000){
+        console.log(`delete ${token}`)
+        clearInterval(userInstances[token])
+        let deleteQuery:{text:string, values:Array<string>} = {
+          text:'DELETE FROM salesforce.application_session WHERE token = $1',
+          values: [token]
+        }
+        client.query(deleteQuery)
+      }
+    })
+  },5000,token)
+  
+  userInstances[token] = intervalRef
+
   let sessionInsert : queryParameters = {
     text:'INSERT INTO salesforce.application_session(account_number, application_id, last_active, token) VALUES($1,$2,$3,$4)',
     values:[accountNumber, applicationId, time, token]
   }
   client.query(sessionInsert).then((result:pg.QueryResult)=>{
-    setInterval((token)=>{
-      console.log(`check for activity: ${token}`)
-      let query = {text:'SELECT * FROM salesforce.application_session WHERE token = $1',
-                  values: [token]}
-    },5000,token)
     res.json({sessionId:token})
     return
   }).catch(err=>{
+    clearInterval(intervalRef)
+    userInstances[token] = undefined
     console.log(err)
     console.log('failed to insert session')
     res.status(500).send('Could not create session');

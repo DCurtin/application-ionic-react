@@ -54,7 +54,7 @@ const App: React.FC = () => {
             <Route path='/docusignReturn' exact>
               <DocusignReturn/>
             </Route>
-            <Route path="/resume" render={(props) => <Resume {...props} setSessionId={setSessionId}/>}/>
+            <Route path="/resume/:herokuToken" render={(props) => <Resume {...props} setSessionId={setSessionId}/>}/>
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>
