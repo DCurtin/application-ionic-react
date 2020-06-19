@@ -50,7 +50,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     SpecifiedSource: '',
     CashContribution: false,
     RolloverEmployer: false,
-    TransferIra: false
+    TransferIra: false,
+    HasReadDisclosure: false
   });
 
   const [currentState, setCurrentState] = useState<userState>({
@@ -139,7 +140,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'Welcome': 
         return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Disclosures':
-        return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
+        return <Disclosures initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} selectedAccountType={welcomePageFields.AccountType}/>;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Beneficiaries':
