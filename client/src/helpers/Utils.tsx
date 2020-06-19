@@ -12,6 +12,7 @@ export interface welcomePageParameters {
     SalesRep: string,
     SpecifiedSource: string,
     ReferralCode: string,
+    HasReadDisclosure: boolean
 }
 
 //component client <-> server fetch paramters
