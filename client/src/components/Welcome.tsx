@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
+import {useForm} from 'react-hook-form';
 
 import {useHistory} from 'react-router-dom';
 
@@ -139,8 +140,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
             if(props.sessionId !== ''){
                 url = '/saveState'
             }
-            console.log(url);
-            console.log(props.sessionId);
             let body : saveWelcomeParameters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
                 data: props.initialValues

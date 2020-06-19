@@ -8,7 +8,7 @@ import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator'
+import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -66,7 +66,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
-  const [validatOnNext, setValidateOnNext] = useState(false);
+  const [validateOnNext, setValidateOnNext] = useState(false);
 
 
   useEffect(function(){
@@ -116,14 +116,6 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     setCurrentState(updatedState);
   }, [name,menuSections]);
 
-  useEffect(() => {
-    if (validatOnNext){
-      validateFields();
-    }
-
-  }, [validatOnNext])
-
-
   const getPageStateFromPage = (currentPageName:string) => {
     const appPagesArr = [...appPages];
     let currentPageIndex = appPagesArr.findIndex(page => page.url.includes(currentPageName));
@@ -159,7 +151,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'Disclosures':
         return <Disclosures selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} validateOnNext={validateOnNext}/>;
       case 'Beneficiaries':
         return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'FeeArrangement':
@@ -222,6 +214,14 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
     menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
     setMenuSections(menuSectionsArr);
+    
+    if (isPageValid){
+      let path = currentState.nextPage?.url;
+      if (path){
+        history.push(path);
+      }
+    }
+    setValidateOnNext(false);
   }
 
   return (

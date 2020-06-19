@@ -1,11 +1,18 @@
 import React, {useState, useRef, useEffect} from 'react';
+import {useForm} from 'react-hook-form';
 import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
-const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections}) => {
+interface PageInterface extends SessionApp {
+validateOnNext:boolean
+}
+
+const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, updateMenuSections, validateOnNext}) => {
     const history = useHistory();
+    const {register, handleSubmit, watch, errors} = useForm(); 
+
     const [isValid, setIsValid] = useState(false);
     const isInitialRender = useRef(true);
     const formRef = useRef<HTMLFormElement>(null);
@@ -49,32 +56,39 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
         }
         
         useEffect(()=>{
-            if (formData.first_name && formData.first_name !== '') {
-                setIsValid(true);
-            } 
           return history.listen(()=>{
             saveAppPage(sessionId, formData);
           })
         },[formData])
 
-        useEffect(() => { 
-            if (isInitialRender.current) {
-                isInitialRender.current = false; 
-                return; 
-            } else {
-                updateMenuSections(isValid);
+        useEffect(() => {
+            if (validateOnNext) {
+                if (formRef !== null && formRef.current !== null) {
+                    formRef.current.dispatchEvent(new Event('submit'));
+                } 
             }
-        }, [isValid]);
 
+        }, [validateOnNext])
+
+        const validateFields = () => {
+            updateMenuSections(true);
+        }
+
+        const showError = () => {
+            let errorsArr = (Object.keys(errors));
+            console.log(errorsArr);
+
+        };
 
 
     return (
         <IonContent className="ion-padding">
-            <form ref={formRef}>
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
                 <IonGrid>
                     <IonRow className="well">
                         <IonCol>
                         Please complete your personal information below. Fields outlined in red are required. Others are optional.
+                        {showError()}
                         </IonCol>
                     </IonRow>
                     <IonItemDivider>
@@ -98,13 +112,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                             <IonLabel>
                                 First Name *
                             </IonLabel>
-                            <IonInput class='item-input' name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput required={true}></IonInput>
+                            <IonInput class='item-input' name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput ref={register({required: true})}></IonInput>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 Last Name *
                             </IonLabel>
-                            <IonInput class='item-input' name="last_name" value={formData.last_name} placeholder="Last Name" onIonInput={updateForm} clearInput required={true}></IonInput>
+                            <IonInput class='item-input' name="last_name" value={formData.last_name} placeholder="Last Name" onIonInput={updateForm} clearInput></IonInput>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -112,7 +126,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                             <IonLabel>
                                 Social Security Number *
                             </IonLabel>
-                            <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} required clearInput></IonInput>
+                            <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} clearInput ref={register({required: true})}> </IonInput>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
