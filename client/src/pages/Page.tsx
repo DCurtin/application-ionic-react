@@ -66,6 +66,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
+  const [validatOnNext, setValidateOnNext] = useState(false);
+
 
   useEffect(function(){
     let formParams : MenuParameters = {
@@ -113,6 +115,13 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     let updatedState = getPageStateFromPage(name);
     setCurrentState(updatedState);
   }, [name,menuSections]);
+
+  useEffect(() => {
+    if (validatOnNext){
+      validateFields();
+    }
+
+  }, [validatOnNext])
 
 
   const getPageStateFromPage = (currentPageName:string) => {
@@ -176,7 +185,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
 
   const goToNextPage = () => {
-    validateFields();
+    setValidateOnNext(true);
   }
 
   const validateFields = () => {
@@ -196,6 +205,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
         history.push(path);
       }
     }
+    setValidateOnNext(false);
   }
 
   const updateMenuSections = (isPageValid:boolean) => {
