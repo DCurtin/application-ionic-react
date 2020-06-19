@@ -100,8 +100,6 @@ app.post('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
     console.log('getPenSignDoc enpoint: ' + url);
 
-    console.log('getPenSignDoc token: ' + serverConn.accessToken);
-
     let options = {
       method: 'GET',
       headers: {

@@ -77,7 +77,7 @@ export function getESignUrl(sessionId: string)
     })
 }
 
-export function getPenSignDocuments(sessionId: string)
+export function getPenSignDocs(sessionId: string)
 {
     let url = '/getPenSignDocs'
     let body = {
