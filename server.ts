@@ -258,13 +258,16 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
 
 function createAppSession(accountNumber: string, applicationId: string, res: express.Response){
   var token = uuidv4();
+  let time = Date.now()
   let sessionInsert : queryParameters = {
-    text:'INSERT INTO salesforce.application_session(account_number, application_id, token) VALUES($1,$2,$3)',
-    values:[accountNumber, applicationId, token]
+    text:'INSERT INTO salesforce.application_session(account_number, application_id, last_active, token) VALUES($1,$2,$3,$4)',
+    values:[accountNumber, applicationId, time, token]
   }
   client.query(sessionInsert).then((result:pg.QueryResult)=>{
     setInterval((token)=>{
       console.log(`check for activity: ${token}`)
+      let query = {text:'SELECT * FROM salesforce.application_session WHERE token = $1',
+                  values: [token]}
     },5000,token)
     res.json({sessionId:token})
     return

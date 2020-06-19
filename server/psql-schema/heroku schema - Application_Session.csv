@@ -2,5 +2,5 @@ Identifier,Type,Unique,Required
 account_number,text,yes,yes
 application_id,text,yes,yes
 interval_Id,text,"",yes
-active,boolean,,yes
+last_active,time,,yes
 token,uuid,yes,yes
