@@ -21,7 +21,6 @@ import InitialInvestment from '../components/InitialInvestment';
 import NewContribution from '../components/NewContribution';
 import PaymentInformation from '../components/PaymentInformation';
 import ReviewAndSign from '../components/ReviewAndSign';
-import { checkmarkCircleSharp, checkmarkCircle, alertCircleOutline, alertCircleSharp } from 'ionicons/icons';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -148,7 +147,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} validateOnNext={validateOnNext}/>;
       case 'Disclosures':
         return <Disclosures initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections}/>;
       case 'OwnerInformation':
@@ -172,7 +171,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'ReviewAndSign':
         return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       default: 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} validateOnNext={validateOnNext}/>;
     }
   }
 
@@ -181,31 +180,10 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     setValidateOnNext(true);
   }
 
-  const validateFields = () => {
-    let isPageValid;
-    if (currentState.currentPage.url.includes('Welcome')) {
-      isPageValid = ( welcomePageFields.AccountType !== '' && welcomePageFields.InitialInvestment !== '');
-      updateMenuSections(isPageValid);
-      
-    }
-    else {
-      isPageValid = currentState.currentPage.isValid;
-    }
-
-    if (isPageValid){
-      let path = currentState.nextPage?.url;
-      if (path){
-        history.push(path);
-      }
-    }
-    setValidateOnNext(false);
-  }
 
   const updateMenuSections = (isPageValid:boolean) => {
     let currentPage  = {...currentState.currentPage};
-    let iosIcon = isPageValid ? checkmarkCircle : alertCircleOutline;
-    let mdIcon = isPageValid ? checkmarkCircleSharp : alertCircleSharp;
-    let newPage = {...currentPage, isValid: isPageValid, iosIcon:iosIcon, mdIcon: mdIcon};
+    let newPage = {...currentPage, isValid: isPageValid};
     let menuSectionsArr = [...menuSections];
     let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header === currentPage.header); 
     let currentMenuSection = menuSectionsArr[currentMenuSectionIndex];

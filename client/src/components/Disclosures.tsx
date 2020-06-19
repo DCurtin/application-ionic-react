@@ -9,8 +9,6 @@ interface InitSessionApp {
     updateMenuSections:Function
 }
 
-
-
 const Disclosures: React.FC<InitSessionApp> = props => {
     let disclosurePDF = props.selectedAccountType.includes('Roth') ? 'https://www.midlandira.com/wp-content/uploads/2015/12/ROTH-IRA-5305-RA.pdf' : 'https://www.midlandira.com/wp-content/uploads/2015/12/Traditional-IRA-5305-A.pdf';
     const [hasReadDisclosures, setHasReadDisclosures] = useState(false)

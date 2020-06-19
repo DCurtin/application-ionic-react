@@ -16,6 +16,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Menu.css';
 import { AppPage } from '../helpers/MenuGenerator';
+import { checkmarkCircleSharp, checkmarkCircle, alertCircleOutline, alertCircleSharp } from 'ionicons/icons';
 
 interface AppSection {
   header: string;
@@ -43,7 +44,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
                     return (
                       <IonMenuToggle key={index} autoHide={false}>
                         <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink( appPage.url, appPages)} routerDirection="none" lines="none" detail={false}>
-                          <IonIcon slot="start" icon={appPage.iosIcon} />
+                          <IonIcon slot="start" icon={appPage.isValid ? checkmarkCircle : alertCircleOutline} />
                           <IonLabel className='ion-text-wrap'>{appPage.title}</IonLabel>
                         </IonItem>
                       </IonMenuToggle>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'; 
+import React, { useEffect, useRef } from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 import {useForm} from 'react-hook-form';
@@ -7,9 +7,12 @@ import {useHistory} from 'react-router-dom';
 
 import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes} from "../helpers/Utils";
 
+
 interface InitSessionApp extends SessionApp {
     initialValues: welcomePageParameters,
-    setInitialValues: Function
+    setInitialValues: Function,
+    updateMenuSections: Function,
+    validateOnNext:boolean
 }
 
 const Welcome: React.FC<InitSessionApp> = props => {
@@ -23,6 +26,10 @@ const Welcome: React.FC<InitSessionApp> = props => {
     ]
 
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
+
+    const {register, handleSubmit, watch, errors} = useForm(); 
+    const formRef = useRef<HTMLFormElement>(null);
+
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
         if (event.detail.value.includes('Inherited')) {
@@ -159,9 +166,24 @@ const Welcome: React.FC<InitSessionApp> = props => {
         })
     },[props.initialValues])
 
+    useEffect(() => {
+        if(props.validateOnNext) {
+            if (formRef !== null && formRef.current !== null) {
+                formRef.current.dispatchEvent(new Event('submit'));
+            }
+        }
+    }, [props.validateOnNext])
+
+
+
+    const validateFields = () => {
+        props.updateMenuSections(true);
+    }
+
     return (
         <IonContent className="ion-padding">
-            <IonGrid>
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
+             <IonGrid>
                 <IonRow color="medium" className="well">
                     <IonCol>
                         <p>
@@ -191,7 +213,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected}>
+                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: true})}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}
@@ -238,7 +260,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
-                        <IonSelect interface='action-sheet' value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                        <IonSelect interface='action-sheet' value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}} name='initialInvestment' ref={register({required: true})}>
                             {initialInvestmentTypes.map((investmentType, index) => (
                             <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                             ))}
@@ -289,7 +311,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
                        </p>
                    </IonCol>
                </IonRow>
-            </IonGrid>
+             </IonGrid>
+            </form>
         </IonContent>
     );
 }
