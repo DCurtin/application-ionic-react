@@ -1,14 +1,17 @@
 import React, {useEffect} from 'react';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent } from '@ionic/react';
 import {getPenSignDocs} from '../helpers/CalloutHelpers'
-import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 
 const DocusignReturn: React.FC = () => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
 
+    let queryStringParams = new URLSearchParams(useLocation().search);
+    
     useEffect(()=>{
         console.log('sessionId on client: ' + sessionId);
-        //console.log('event on client: ' + event);
+        console.log('event on client: ' + queryStringParams.get('event'));
+        
         getPenSignDocs(sessionId).then(function(response: any) {
             console.log('pen sign docs successful on client');
         })   
