@@ -4,6 +4,7 @@ import {addressSchema, identificationSchema, queryParameters} from './helperSche
 import express from 'express';
 import pg from 'pg';
 import {Connection as jsfConection, RecordResult} from 'jsforce'
+const { v4: uuidv4 } = require('uuid');
 import { text } from 'body-parser';
 
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: applicationInterfaces.welcomePageParameters, res: express.Response, client: pg.Client)
@@ -12,7 +13,7 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: appl
   runQuery(welcomePageUpsertQuery, res, client);
 }
 
-export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, client: pg.Client, serverConn: Partial<jsfConection>){
+export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, client: pg.Client, userInstances: any, serverConn: Partial<jsfConection>){
     //query for application_session
     //if none exists
     //insert on SF and create a new application_session
@@ -39,18 +40,15 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
       }).then((result:any)=>{
         console.log(' getting fields')
           serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
-            //console.log(queryResult);
-            console.log(queryResult['First_Name__c']);
-            console.log(queryResult['AccountNew__c']);
-            console.log(queryResult['SSN__c'])
-            let sessionInsert : queryParameters = {
+            createAppSession(queryResult.AccountNew__c, result.id, client, userInstances, res)
+            /*let sessionInsert : queryParameters = {
               text:'INSERT INTO salesforce.application_session(account_number,application_id,token) VALUES($1,$2,$3)',
               values:[queryResult['AccountNew__c'], result.id, sessionId]
             }
             client.query(sessionInsert).then(result=>{
               let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
               runQuery(appQueryUpsert, res, client);
-            })
+            })*/
           })
         }).catch(err=>{
           console.log('failed to start session');
@@ -248,5 +246,50 @@ function runQuery(queryString: queryParameters, res: express.Response, client: p
   }).catch(err=>{
     console.log(err);
     res.status(500).send('failed saving fee arrangements');
+  })
+}
+
+
+export function createAppSession(accountNumber: string, applicationId: string, client: pg.Client, userInstances: any, res: express.Response){
+  var token : string = uuidv4();
+  let time = Date.now()
+  let intervalRef = setInterval(()=>{
+    console.log(`check for activity: ${token}`)
+    let query:{text:string, values:Array<string>} = {
+      text:'SELECT * FROM salesforce.application_session WHERE token = $1',
+      values:[token]
+    }
+    client.query(query).then((result:pg.QueryResult)=>{
+      let time = Date.now()
+      let appSession: salesforceSchema.application_session = result.rows[0]
+      let elapsedTime = (time - appSession.last_active)
+      console.log(`elapsed time: ${elapsedTime} token: ${token}`)
+      if(elapsedTime > 30000){
+        console.log(`delete ${token}`)
+        clearInterval(userInstances[token])
+        let deleteQuery:{text:string, values:Array<string>} = {
+          text:'DELETE FROM salesforce.application_session WHERE token = $1',
+          values: [token]
+        }
+        client.query(deleteQuery)
+      }
+    })
+  },5000,token)
+  
+  userInstances[token] = intervalRef
+
+  let sessionInsert : queryParameters = {
+    text:'INSERT INTO salesforce.application_session(account_number, application_id, last_active, token) VALUES($1,$2,$3,$4)',
+    values:[accountNumber, applicationId, time, token]
+  }
+  client.query(sessionInsert).then((result:pg.QueryResult)=>{
+    res.json({sessionId:token})
+    return
+  }).catch(err=>{
+    clearInterval(intervalRef)
+    userInstances[token] = undefined
+    console.log(err)
+    console.log('failed to insert session')
+    res.status(500).send('Could not create session');
   })
 }

@@ -1,15 +1,18 @@
-import React, { useEffect } from 'react'; 
+import React, { useEffect, useRef } from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
+import {useForm} from 'react-hook-form';
 
 import {useHistory} from 'react-router-dom';
 
 import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes} from "../helpers/Utils";
-import { Interface } from 'readline';
+
 
 interface InitSessionApp extends SessionApp {
     initialValues: welcomePageParameters,
     setInitialValues: Function,
+    updateMenuSections: Function,
+    validateOnNext:boolean
 }
 
 const Welcome: React.FC<InitSessionApp> = props => {
@@ -22,15 +25,29 @@ const Welcome: React.FC<InitSessionApp> = props => {
         'Inherited IRA - Roth'
     ]
 
-    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
+    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
+
+    const {register, handleSubmit, watch, errors} = useForm(); 
+    const formRef = useRef<HTMLFormElement>(null);
+
     
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        props.setInitialValues(
-            {
-                ...props.initialValues,
-                AccountType: event.detail.value
-            }
-        )
+        if (event.detail.value.includes('Inherited')) {
+            props.setInitialValues(
+                {...props.initialValues,
+                AccountType: event.detail.value,
+                RolloverEmployer: false, 
+                CashContribution: false
+                }
+            )
+        } else {
+            props.setInitialValues(
+                {
+                    ...props.initialValues,
+                    AccountType: event.detail.value
+                }
+            )
+        }
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
@@ -94,8 +111,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
     }
 
     const handleChecked = (event: CustomEvent) => {
-        console.log(event.detail.value);
-        console.log(event.detail.checked);
         if(event.detail.value === 'TransferIra'){
             props.setInitialValues(
                 {
@@ -124,20 +139,14 @@ const Welcome: React.FC<InitSessionApp> = props => {
         }
     }
 
-
     useEffect(()=>{
-        //save state on page change
         return history.listen(()=>{
             //save initial data
-            //return session id
-            console.log('saving welcome page');
-            
+            //return session id            
             var url = '/startApplication'
             if(props.sessionId !== ''){
                 url = '/saveState'
             }
-            console.log(url);
-            console.log(props.sessionId);
             let body : saveWelcomeParameters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
                 data: props.initialValues
@@ -157,9 +166,24 @@ const Welcome: React.FC<InitSessionApp> = props => {
         })
     },[props.initialValues])
 
+    useEffect(() => {
+        if(props.validateOnNext) {
+            if (formRef !== null && formRef.current !== null) {
+                formRef.current.dispatchEvent(new Event('submit'));
+            }
+        }
+    }, [props.validateOnNext])
+
+
+
+    const validateFields = () => {
+        props.updateMenuSections(true);
+    }
+
     return (
         <IonContent className="ion-padding">
-            <IonGrid>
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
+             <IonGrid>
                 <IonRow color="medium" className="well">
                     <IonCol>
                         <p>
@@ -189,7 +213,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected}>
+                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: true})}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}
@@ -236,7 +260,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 Do you have an initial investment in mind?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
+                        <IonSelect interface='action-sheet' value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}} name='initialInvestment' ref={register({required: true})}>
                             {initialInvestmentTypes.map((investmentType, index) => (
                             <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                             ))}
@@ -287,7 +311,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
                        </p>
                    </IonCol>
                </IonRow>
-            </IonGrid>
+             </IonGrid>
+            </form>
         </IonContent>
     );
 }

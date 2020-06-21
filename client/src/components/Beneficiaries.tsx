@@ -5,11 +5,12 @@ import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
-const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count: 0
     })
+    const [isValid, setIsValid] = useState(true); 
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -24,6 +25,14 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         }
     },[sessionId])
 
+    useEffect(() => {
+        updateMenuSections(isValid);
+    }, [isValid]);
+
+    useEffect(() => {
+        setIsValid(true);
+    }, [])
+
     
     function ImportForm(data : any){
         let importedForm : FormData = data
@@ -35,7 +44,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         console.log('saving bene');
         saveBenePage(sessionId, formData);
       })
-    },[formData])
+    },[formData]);
 
     const addBeneficiary = () => {
         setFormData(prevState => {
@@ -90,7 +99,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel> Type </IonLabel>
-                        <IonSelect name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm}>
                             <IonSelectOption value='Primary'>Primary</IonSelectOption>
                             <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
                         </IonSelect>
@@ -99,7 +108,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonLabel>
                             Relationship
                         </IonLabel>
-                        <IonSelect name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm}>
                             <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
                             <IonSelectOption value='Parent'>Parent</IonSelectOption>
                             <IonSelectOption value='Child'>Child</IonSelectOption>
@@ -131,7 +140,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 <IonRow>
                     <IonCol>
                         <IonLabel>Beneficiary State</IonLabel>
-                        <IonSelect name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
                             {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                         </IonSelect>
                     </IonCol>

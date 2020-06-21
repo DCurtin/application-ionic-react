@@ -114,7 +114,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     State
                                 </IonLabel>
-                                <IonSelect value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
                                     {states.map((state,index) => (
                                         <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                     ))}
@@ -133,7 +133,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Account Type
                                 </IonLabel>
-                                <IonSelect value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
                                     {formData.account_type.includes('Roth') ? (
                                         <React.Fragment>
                                             <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
@@ -170,7 +170,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Rollover Type
                                 </IonLabel>
-                                <IonSelect value={formData[`rollover_type__${i}`]} name={`rollover_type__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`rollover_type__${i}`]} name={`rollover_type__${i}`} onIonChange={updateForm}>
                                     <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
                                     <IonSelectOption value='Indirect Rollover'>
                                         Indirect Rollover

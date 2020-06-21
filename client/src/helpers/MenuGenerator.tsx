@@ -1,11 +1,8 @@
-import {alertCircleOutline,alertCircleSharp, archiveOutline, archiveSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
-
 export interface AppPage {
     header?: string;
     url: string;
-    iosIcon: string;
-    mdIcon: string;
     title: string;
+    isValid: boolean;
   }
 
   var appPagesMap: {[key :string]: AppPage} = {
@@ -13,115 +10,103 @@ export interface AppPage {
       header: 'Getting Started',
       title: 'Welcome to Midland Trust!',
       url: '/page/Welcome',
-      iosIcon: mailOutline,
-      mdIcon: mailSharp
+      isValid: false,
     },
 
     'Disclosures':{
       header: 'Getting Started',
       title: 'Disclosures',
       url: '/page/Disclosures',
-      iosIcon: paperPlaneOutline,
-      mdIcon: paperPlaneSharp
+      isValid: false
     },
     'OwnerInformation':{
       header: 'Open Account',
       title: 'Owner Information',
       url: '/page/OwnerInformation',
-      iosIcon: heartOutline,
-      mdIcon: heartSharp
+      isValid: false
     },
     'PlanInformation':{
       header: 'Open Account',
       title: 'Plan Information',
       url: '/page/PlanInformation',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
+      isValid: false
     },
     'Beneficiaries':{
       header: 'Open Account',
       title: 'Beneficiaries',
       url: '/page/Beneficiaries',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
+      isValid: false
     },
     'FeeArrangement':{
       header: 'Open Account',
       title: 'Fee Arrangement',
       url: '/page/FeeArrangement',
-      iosIcon: alertCircleOutline,
-      mdIcon: alertCircleSharp
+      isValid: false
     },
     'AccountNotifications':{
       header: 'Open Account',
       title: 'Account Notifications',
       url: '/page/AccountNotifications',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      isValid: false
     },
     'TransferFromIRA':{
       header: 'Fund Account',
       title: 'Transfer From Existing IRA',
       url: '/page/TransferIRA',
-      iosIcon: archiveOutline,
-      mdIcon: archiveSharp
+      isValid: false
     },
     'RolloverPlan':{
       header: 'Fund Account',
       title: 'Rollover from Existing Employer Plan',
       url: '/page/RolloverPlan',
-      iosIcon: trashOutline,
-      mdIcon: trashSharp
+      isValid: false
     },
     'NewContribution':{
       header: 'Fund Account',
       title: 'New Contribution',
       url: '/page/NewContribution',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      isValid: false
     },
     'InvestmentDetails':{
       header: 'Make Investment',
       title: 'Investment Details',
       url: '/page/InvestmentDetails',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      isValid: false
     },
     'PaymentInformation':{
       header: 'Finishing Up',
       title: 'Payment Information',
       url: '/page/PaymentInformation',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      isValid: false
     },
     'ReviewAndSign':{
       header: 'Finishing Up',
       title: 'Review and Sign',
       url: '/page/ReviewAndSign',
-      iosIcon: warningOutline,
-      mdIcon: warningSharp
+      isValid: false
     }
 };
 
 let appPages: AppPage[] = Object.values(appPagesMap);
   
 
-  export interface MenuParamters{
+  export interface MenuParameters{
     planInfo: Boolean,
     transferForm: Boolean,
     rolloverForm: Boolean,
     newContribution: Boolean,
-    initialInvestment: Boolean
+    initialInvestment: Boolean,
+    is401k: Boolean
   }
 
     
-export  interface AppSection {
+export  interface MenuSection {
     header: string;
     pages: AppPage[]
   }
 
-  function generateAppPages(menuParams:MenuParamters){
-    let appSections:AppSection[] = [];
+  function generateAppPages(menuParams:MenuParameters){
+    let appSections:MenuSection[] = [];
     
     appSections.push(generateWelcomeSection());
 
@@ -165,7 +150,7 @@ export  interface AppSection {
     }
   }
 
-  function generateFundAccountSection(menuParams:MenuParamters){
+  function generateFundAccountSection(menuParams:MenuParameters){
     let pages: AppPage[] = [];
     if(menuParams.transferForm){
         pages.push(appPagesMap['TransferFromIRA'])

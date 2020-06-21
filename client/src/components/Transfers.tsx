@@ -108,7 +108,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonLabel> State </IonLabel>
-                                <IonSelect value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
                                 {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                                 </IonSelect>
                             </IonCol>
@@ -124,7 +124,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     Transfer Type 
                                 </IonLabel>
-                                <IonSelect value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`} onIonChange={updateForm}>
                                     <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
                                     <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
                                 </IonSelect>
@@ -132,7 +132,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             {formData[`transfer_type__${i}`] === 'Cash Transfer' && (
                                 <IonCol>
                                     <IonLabel>Account Type</IonLabel>
-                                    <IonSelect value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
+                                    <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
                                         {formData.account_type.includes('Roth') ? (
                                             <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
                                         ) : (
@@ -159,7 +159,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonRow>
                                     <IonCol>
                                         <IonLabel> Account Type</IonLabel>
-                                        <IonSelect value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
+                                        <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm}>
                                             {formData.account_type.includes('Roth') ? (
                                                 <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
                                             ) : (
@@ -183,7 +183,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                         <IonLabel>
                                             Complete or Partial Transfer
                                         </IonLabel>
-                                        <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm}>
+                                        <IonSelect interface='action-sheet' value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm}>
                                             <IonSelectOption value='All Available Cash'> Complete </IonSelectOption>
                                             <IonSelectOption value=''>Partial</IonSelectOption>
                                         </IonSelect>

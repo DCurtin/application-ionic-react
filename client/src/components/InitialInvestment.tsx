@@ -125,7 +125,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         <IonLabel>
                             What type of asset?
                         </IonLabel>
-                        <IonSelect value={formData.initial_investment_type} name='initial_investment_type' onIonChange={updateForm}>
+                        <IonSelect interface='action-sheet' value={formData.initial_investment_type} name='initial_investment_type' onIonChange={updateForm}>
                             {investmentTypesArr.map((investmentType, index) => (
                                 <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                             ))}

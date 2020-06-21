@@ -1,6 +1,7 @@
 export interface SessionApp {
     sessionId : string,
-    setSessionId : Function
+    setSessionId : Function, 
+    updateMenuSections:Function
 }
 
 export interface welcomePageParameters {
@@ -12,6 +13,7 @@ export interface welcomePageParameters {
     SalesRep: string,
     SpecifiedSource: string,
     ReferralCode: string,
+    HasReadDisclosure: boolean
 }
 
 //component client <-> server fetch paramters
