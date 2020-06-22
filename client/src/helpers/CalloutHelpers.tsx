@@ -136,6 +136,7 @@ function makeGetPageInfoCallout(sessionId: string, page: string)
             console.log('before json parse')
             return response.json().then(function(data: any){
                 console.log('after json parse')
+                console.log(data.data);
                 return data.data;
             })
         })

@@ -166,6 +166,30 @@ const Welcome: React.FC<InitSessionApp> = props => {
 
 
     const validateFields = () => {
+        history.listen(()=>{
+            //save initial data
+            //return session id            
+            var url = '/startApplication'
+            if(props.sessionId !== ''){
+                url = '/saveState'
+            }
+            let body : saveWelcomeParameters ={
+                session: {sessionId: props.sessionId, page: 'welcomePage'},
+                data: props.initialValues
+            }
+            let options = {
+                method : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            }
+
+            fetch(url, options).then((response)=>{
+                response.json().then(function(data: any){
+                    console.log(data);
+                    props.setSessionId(data.sessionId);
+                })
+            })
+        })
         props.updateMenuSections('isWelcomePageValid', true);
     }
 

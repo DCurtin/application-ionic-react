@@ -40,13 +40,16 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
       client.query(applicantQuery).then( function(applicantResult:pg.QueryResult ){
         let applicantInfo : salesforceSchema.applicant = applicantResult.rows[0]
         if(applicantInfo === undefined){
+          console.log('hello does it hit here? ');
           res.json({data:applicantInfo});
           return;
         }
  
-        let data : applicantIdForm = applicantInfo as applicantIdForm        
+        let data : applicantIdForm = applicantInfo as applicantIdForm ; 
+        console.log(data);      
         res.json({'data': data})
       }).catch(err=>{
+        console.log(err);
         res.status(500).send('failed getting apllicant data');
       })
 }
