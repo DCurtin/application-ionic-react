@@ -73,52 +73,6 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 
 app.use(router);
 
-app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
-  console.log('getPenSignDocs running on server' );
-
-  //let sessionId = req.body.sessionId;
-
-  let sessionId = req.query['sessionId'];
-  
-  if(sessionId === '' || sessionId === undefined){
-    console.log('no sesssion id');
-    res.status(500).send('no session id');
-    return
-  }
-  
-  let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
-    values: [sessionId]
-  }
-
-  client.query(sessionQuery).then(function(result:pg.QueryResult) {
-    if(result.rowCount == 0)
-    {
-      console.log('no application')
-      res.status(500).send('no application');
-      return;
-    }
-    
-    let application_session : salesforceSchema.application_session = result.rows[0];
-    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
-    console.log('getPenSignDoc enpoint: ' + url);
-
-    let options = {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + serverConn.accessToken,
-        'Content-Type':  'application/pdf',
-      }
-    }
-
-    let request = https.request(url, options, function(response: any) { 
-      response.pipe(res);
-    })
-
-    request.end();
-  })
-});
-
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
   let sessionId = req.body.sessionId;
 
@@ -190,6 +144,50 @@ app.post('/getESignUrl', (req, res) => {
         return
       }
     })
+  })
+});
+
+app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
+  console.log('getPenSignDocs running on server' );
+
+  let sessionId = req.query['sessionId'];
+  
+  if(sessionId === '' || sessionId === undefined){
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return
+  }
+  
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(sessionQuery).then(function(result:pg.QueryResult) {
+    if(result.rowCount == 0)
+    {
+      console.log('no application')
+      res.status(500).send('no application');
+      return;
+    }
+    
+    let application_session : salesforceSchema.application_session = result.rows[0];
+    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
+    console.log('getPenSignDoc enpoint: ' + url);
+
+    let options = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + serverConn.accessToken,
+        'Content-Type':  'application/pdf',
+      }
+    }
+
+    let request = https.request(url, options, function(response: any) { 
+      response.pipe(res);
+    })
+
+    request.end();
   })
 });
 
