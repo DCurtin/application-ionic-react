@@ -18,7 +18,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
         props.setInitialValues(
             {
                 ...props.initialValues,
-                HasReadDisclosure: event.target.checked
+                HasReadDisclosure: event.detail.checked
             }
         )
     }
