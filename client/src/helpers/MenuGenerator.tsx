@@ -2,7 +2,7 @@ export interface AppPage {
     header?: string;
     url: string;
     title: string;
-    isValid: boolean;
+    isValid: Boolean;
   }
 
   var appPagesMap: {[key :string]: AppPage} = {
@@ -96,7 +96,11 @@ let appPages: AppPage[] = Object.values(appPagesMap);
     rolloverForm: Boolean,
     newContribution: Boolean,
     initialInvestment: Boolean,
-    is401k: Boolean
+    is401k: Boolean,
+    isWelcomePageValid: Boolean, 
+    isDisclosurePageValid: Boolean, 
+    isOwnerInfoPageValid: Boolean,
+    [key:string] : any
   }
 
     
@@ -108,9 +112,9 @@ export  interface MenuSection {
   function generateAppPages(menuParams:MenuParameters){
     let appSections:MenuSection[] = [];
     
-    appSections.push(generateWelcomeSection());
+    appSections.push(generateWelcomeSection(menuParams));
 
-    appSections.push(generateOpenAccountSection(menuParams.planInfo));
+    appSections.push(generateOpenAccountSection(menuParams));
 
     if(menuParams.transferForm || menuParams.rolloverForm || menuParams.newContribution)
     {
@@ -128,25 +132,44 @@ export  interface MenuSection {
 
   }
 
-  function generateWelcomeSection(){
+  function generateWelcomeSection(menuParams: MenuParameters){
+    let welcomePages = [...appPages.filter(page => page.header === 'Getting Started')];
+    let updatedWelcomePages = welcomePages.map(page => {
+      let newPage = {...page};
+     if (page.url === '/page/Welcome') {
+       newPage.isValid = menuParams.isWelcomePageValid;
+     }
+     if (page.url === '/page/Disclosures') {
+       newPage.isValid = menuParams.isDisclosurePageValid;
+     }
+      return newPage; 
+    })
     return {
         header: 'Getting Started',
-        pages: [...appPages.filter(page => page.header === 'Getting Started')]
+        pages: updatedWelcomePages
     }
   }
 
-  function generateOpenAccountSection(includePlanInfo : Boolean){
-    if(includePlanInfo){
-      console.log('plan info')
-        var pages:AppPage[] = [...appPages.filter(page => page.header === 'Open Account')]
-    }else{
-      console.log('no plan info')
-        var pages:AppPage[] = [...appPages.filter(page => page.header === 'Open Account' && page.title !== 'Plan Information')]
-    }
+  function generateOpenAccountSection(menuParams : MenuParameters){
+    let openAccountPages = [...appPages.filter(page => page.header === 'Open Account')];
     
+    if(!menuParams.includePlanInfo){
+      console.log('no plan info')
+      openAccountPages = [...appPages.filter(page => page.header === 'Open Account' && page.title !== 'Plan Information')]
+    }
+
+    let updatedOpenAccountPages = openAccountPages.map(page => {
+      let newPage = {...page};
+      if (page.url === '/page/OwnerInformation') {
+        newPage.isValid = menuParams.isOwnerInfoPageValid; 
+      }
+
+      return newPage; 
+    })
+
     return {
         header: 'Open Account',
-        pages: pages
+        pages: updatedOpenAccountPages
     }
   }
 

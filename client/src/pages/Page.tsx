@@ -33,20 +33,17 @@ export interface session{
   setSessionId: Function,
   menuSections: MenuSection[],
   setMenuParams: Function,
-  setMenuSections: Function
+  setMenuSections: Function,
+  menuParams: MenuParameters
 }
 
-interface PageRef {
-  validatePage: Function;
-}
-
-const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams}) => {
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams, menuParams}) => {
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
   });
 
-  const disclosureRef = useRef<PageRef>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     AccountType: '',
@@ -66,18 +63,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
-  const [validateOnNext, setValidateOnNext] = useState(false);
-
-
   useEffect(function(){
-    let formParams : MenuParameters = {
-      initialInvestment : false,
-      newContribution : false,
-      planInfo : false,
-      rolloverForm : false,
-      transferForm : false,
-      is401k: false
-    }
+    let formParams = {...menuParams};
     
     formParams.transferForm = welcomePageFields.TransferIra;
     formParams.rolloverForm = welcomePageFields.RolloverEmployer;
@@ -147,11 +134,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} validateOnNext={validateOnNext}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       case 'Disclosures':
-        return <Disclosures initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections}/>;
+        return <Disclosures initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections} formRef={formRef} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} validateOnNext={validateOnNext}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       case 'Beneficiaries':
         return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'FeeArrangement':
@@ -171,28 +158,29 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'ReviewAndSign':
         return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       default: 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} validateOnNext={validateOnNext}/>;
+        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
     }
   }
 
 
   const goToNextPage = () => {
-    setValidateOnNext(true);
+    if (formRef !== null && formRef.current !== null) {
+      formRef.current.dispatchEvent(new Event('submit'));
+    }
   }
 
 
-  const updateMenuSections = (isPageValid:boolean) => {
+  const updateMenuSections = (page: string, isPageValid:boolean) => {
     let currentPage  = {...currentState.currentPage};
     let newPage = {...currentPage, isValid: isPageValid};
-    let menuSectionsArr = [...menuSections];
-    let currentMenuSectionIndex = menuSectionsArr.findIndex(menuSection => menuSection.header === currentPage.header); 
-    let currentMenuSection = menuSectionsArr[currentMenuSectionIndex];
-    let menuSectionPagesArr = [...menuSectionsArr[currentMenuSectionIndex].pages];
-    let currentPageIndex = menuSectionPagesArr.findIndex(appPage => appPage.url === currentPage.url);
-    menuSectionPagesArr.splice(currentPageIndex, 1, newPage);
-    let newMenuSection = {...currentMenuSection, pages: menuSectionPagesArr};
-    menuSectionsArr.splice(currentMenuSectionIndex, 1, newMenuSection);
-    setMenuSections(menuSectionsArr);
+    setCurrentState(prevState => {
+      return {
+        ...prevState,
+        currentPage: newPage
+      } 
+    });
+    
+    updateMenuParams(page, isPageValid);
     
     if (isPageValid){
       let path = currentState.nextPage?.url;
@@ -200,7 +188,12 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
         history.push(path);
       }
     }
-    setValidateOnNext(false);
+  }
+
+  const updateMenuParams = (page: string, isValid: boolean) => {
+    let currentMenuParams = {...menuParams};
+    currentMenuParams[page] = isValid; 
+    setMenuParams(currentMenuParams);
   }
 
   return (

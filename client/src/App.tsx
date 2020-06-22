@@ -36,7 +36,10 @@ const App: React.FC = () => {
     rolloverForm: false,
     newContribution: false,
     initialInvestment: false,
-    is401k: false
+    is401k: false, 
+    isWelcomePageValid: false, 
+    isDisclosurePageValid: false,
+    isOwnerInfoPageValid: false
   });
 
 
@@ -51,7 +54,7 @@ const App: React.FC = () => {
         <IonSplitPane contentId="main">
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams}/>} /> 
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
             <Route path='/docusignReturn' exact>
               <DocusignReturn/>
             </Route>

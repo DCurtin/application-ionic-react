@@ -12,7 +12,7 @@ interface InitSessionApp extends SessionApp {
     initialValues: welcomePageParameters,
     setInitialValues: Function,
     updateMenuSections: Function,
-    validateOnNext:boolean
+    formRef: any
 }
 
 const Welcome: React.FC<InitSessionApp> = props => {
@@ -28,9 +28,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
 
     const {register, handleSubmit, watch, errors} = useForm(); 
-    const formRef = useRef<HTMLFormElement>(null);
 
-    
     const handleAccountTypeSelected = (event: CustomEvent) => {
         if (event.detail.value.includes('Inherited')) {
             props.setInitialValues(
@@ -166,23 +164,22 @@ const Welcome: React.FC<InitSessionApp> = props => {
         })
     },[props.initialValues])
 
-    useEffect(() => {
-        if(props.validateOnNext) {
-            if (formRef !== null && formRef.current !== null) {
-                formRef.current.dispatchEvent(new Event('submit'));
-            }
-        }
-    }, [props.validateOnNext])
-
-
 
     const validateFields = () => {
-        props.updateMenuSections(true);
+        props.updateMenuSections('isWelcomePageValid', true);
+    }
+
+    const showErrors = () => {
+        let errorField;
+        for (errorField in errors) {
+            console.log(errors[errorField].message);
+        }
     }
 
     return (
         <IonContent className="ion-padding">
-            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
+            {showErrors()}
+            <form ref={props.formRef} onSubmit={handleSubmit(validateFields)}>
              <IonGrid>
                 <IonRow color="medium" className="well">
                     <IonCol>
@@ -213,7 +210,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: true})}>
+                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
                            {accountTypes.map((accountType, index) => 
                            (<IonSelectOption key={index} value={accountType}>
                                {accountType}

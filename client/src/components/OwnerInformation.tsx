@@ -5,17 +5,13 @@ import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
-interface PageInterface extends SessionApp {
-validateOnNext:boolean
+interface PageReference extends SessionApp {
+    formRef : any
 }
 
-const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, updateMenuSections, validateOnNext}) => {
+const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
     const history = useHistory();
     const {register, handleSubmit, watch, errors} = useForm(); 
-
-    const [isValid, setIsValid] = useState(false);
-    const isInitialRender = useRef(true);
-    const formRef = useRef<HTMLFormElement>(null);
     const [formData, setFormData] = useState<applicantIdForm>({
             is_self_employed: false,
             has_hsa: false,
@@ -47,31 +43,25 @@ const OwnerInformation: React.FC<PageInterface> = ({sessionId, setSessionId, upd
                     ImportForm(data);
                 })
             }
-        },[sessionId])
+        },[sessionId]);
+
+        useEffect(()=>{
+            return history.listen(()=>{
+                console.log(formData)
+              saveAppPage(sessionId, formData);
+            })
+          })
     
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
             console.log(importedForm);
             setFormData(importedForm);
         }
-        
-        useEffect(()=>{
-          return history.listen(()=>{
-            saveAppPage(sessionId, formData);
-          })
-        },[formData])
 
-        useEffect(() => {
-            if (validateOnNext) {
-                if (formRef !== null && formRef.current !== null) {
-                    formRef.current.dispatchEvent(new Event('submit'));
-                } 
-            }
-
-        }, [validateOnNext])
 
         const validateFields = () => {
-            updateMenuSections(true);
+            updateMenuSections('isOwnerInfoPageValid', true);
+            saveAppPage(sessionId, formData);
         }
 
         const showError = () => {
