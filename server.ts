@@ -184,7 +184,12 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     }
 
     let request = https.request(url, options, function(response: any) { 
-      response.pipe(res);
+      if (response.statusCode === 200) {
+        response.pipe(res);
+      }
+      else {
+        res.status(response.statusCode).send(response.statusMessage);
+      }
     })
 
     request.end();

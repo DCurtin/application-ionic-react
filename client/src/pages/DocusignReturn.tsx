@@ -10,6 +10,7 @@ const DocusignReturn: React.FC = () => {
     let docusignEvent = queryStringParams.get('event');
     
     useEffect(()=>{
+        console.log('docusign return');
         var xhr = new XMLHttpRequest();
         
         xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId, true);
@@ -17,6 +18,7 @@ const DocusignReturn: React.FC = () => {
 
         xhr.onload = function () {
             if (this.status === 200) {
+                console.log('status 200');
                 var blob = new Blob([xhr.response], {type: "application/pdf"});
                 var objectUrl = URL.createObjectURL(blob);
                 
@@ -26,7 +28,11 @@ const DocusignReturn: React.FC = () => {
                 a.click();
                 window.URL.revokeObjectURL(objectUrl);
             }
+            if (this.status !== 200) {
+                console.log(this.statusText);
+            }
         };
+
         xhr.send();
     },[])
 
