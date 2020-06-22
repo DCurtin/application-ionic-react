@@ -8,8 +8,8 @@ import {transformRolloverClientToServer} from './server/utils/transformRollovers
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
-import {queryParameters} from './server/utils/helperSchemas';
 import * as salesforceSchema from './server/utils/salesforce'
+import {createAppSession} from './server/utils/appSessionHandler';
 import jsforce, {Connection as jsfConnection} from 'jsforce'
 import pg, { Client, Connection } from 'pg'
 import { create } from 'domain';
@@ -78,6 +78,7 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 app.use(router);
 
 app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
+
     console.log(serverConn.accessToken);
     let accountNumber = '1234567';
     let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
@@ -123,7 +124,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
       return
     }
     let sessionQuery = {
-      text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+      text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
       values: [sessionId]
     }
     
@@ -167,7 +168,7 @@ app.post('/getESignUrl', (req, res) => {
   }
   
   let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -246,9 +247,9 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
 
     if(dateOfBirthsMatch && emailsMatch && lastNamesMatch && lastFourSocialMatch)
     {
-      create
       console.log('success')
-      createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, res)
+      let sessionId : string = uuidv4();
+      createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
       return
     }
     console.group('fail')
@@ -256,54 +257,10 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
   })
 })
 
-function createAppSession(accountNumber: string, applicationId: string, res: express.Response){
-  var token : string = uuidv4();
-  let time = Date.now()
-  let intervalRef = setInterval(()=>{
-    console.log(`check for activity: ${token}`)
-    let query:{text:string, values:Array<string>} = {
-      text:'SELECT * FROM salesforce.application_session WHERE token = $1',
-      values:[token]
-    }
-    client.query(query).then((result:pg.QueryResult)=>{
-      let time = Date.now()
-      let appSession: salesforceSchema.application_session = result.rows[0]
-      let elapsedTime = (time - appSession.last_active)
-      console.log(`elapsed time: ${elapsedTime} token: ${token}`)
-      if(elapsedTime > 30000){
-        console.log(`delete ${token}`)
-        clearInterval(userInstances[token])
-        let deleteQuery:{text:string, values:Array<string>} = {
-          text:'DELETE FROM salesforce.application_session WHERE token = $1',
-          values: [token]
-        }
-        client.query(deleteQuery)
-      }
-    })
-  },5000,token)
-  
-  userInstances[token] = intervalRef
-
-  let sessionInsert : queryParameters = {
-    text:'INSERT INTO salesforce.application_session(account_number, application_id, last_active, token) VALUES($1,$2,$3,$4)',
-    values:[accountNumber, applicationId, time, token]
-  }
-  client.query(sessionInsert).then((result:pg.QueryResult)=>{
-    res.json({sessionId:token})
-    return
-  }).catch(err=>{
-    clearInterval(intervalRef)
-    userInstances[token] = undefined
-    console.log(err)
-    console.log('failed to insert session')
-    res.status(500).send('Could not create session');
-  })
-}
-
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
   let welcomePageData : applicationInterfaces.saveWelcomeParameters = req.body;
-  let sessionId : String = welcomePageData.session.sessionId;
+  let sessionId : string = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
 
   console.log("sessionId");
@@ -324,20 +281,20 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   }
 
   //figure out what page they're on
-  var token = uuidv4();
-  initializeApplication(welcomePageData.data, res, token);
+  initializeApplication(welcomePageData.data, res);
 });
 
-function initializeApplication(welcomePageData : applicationInterfaces.welcomePageParameters, res: express.Response, token : string){
+function initializeApplication(welcomePageData : applicationInterfaces.welcomePageParameters, res: express.Response){
   //need to resolve offering_id and owner_id
+  let sessionId : string = uuidv4();
   const insertAppDataQuery = {
     text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-    values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
+    values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, sessionId],
   }
   client.query(insertAppDataQuery, function(err : any, response : any){
     console.log(err);
     console.log(response);
-    res.json({'sessionId': token});
+    res.json({'sessionId': sessionId});
   });
 }
 
