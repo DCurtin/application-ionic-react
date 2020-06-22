@@ -22,7 +22,7 @@ const DocusignReturn: React.FC = () => {
                 
                 let a = document.createElement('a');
                 a.href = objectUrl;
-                a.download = 'test.pdf';
+                a.download = 'Midland_Application_Documents.pdf';
                 a.click();
                 window.URL.revokeObjectURL(objectUrl);
             }
