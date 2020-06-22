@@ -73,9 +73,12 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 
 app.use(router);
 
-app.post('/getPenSignDocs', (req : express.Request, res : express.Response) => {
+app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   console.log('getPenSignDocs running on server' );
-  let sessionId = req.body.sessionId;
+
+  //let sessionId = req.body.sessionId;
+
+  let sessionId = req.query['sessionId'];
   
   if(sessionId === '' || sessionId === undefined){
     console.log('no sesssion id');

@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import { FormData } from '../helpers/Utils';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent } from '@ionic/react';
 import {getPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
@@ -11,10 +10,25 @@ const DocusignReturn: React.FC = () => {
     let docusignEvent = queryStringParams.get('event');
     
     useEffect(()=>{
-        getPenSignDocs(sessionId).then(function(response: any) {
-            console.log('pen sign docs successful on client');
-        })   
-    })
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId, true);
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function () {
+            if (this.status === 200) {
+                var blob = new Blob([xhr.response], {type: "application/pdf"});
+                var objectUrl = URL.createObjectURL(blob);
+                
+                let a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = 'test.pdf';
+                a.click();
+                window.URL.revokeObjectURL(objectUrl);
+            }
+        };
+        xhr.send();
+    },[])
 
     return (
         <IonPage>
