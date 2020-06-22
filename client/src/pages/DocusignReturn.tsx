@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent } from '@ionic/react';
-import {getPenSignDocs} from '../helpers/CalloutHelpers'
+import {downloadPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
 
 const DocusignReturn: React.FC = () => {
@@ -10,30 +10,7 @@ const DocusignReturn: React.FC = () => {
     let docusignEvent = queryStringParams.get('event');
     
     useEffect(()=>{
-        console.log('docusign return');
-        var xhr = new XMLHttpRequest();
-        
-        xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId, true);
-        xhr.responseType = "arraybuffer";
-
-        xhr.onload = function () {
-            if (this.status === 200) {
-                console.log('status 200');
-                var blob = new Blob([xhr.response], {type: "application/pdf"});
-                var objectUrl = URL.createObjectURL(blob);
-                
-                let a = document.createElement('a');
-                a.href = objectUrl;
-                a.download = 'Midland_Application_Documents.pdf';
-                a.click();
-                window.URL.revokeObjectURL(objectUrl);
-            }
-            if (this.status !== 200) {
-                console.log(this.statusText);
-            }
-        };
-
-        xhr.send();
+        downloadPenSignDocs(sessionId);    
     },[])
 
     return (

@@ -77,25 +77,32 @@ export function getESignUrl(sessionId: string)
     })
 }
 
-export function getPenSignDocs(sessionId: string)
+export function downloadPenSignDocs(sessionId: string)
 {
-    let url = '/getPenSignDocs'
-    let body = {
-        sessionId : sessionId
-    }
-    let options = {
-        method : 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)     
-    }
-    return fetch(url, options).then(function(response: any){
-        return response.json().then(function(data: any){
-            console.log('getPenSignDocs successful in callout helpers')
-            return data;
-        }).catch(function(error: any) {
-            console.log('error: ' + error);
-        })
-    })
+    console.log('docusign return');
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId, true);
+    xhr.responseType = "arraybuffer";
+
+    xhr.onload = function () {
+        if (this.status === 200) {
+            console.log('status 200');
+            var blob = new Blob([xhr.response], {type: "application/pdf"});
+            var objectUrl = URL.createObjectURL(blob);
+            
+            let a = document.createElement('a');
+            a.href = objectUrl;
+            a.download = 'Midland_Application_Documents.pdf';
+            a.click();
+            window.URL.revokeObjectURL(objectUrl);
+        }
+        if (this.status !== 200) {
+            console.log(this.statusText);
+        }
+    };
+
+    xhr.send();
 }
 
 export function saveTransferPage(sessionId: string, formData: FormData){
