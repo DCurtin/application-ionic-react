@@ -194,16 +194,14 @@ const Welcome: React.FC<InitSessionApp> = props => {
         
     }
 
-    const showErrors = () => {
-        let errorField;
-        for (errorField in errors) {
-            console.log(errors[errorField].message);
-        }
-    }
+    const showError = (fieldName: string) => {
+            let errorsArr = (Object.keys(errors));
+            let className = errorsArr.includes(fieldName) ? 'danger' : '';
+            return className;
+    };
 
     return (
         <IonContent className="ion-padding">
-            {showErrors()}
             <form ref={props.formRef} onSubmit={handleSubmit(validateFields)}>
              <IonGrid>
                 <IonRow color="medium" className="well">
@@ -229,18 +227,20 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel color="primary">
                             <strong>
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
-                           {accountTypes.map((accountType, index) => 
-                           (<IonSelectOption key={index} value={accountType}>
-                               {accountType}
-                           </IonSelectOption>))}
-                        </IonSelect> 
+                        <IonItem className={showError('accountType')}>
+                            <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
+                            {accountTypes.map((accountType, index) => 
+                            (<IonSelectOption key={index} value={accountType}>
+                                {accountType}
+                            </IonSelectOption>))}
+                            </IonSelect>
+                        </IonItem> 
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -256,7 +256,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
                                 How would you like to fund your account?
@@ -276,53 +276,61 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
-                                Do you have an initial investment in mind?
+                                Do you have an initial investment in mind? *
                             </strong>
                         </IonLabel>
-                        <IonSelect interface='action-sheet' value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}} name='initialInvestment' ref={register({required: true})}>
-                            {initialInvestmentTypes.map((investmentType, index) => (
-                            <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
-                            ))}
-                        </IonSelect>
+                        <IonItem className={showError('initialInvestment')}>
+                            <IonSelect interface='action-sheet' value={props.initialValues.InitialInvestment} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}} name='initialInvestment' ref={register({required: true})}>
+                                {initialInvestmentTypes.map((investmentType, index) => (
+                                <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                                ))}
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
                                 Have you been working with a Midland rep?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.initialValues.SalesRep} onIonChange={handleSalesRepChange}>
-                            {midlandReps.map((rep, index) => (
-                                <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
-                            ))}
-                        </IonSelect>
+                        <IonItem>
+                            <IonSelect value={props.initialValues.SalesRep} onIonChange={handleSalesRepChange}>
+                                {midlandReps.map((rep, index) => (
+                                    <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
+                                ))}
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong> 
                                 How did you hear about us?
                             </strong>
                         </IonLabel>
+                        <IonItem>
                         <IonInput value={props.initialValues.SpecifiedSource} onIonChange={handleSpecifiedSourceChange}>
-
                         </IonInput>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
                                 Referral / Group Code
                             </strong>
                         </IonLabel>
+                        <IonItem>
                         <IonInput value={props.initialValues.ReferralCode} onIonChange={handleReferralCodeChange}></IonInput>
+                        </IonItem>
+                        <br/>
                         <IonButton color="primary">Apply Code</IonButton>
                     </IonCol>
                 </IonRow>

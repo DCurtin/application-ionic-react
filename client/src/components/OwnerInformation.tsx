@@ -65,9 +65,7 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
 
         const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
-            console.log(errorsArr);
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
-            console.log(className);
             return className;
         };
 
@@ -105,7 +103,7 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                                 First Name *
                             </IonLabel>
                             <IonItem className={showError('first_name')}>
-                                <IonInput class='item-input' name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput ref={register({required: true})}></IonInput>
+                                <IonInput name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput ref={register({required: true})}></IonInput>
                             </IonItem>
                         </IonCol>
                         <IonCol>

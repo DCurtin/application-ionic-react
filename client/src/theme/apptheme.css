@@ -14,8 +14,10 @@ form ion-item {
 } 
 
 .danger{
-    --border-color: var(--ion-color-danger, red);
+    border: 2px solid var(--ion-color-danger, red);
+    background-color: rgba(255, 0, 7, 0.16);
 }
+
 
 ion-select {
     width: 100%;
