@@ -77,6 +77,38 @@ export function getESignUrl(sessionId: string)
     })
 }
 
+export function downloadPenSignDocs(sessionId: string)
+{
+    //http://ccoenraets.github.io/es6-tutorial-data/promisify/
+    return new Promise((resolve, reject) => {
+        console.log('docusign return');
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId, true);
+        xhr.responseType = "arraybuffer";
+
+        xhr.onload = function () {
+            if (this.status === 200) {
+                console.log('status 200');
+                var blob = new Blob([xhr.response], {type: "application/pdf"});
+                var objectUrl = URL.createObjectURL(blob);
+                
+                /*let a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = 'Midland_Application_Documents.pdf';
+                a.click();*/
+                //window.URL.revokeObjectURL(objectUrl);
+                resolve(objectUrl);
+            }
+            if (this.status !== 200) {
+                reject(xhr.statusText);
+            }
+        };
+        xhr.onerror = () => reject(xhr.statusText);
+        xhr.send();
+    })
+}
+
 export function saveTransferPage(sessionId: string, formData: FormData){
     return makeSaveStateCallout(sessionId, 'transfer', formData)
 }
