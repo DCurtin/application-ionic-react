@@ -4,14 +4,14 @@ export interface SessionApp {
 }
 
 export interface welcomePageParameters {
-    AccountType: string,    
-    TransferIra: boolean,
-    RolloverEmployer: boolean,
-    CashContribution: boolean,
-    InitialInvestment: string,
-    SalesRep: string,
-    SpecifiedSource: string,
-    ReferralCode: string,
+    account_type: string,    
+    transfer_form: boolean,
+    rollover_form: boolean,
+    cash_contribution_form: boolean,
+    investment_type: string,
+    sales_rep: string,
+    referred_by: string,
+    referral_code: string
 }
 
 //component client <-> server fetch paramters
