@@ -1,16 +1,19 @@
-import React, {useEffect} from 'react';
-import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import React, {useEffect, useState} from 'react';
+import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonRow, IonCol, IonButton } from '@ionic/react';
 import {downloadPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
 
 const DocusignReturn: React.FC = () => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
+    const [downloadUrl, setDownloadUrl] = useState(''); 
 
     let queryStringParams = new URLSearchParams(useLocation().search);
     let docusignEvent = queryStringParams.get('event');
     
-    useEffect(()=>{
-        downloadPenSignDocs(sessionId);    
+    useEffect(() => {
+        downloadPenSignDocs(sessionId).then((response : any) => {
+            setDownloadUrl(response);
+        })    
     },[])
 
     return (
@@ -41,6 +44,16 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
+                <IonRow>
+                    <IonCol>
+                    <a className="btn btn-primary" href={downloadUrl} download = 'Midland_Application_Documents.pdf'>
+                        <IonButton disabled={downloadUrl === ''}>
+                            {downloadUrl === '' ? 'loading...' : 'Download'}
+                        </IonButton>
+                    </a>
+                
+                    </IonCol>    
+                </IonRow>
                 
             </IonContent>
         </IonPage>
