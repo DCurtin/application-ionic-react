@@ -88,9 +88,7 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <a className="btn btn-primary" href={docusignUrl}>
-                                    <IonButton>
-                                    Download My Signature Document
-                                    </IonButton>
+                                    <IonButton>Download My Signature Document</IonButton>
                                 </a>
                             </IonCol>
                         </IonRow>
