@@ -4,9 +4,30 @@ import {addressSchema, identificationSchema, queryParameters} from './helperSche
 import express from 'express';
 import pg from 'pg';
 import {Connection as jsfConection, RecordResult} from 'jsforce'
-import { text } from 'body-parser';
-import { createAppSession } from './appSessionHandler';
+import {startSFOnlineApp} from './saveToSalesforce'
 const { v4: uuidv4 } = require('uuid');
+
+export function initializeApplication(welcomeParameters : applicationInterfaces.welcomePageParameters, res: express.Response, pgClient: pg.Client){
+  //need to resolve offering_id and owner_id
+  let sessionId : string = uuidv4();
+  console.log(welcomeParameters)
+  let welcomePageUpsertQuery : queryParameters = updateWelcomeForm(sessionId, welcomeParameters);
+  runQueryReturnPromise(welcomePageUpsertQuery,pgClient).then((result:pg.QueryResult)=>{
+    res.json({'sessionId': sessionId});
+  }).catch(err=>{
+    console.log('failed to start app')
+    res.status(500).send('unable to initialize application')
+  })
+  /*const insertAppDataQuery = {
+    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, sales_rep, referred_by, referral_code, session_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    values: [welcomePageData.account_type, welcomePageData.transfer_form, welcomePageData.rollover_form, welcomePageData.cash_contribution_form, welcomePageData.investment_type, welcomePageData.sales_rep, welcomePageData.referred_by, welcomePageData.referral_code, sessionId],
+  }
+  client.query(insertAppDataQuery, function(err : any, response : any){
+    console.log(err);
+    console.log(response);
+    res.json({'sessionId': sessionId});
+  });*/
+}
 
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: applicationInterfaces.welcomePageParameters, res: express.Response, pgClient: pg.Client)
 {
@@ -25,40 +46,8 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
     pgClient.query(sessionQuery).then( function(appSessionResult:pg.QueryResult){
       if(appSessionResult.rowCount == 0 && serverConn.accessToken !== 'test_conn')
       {
-        let herokuToken = uuidv4();
-        console.log('found no app')
-        serverConn.sobject("Online_Application__c").create({'First_Name__c': applicantForm.first_name, 
-        'Last_Name__c':applicantForm.last_name, 
-        'heroku_token__c':herokuToken, 
-        'IntegrationOwner__c':'0052i000000Mz0CAAS', 
-        'Expiration_Date__c':'2025-10-10', 
-        'Account_Type__c':'Traditional IRA', 
-        'Email__c': applicantForm.email,
-        'Legal_Address__c': applicantForm.legal_street,
-        'legal_City__c':applicantForm.legal_city,
-        'legal_State__c':applicantForm.legal_state,
-        'legal_Zip__c':applicantForm.legal_zip,
-        'SSN__c':applicantForm.ssn
-        }).then((result:any)=>{
-        console.log(' getting fields')
-          serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
-            //console.log(queryResult);
-            console.log(queryResult['First_Name__c']);
-            console.log(queryResult['AccountNew__c']);
-            console.log(queryResult['SSN__c'])
-            let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
-            runQueryReturnPromise(appQueryUpsert,pgClient).then((queryUpsertResult:pg.QueryResult)=>{
-                createAppSession(queryResult['AccountNew__c'], result.id, sessionId,pgClient, {},res)
-              }).catch(err=>{
-                console.log('could not upsert app')
-                res.status(500).send('failed inserting app')
-              });
-
-          })
-        }).catch(err=>{
-          console.log('failed to start session');
-          res.status(500).send('failed to start session');
-        });
+        let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
+        startSFOnlineApp(sessionId,pgClient, serverConn,applicantForm,appQueryUpsert,res)
         //insert salesforce app
       }else
       {
@@ -165,24 +154,17 @@ function updateFeeArrangementPage(token: string, feeArrangementForm: application
   return generateQueryString('fee_arrangement', upsertFeeArrangementParamters, 'token')
 }
 
-function updateWelcomeForm(token: string, welcomeParameters: applicationInterfaces.welcomePageParameters): queryParameters{
+function updateWelcomeForm(session_id: string, welcomeParameters: applicationInterfaces.welcomePageParameters): queryParameters{
   let upsertWelcomeParameters : salesforceSchema.body ={
-    account_type: welcomeParameters.AccountType,
-    transfer_form: welcomeParameters.TransferIra,
-    rollover_form: welcomeParameters.RolloverEmployer,
-    cash_contribution_form: welcomeParameters.CashContribution,
-    investment_type: welcomeParameters.InitialInvestment,
-    owner_id: welcomeParameters.SalesRep,
-    referred_by: welcomeParameters.SpecifiedSource,
-    offering_id: welcomeParameters.ReferralCode,
-    token: token,
+    ...welcomeParameters,
+    session_id: session_id,
     //need to make these nullable and exclude them from this upsert or possibly move them to their own table
     bank_account: {},
     case_management: '',
     credit_card: {},
     investment_amount:0
   }
-  return generateQueryString('body', upsertWelcomeParameters, 'token');
+  return generateQueryString('body', upsertWelcomeParameters, 'session_id');
 }
 
 function updateAppId(sessionId : string, applicantForm : applicationInterfaces.applicantIdForm): queryParameters{
