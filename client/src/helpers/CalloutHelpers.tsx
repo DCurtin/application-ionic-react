@@ -33,6 +33,72 @@ export function getAccountNotificationsPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'accountNotification')
 }
 
+export function saveTransferPage(sessionId: string, formData: FormData){
+    return makeSaveStateCallout(sessionId, 'transfer', formData)
+}
+
+export function getTransferPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'transfer')
+}
+
+export function saveContributionPage(sessionId: string, formData: FormData){
+    console.log(formData);
+    return makeSaveStateCallout(sessionId, 'contribution', formData)
+}
+
+export function getContributionPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'contribution')
+}
+
+export function saveRolloverPage(sessionId: string, formData: FormData){
+    console.log(formData);
+    return makeSaveStateCallout(sessionId, 'rollover', formData)
+}
+
+export function getRolloverPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'rollover')
+}
+
+function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
+    let url = '/saveState'
+    let body : requestBody= {
+    session: {sessionId: sessionId, page: page},
+    data: formData
+    }
+    let options = {
+    method : 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
+        })
+    });
+}
+
+function makeGetPageInfoCallout(sessionId: string, page: string)
+{
+    let url = '/getPageFields'
+        let body : requestBody ={
+            session:{sessionId: sessionId, page: page},
+            data: undefined
+        }
+       let options = {
+            method : 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        }
+        return fetch(url, options).then(function(response: any){
+            console.log('before json parse')
+            return response.json().then(function(data: any){
+                console.log('after json parse')
+                return data.data;
+            })
+        })
+}
+
+//Salesforce related calls
+
 export function chargeCreditCard(formData: FormData, sessionId: string)
 {
     let url = '/chargeCreditCard'
@@ -98,68 +164,4 @@ export function downloadPenSignDocs(sessionId: string)
         xhr.onerror = () => reject(xhr.statusText);
         xhr.send();
     })
-}
-
-export function saveTransferPage(sessionId: string, formData: FormData){
-    return makeSaveStateCallout(sessionId, 'transfer', formData)
-}
-
-export function getTransferPage(sessionId: string){
-    return makeGetPageInfoCallout(sessionId, 'transfer')
-}
-
-export function saveContributionPage(sessionId: string, formData: FormData){
-    console.log(formData);
-    return makeSaveStateCallout(sessionId, 'contribution', formData)
-}
-
-export function getContributionPage(sessionId: string){
-    return makeGetPageInfoCallout(sessionId, 'contribution')
-}
-
-export function saveRolloverPage(sessionId: string, formData: FormData){
-    console.log(formData);
-    return makeSaveStateCallout(sessionId, 'rollover', formData)
-}
-
-export function getRolloverPage(sessionId: string){
-    return makeGetPageInfoCallout(sessionId, 'rollover')
-}
-
-function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
-    let url = '/saveState'
-    let body : requestBody= {
-    session: {sessionId: sessionId, page: page},
-    data: formData
-    }
-    let options = {
-    method : 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
-    }
-    return fetch(url, options).then(function(response: any){
-        return response.json().then(function(data: any){
-        })
-    });
-}
-
-function makeGetPageInfoCallout(sessionId: string, page: string)
-{
-    let url = '/getPageFields'
-        let body : requestBody ={
-            session:{sessionId: sessionId, page: page},
-            data: undefined
-        }
-       let options = {
-            method : 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
-        }
-        return fetch(url, options).then(function(response: any){
-            console.log('before json parse')
-            return response.json().then(function(data: any){
-                console.log('after json parse')
-                return data.data;
-            })
-        })
 }
