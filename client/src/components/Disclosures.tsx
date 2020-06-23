@@ -25,13 +25,23 @@ const Disclosures: React.FC<InitSessionApp> = props => {
 
     const {register, handleSubmit, watch, errors} = useForm(); 
 
-    const validateFields = () => { 
+    const onSubmit = () => { 
         props.updateMenuSections('isDisclosurePageValid',true);
     }
 
+    const validateFields = () => {
+      return (props.initialValues.HasReadDisclosure === true);
+    }
+
+    const showError = (fieldName: string) => {
+            let errorsArr = (Object.keys(errors));
+            let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
+            return className;
+    };
+
     return (
         <IonContent className="ion-padding">
-            <form ref={props.formRef} onSubmit={handleSubmit(validateFields)}>
+            <form ref={props.formRef} onSubmit={handleSubmit(onSubmit)}>
                 <IonGrid>
                     <IonRow className="well">
                         <IonCol>
@@ -55,7 +65,8 @@ const Disclosures: React.FC<InitSessionApp> = props => {
                                 </a> 
                             </p>
 
-                            <IonCheckbox checked={props.initialValues.HasReadDisclosure} onIonChange={handleReadDisclosure} ref={register({required: true})}></IonCheckbox> &nbsp; I have reviewed these disclosures and agree to all terms and conditions herein 
+                            <IonCheckbox checked={props.initialValues.HasReadDisclosure} onIonChange={handleReadDisclosure} 
+                            name='hasReadDisclosure' className={showError('hasReadDisclosure')} ref={register({validate: validateFields})}></IonCheckbox> &nbsp; I have reviewed these disclosures and agree to all terms and conditions herein 
                         </IonCol>
                     </IonRow>
                 </IonGrid>

@@ -196,7 +196,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
 
     const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
-            let className = errorsArr.includes(fieldName) ? 'danger' : '';
+            let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
             return className;
     };
 
