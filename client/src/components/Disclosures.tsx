@@ -25,7 +25,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
 
     const {register, handleSubmit, watch, errors} = useForm(); 
 
-    const validateFields = () => {
+    const validateFields = () => { 
         props.updateMenuSections('isDisclosurePageValid',true);
     }
 

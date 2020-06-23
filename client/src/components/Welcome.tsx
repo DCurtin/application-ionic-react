@@ -165,15 +165,16 @@ const Welcome: React.FC<InitSessionApp> = props => {
     },[props.initialValues])
 
 
-    const validateFields = () => {
-        history.listen(()=>{
+    const validateFields = (e: any) => {
+        console.log(e);
+        
             //save initial data
             //return session id            
-            var url = '/startApplication'
-            if(props.sessionId !== ''){
-                url = '/saveState'
-            }
-            let body : saveWelcomeParameters ={
+        var url = '/startApplication'
+        if(props.sessionId !== ''){
+            url = '/saveState'
+        }
+        let body : saveWelcomeParameters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
                 data: props.initialValues
             }
@@ -189,8 +190,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     props.setSessionId(data.sessionId);
                 })
             })
-        })
-        props.updateMenuSections('isWelcomePageValid', true);
+            props.updateMenuSections('isWelcomePageValid', true);
+        
     }
 
     const showErrors = () => {

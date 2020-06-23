@@ -60,7 +60,7 @@ export interface applicantIdForm{
     preferred_contact_method?: string, 
     alternate_phone?: string, 
     alternate_phone_type?: string
-}
+}  
 
 export interface FormData {
     [key:string] : any

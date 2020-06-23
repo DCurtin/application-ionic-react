@@ -2,7 +2,7 @@ export interface AppPage {
     header?: string;
     url: string;
     title: string;
-    isValid: Boolean;
+    isValid: Boolean; 
   }
 
   var appPagesMap: {[key :string]: AppPage} = {

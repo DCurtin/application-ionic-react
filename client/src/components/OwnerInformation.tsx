@@ -50,7 +50,7 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                 console.log(formData)
               saveAppPage(sessionId, formData);
             })
-          }, [formData])
+          }, [formData]);
     
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
@@ -59,11 +59,10 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
         }
 
 
-        const validateFields = () => {
-            history.listen(()=>{
-                console.log(formData)
-              saveAppPage(sessionId, formData);
-            })
+        const validateFields = (e: any) => {
+            console.log(e);
+            console.log(sessionId);
+            saveAppPage(sessionId, formData);
             updateMenuSections('isOwnerInfoPageValid', true);
         }
 

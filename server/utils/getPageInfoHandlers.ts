@@ -37,6 +37,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
         text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
         values : [sessionId]
       }
+      console.log(sessionId);
       client.query(applicantQuery).then( function(applicantResult:pg.QueryResult ){
         let applicantInfo : salesforceSchema.applicant = applicantResult.rows[0]
         if(applicantInfo === undefined){
