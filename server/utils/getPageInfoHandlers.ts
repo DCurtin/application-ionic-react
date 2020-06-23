@@ -12,19 +12,19 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
         text : 'SELECT * FROM salesforce.body WHERE token = $1',
         values : [sessionId]
       }
-      client.query(bodyQuery).then( function(result:any){
+      client.query(bodyQuery).then( function(result:pg.QueryResult){
       //get data from database
       //load into response
       let welcomePage : welcomePageParameters;
-      let rows = result['rows'];
-      welcomePage.AccountType = rows.account_type;
-      welcomePage.TransferIra = rows.transfer_form;
-      welcomePage.RolloverEmployer = rows.rollover_form;
-      welcomePage.CashContribution = rows.cash_contribution_form;
-      welcomePage.InitialInvestment = rows.investment_type;
-      welcomePage.SalesRep = rows.owner_id;
-      welcomePage.SpecifiedSource = rows.referred_by;
-      welcomePage.ReferralCode = rows.offering_id;
+      let row :salesforceSchema.body = result.rows[0];
+      welcomePage.account_type = row.account_type;
+      welcomePage.transfer_form = row.transfer_form;
+      welcomePage.rollover_form = row.rollover_form;
+      welcomePage.cash_contribution_form = row.cash_contribution_form;
+      welcomePage.investment_type = row.investment_type;
+      welcomePage.sales_rep = row.sales_rep;
+      welcomePage.referred_by = row.referred_by;
+      welcomePage.referral_code = row.referral_code;
       
       res.json(welcomePage);
     }).catch(err=>{
