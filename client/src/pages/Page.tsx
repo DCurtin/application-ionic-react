@@ -206,12 +206,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
           <IonThumbnail slot="start">
             <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
-          <IonTitle>{currentState.currentPage.title}</IonTitle>
+          <IonTitle>
+          {currentState.currentPage.title}
+            <IonButtons slot='end'>
+              <IonButton slot='end' routerLink={currentState.prevPage?.url}>Prev</IonButton>
+              <IonButton onClick={goToNextPage} slot='end'>Next</IonButton>
+            </IonButtons>
+          </IonTitle>
         </IonToolbar>
-        <IonButtons>
-            <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
-            <IonButton onClick={goToNextPage}>Next</IonButton>
-        </IonButtons>
+           
       </IonHeader>
 
       <IonContent>

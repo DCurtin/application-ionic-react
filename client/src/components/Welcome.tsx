@@ -165,11 +165,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
     },[props.initialValues])
 
 
-    const validateFields = (e: any) => {
-        console.log(e);
-        
-            //save initial data
-            //return session id            
+    const validateFields = (e: any) => {         
         var url = '/startApplication'
         if(props.sessionId !== ''){
             url = '/saveState'
