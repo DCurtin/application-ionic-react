@@ -1,4 +1,4 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
 import React, {useState, useEffect, useRef} from 'react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
@@ -9,6 +9,8 @@ import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
+import { chevronBackCircleOutline, chevronForwardCircleOutline
+  } from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -203,17 +205,22 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
+            <IonButton slot='end' routerLink={currentState.prevPage?.url} color='secondary'>
+              <IonIcon icon={chevronBackCircleOutline} slot='start'/>
+              Prev
+            </IonButton>
+              <IonButton slot='end' onClick={goToNextPage} color='secondary'>
+                <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
+              Next
+              </IonButton>
           <IonThumbnail slot="start">
             <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
           <IonTitle>
           {currentState.currentPage.title}
-            <IonButtons slot='end'>
-              <IonButton slot='end' routerLink={currentState.prevPage?.url}>Prev</IonButton>
-              <IonButton onClick={goToNextPage} slot='end'>Next</IonButton>
-            </IonButtons>
           </IonTitle>
         </IonToolbar>
+            
            
       </IonHeader>
 
