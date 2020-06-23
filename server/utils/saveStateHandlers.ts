@@ -14,16 +14,16 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: appl
   runQuery(welcomePageUpsertQuery, res, pgClient);
 }
 
-export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, pgClient: pg.Client, serverConn: Partial<jsfConection>){
+export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, pgClient: pg.Client, serverConn: Partial<jsfConection>, userInstances:any){
     //query for application_session
     //if none exists
     //insert on SF and create a new application_session
     let sessionQuery = {
-      text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+      text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
       values: [sessionId]
     }
     pgClient.query(sessionQuery).then( function(appSessionResult:pg.QueryResult){
-      if(appSessionResult.rowCount == 0)
+      if(appSessionResult.rowCount == 0 && serverConn.accessToken !== 'test_conn')
       {
         let herokuToken = uuidv4();
         console.log('found no app')
@@ -39,7 +39,7 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
         'legal_State__c':applicantForm.legal_state,
         'legal_Zip__c':applicantForm.legal_zip,
         'SSN__c':applicantForm.ssn
-      }).then((result:any)=>{
+        }).then((result:any)=>{
         console.log(' getting fields')
           serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
             //console.log(queryResult);
@@ -64,7 +64,16 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
       {
         let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
         runQuery(appQueryUpsert, res, pgClient);
+        /*runQueryReturnPromise(appQueryUpsert,pgClient).then((queryUpsertResult:pg.QueryResult)=>{
+                createAppSession('', '', sessionId,pgClient, userInstances,res)
+              }).catch(err=>{
+                console.log('could not upsert app')
+                res.status(500).send('failed inserting app')
+              });*/
       }
+    }).catch(err=>{
+      console.log(err)
+      res.status(500).send('unknown exception saving application')
     })
 }
 
@@ -176,10 +185,10 @@ function updateWelcomeForm(token: string, welcomeParameters: applicationInterfac
   return generateQueryString('body', upsertWelcomeParameters, 'token');
 }
 
-function updateAppId(token : string, applicantForm : applicationInterfaces.applicantIdForm): queryParameters{
+function updateAppId(sessionId : string, applicantForm : applicationInterfaces.applicantIdForm): queryParameters{
     let upsertApplicantv2 : Partial<salesforceSchema.applicant> = applicantForm
     console.log(upsertApplicantv2)
-    upsertApplicantv2.token = token;
+    upsertApplicantv2.token = sessionId;
     return generateQueryString('applicant', upsertApplicantv2, 'token')
 }
 
@@ -201,7 +210,7 @@ function updateBeneficiaries(token: string, beneficiaryData: applicationInterfac
   return generateQueryStringFromList('beneficiary', beneficiaryDataList, 'bene_uuid');
 }
 
-function generateQueryString(table : string, upsertObject : any , constraint: string = undefined) : queryParameters{
+export function generateQueryString(table : string, upsertObject : any , constraint: string = undefined) : queryParameters{
   return generateQueryStringFromList(table, [upsertObject], constraint);
 }
 
@@ -254,7 +263,8 @@ function runQuery(queryString: queryParameters, res: express.Response, pgClient:
   })
 }
 
-function runQueryReturnPromise(queryString: queryParameters, pgClient: pg.Client)
+export function runQueryReturnPromise(queryString: queryParameters, pgClient: pg.Client)
 {
+  console.log(queryString)
   return pgClient.query(queryString)
 }
