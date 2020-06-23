@@ -53,6 +53,7 @@ if(qaUser === 'test' || qaPw === 'test')
 
 console.log('query url: ' +  connectionString)
 client.connect();
+client.query('DELETE FROM salesforce.application_session')
 
 var app = express();
 app.use(session({
@@ -249,7 +250,19 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
     {
       console.log('success')
       let sessionId : string = uuidv4();
-      createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
+      let ownerInfo : Partial<salesforceSchema.applicant> ={
+        application_id: record.Id,
+        account_number: record.AccountNew__c,
+        last_name: record.Last_Name__c,
+        email: record.Email__c,
+        ssn: record.SSN__c,
+        dob: record.DOB__c,
+        token: record.heroku_token__c
+      }
+      let queryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'token')
+      saveStateHandlers.runQueryReturnPromise(queryParams, client).then((result:pg.QueryResult)=>{
+        createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
+      })
       return
     }
     console.group('fail')
@@ -325,7 +338,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'appId'){
-    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn);
+    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn, userInstances);
     return
   }
 
