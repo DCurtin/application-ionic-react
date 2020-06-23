@@ -43,14 +43,14 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   })
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
-    AccountType: '',
-    InitialInvestment: '',
-    ReferralCode: '',
-    SalesRep: '',
-    SpecifiedSource: '',
-    CashContribution: false,
-    RolloverEmployer: false,
-    TransferIra: false
+    account_type: '',
+    investment_type: '',
+    referral_code: '',
+    sales_rep: '',
+    referred_by: '',
+    cash_contribution_form: false,
+    rollover_form: false,
+    transfer_form: false
   });
 
   const [currentState, setCurrentState] = useState<userState>({
@@ -69,15 +69,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
     console.log('use effect on page');
     
-    formParams.transferForm = welcomePageFields.TransferIra;
-    formParams.rolloverForm = welcomePageFields.RolloverEmployer;
-    formParams.newContribution = welcomePageFields.CashContribution;
-    formParams.planInfo = welcomePageFields.AccountType.includes('SEP');
+    formParams.transferForm = welcomePageFields.transfer_form;
+    formParams.rolloverForm = welcomePageFields.rollover_form;
+    formParams.newContribution = welcomePageFields.cash_contribution_form;
+    formParams.planInfo = welcomePageFields.account_type.includes('SEP');
 
-    formParams.initialInvestment = (welcomePageFields.InitialInvestment !== "I'm Not Sure" && welcomePageFields.InitialInvestment !== '')
+    formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
     setMenuParams(formParams);
-  },[welcomePageFields])
+  },[welcomePageFields, setMenuParams])
   
   useEffect(function(){
     let url = '/getPageFields'
@@ -137,9 +137,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Disclosures':
-        return <Disclosures selectedAccountType={welcomePageFields.AccountType}/>;
+        return <Disclosures selectedAccountType={welcomePageFields.account_type}/>;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
       case 'Beneficiaries':
@@ -161,7 +161,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'ReviewAndSign':
         return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId}/>;
       default: 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
     }
   }
 
