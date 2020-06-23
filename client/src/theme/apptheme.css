@@ -7,16 +7,18 @@
     background-color: #1A1B3F;
 }
 
-ion-input{
-    border-radius: 10px;
-    padding-right: 30px;
-    font-size: 0.9em;
-    border: 1px solid #dedede;
+
+form ion-item {
+   border-radius: 10px;
+   border: 1px solid #dedede;
+} 
+
+.danger{
+    --border-color: var(--ion-color-danger, red);
 }
 
 ion-select {
-    border-radius:10px;
-    border: 1px solid #dedede;
+    width: 100%;
 }
 
 .well {

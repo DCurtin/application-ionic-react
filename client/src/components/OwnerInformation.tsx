@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
@@ -54,22 +54,21 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
     
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
-            console.log(importedForm);
             setFormData(importedForm);
         }
 
 
         const validateFields = (e: any) => {
-            console.log(e);
-            console.log(sessionId);
             saveAppPage(sessionId, formData);
             updateMenuSections('isOwnerInfoPageValid', true);
         }
 
-        const showError = () => {
+        const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
             console.log(errorsArr);
-
+            let className = errorsArr.includes(fieldName) ? 'danger' : '';
+            console.log(className);
+            return className;
         };
 
 
@@ -80,7 +79,6 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                     <IonRow className="well">
                         <IonCol>
                         Please complete your personal information below. Fields outlined in red are required. Others are optional.
-                        {showError()}
                         </IonCol>
                     </IonRow>
                     <IonItemDivider>
@@ -93,24 +91,30 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Salutation *
                             </IonLabel>
-                            <IonSelect interface='action-sheet' name="salutation" value={formData.salutation} onIonChange={updateForm}>
-                                <IonSelectOption value="Mr.">Mr.</IonSelectOption>
-                                <IonSelectOption value="Ms.">Ms.</IonSelectOption>
-                                <IonSelectOption value="Mrs.">Mrs.</IonSelectOption>
-                                <IonSelectOption value="Dr.">Dr.</IonSelectOption>
-                            </IonSelect>
+                            <IonItem>
+                                <IonSelect interface='action-sheet' name="salutation" value={formData.salutation} onIonChange={updateForm}>
+                                    <IonSelectOption value="Mr.">Mr.</IonSelectOption>
+                                    <IonSelectOption value="Ms.">Ms.</IonSelectOption>
+                                    <IonSelectOption value="Mrs.">Mrs.</IonSelectOption>
+                                    <IonSelectOption value="Dr.">Dr.</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 First Name *
                             </IonLabel>
-                            <IonInput class='item-input' name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput ref={register({required: true})}></IonInput>
+                            <IonItem className={showError('first_name')}>
+                                <IonInput class='item-input' name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput ref={register({required: true})}></IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 Last Name *
                             </IonLabel>
-                            <IonInput class='item-input' name="last_name" value={formData.last_name} placeholder="Last Name" onIonInput={updateForm} clearInput></IonInput>
+                            <IonItem>
+                                <IonInput class='item-input' name="last_name" value={formData.last_name} placeholder="Last Name" onIonInput={updateForm} clearInput></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -118,13 +122,17 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Social Security Number *
                             </IonLabel>
-                            <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} clearInput ref={register({required: true})}> </IonInput>
+                            <IonItem className={showError('ssn')}>
+                                <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} clearInput ref={register({required: true})}> </IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 Date of Birth *
                             </IonLabel>
-                            <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" onIonInput={e => updateForm(e!)} clearInput></IonInput>
+                            <IonItem>
+                                <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" onIonInput={e => updateForm(e!)} clearInput></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -132,20 +140,25 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Marital Status
                             </IonLabel>
-                            <IonSelect interface='action-sheet' name='marital_status' onIonChange={updateForm} value={formData.marital_status}>
-                                <IonSelectOption value="Single">Single</IonSelectOption>
-                                <IonSelectOption value="Married">Married</IonSelectOption>
-                                <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
-                            </IonSelect>
+                            <IonItem>
+                                <IonSelect interface='action-sheet' name='marital_status' onIonChange={updateForm} value={formData.marital_status}>
+                                    <IonSelectOption value="Single">Single</IonSelectOption>
+                                    <IonSelectOption value="Married">Married</IonSelectOption>
+                                    <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>Mother's Maiden Name</IonLabel>
-                            <IonInput name='mothers_maiden_name' value={formData.mothers_maiden_name} onIonInput={updateForm}></IonInput>
+                            <IonItem>
+                                <IonInput name='mothers_maiden_name' value={formData.mothers_maiden_name} onIonInput={updateForm}></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
                         <IonCol>
                             <IonLabel>Occupation</IonLabel>
+                            <IonItem>
                             <IonSelect interface='action-sheet' name='occupation' onIonChange={updateForm} value={formData.occupation}>
                                 <IonSelectOption value="Accountant">Accountant
                                 </IonSelectOption>
@@ -154,6 +167,7 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                                 <IonSelectOption value="Realtor">Realtor</IonSelectOption>
                                 <IonSelectOption value="Other">Other</IonSelectOption>
                             </IonSelect>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>Are you Self-Employed? &nbsp;</IonLabel> 
@@ -187,15 +201,19 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                     <IonRow>
                         <IonCol>
                         <IonLabel>Proof of Identification</IonLabel>
-                            <IonSelect interface='action-sheet' value={formData.id_type} onIonChange={updateForm} name='id_type'>
+                            <IonItem>
+                                <IonSelect interface='action-sheet' value={formData.id_type} onIonChange={updateForm} name='id_type'>
                                 <IonSelectOption value={`Driver's License`}>Driver's License</IonSelectOption>
                                 <IonSelectOption value='Passport'>Passport</IonSelectOption>
                                 <IonSelectOption value='Other'>Other</IonSelectOption>
                             </IonSelect>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel> ID Number </IonLabel>
-                            <IonInput value={formData.id_number} name='id_number' onIonInput={updateForm}></IonInput>
+                            <IonItem>
+                                <IonInput value={formData.id_number} name='id_number' onIonInput={updateForm}></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -203,20 +221,26 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Issued By
                             </IonLabel>
-                            <IonInput value={formData.id_issued_by} onIonInput={updateForm} name='id_issued_by'></IonInput>
+                            <IonItem>
+                                <IonInput value={formData.id_issued_by} onIonInput={updateForm} name='id_issued_by'></IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 Issue Date
                             </IonLabel>
-                            <IonInput type='date' value={formData.id_issued_date} onIonInput={updateForm} name='id_issued_date'></IonInput>
+                            <IonItem>
+                                <IonInput type='date' value={formData.id_issued_date} onIonInput={updateForm} name='id_issued_date'></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
                         <IonCol size='6'>
                             <IonLabel>Expiration Date</IonLabel>
-                            <IonInput type='date' value={formData.id_expiration_date} onIonInput={updateForm} name='id_expiration_date'>
-                            </IonInput>
+                            <IonItem> 
+                                <IonInput type='date' value={formData.id_expiration_date} onIonInput={updateForm} name='id_expiration_date'>
+                                </IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -248,13 +272,17 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Physical Street Address
                             </IonLabel>
-                            <IonInput onIonInput={updateForm} value={formData.legal_street} name='legal_street'></IonInput>
+                            <IonItem> 
+                                <IonInput onIonInput={updateForm} value={formData.legal_street} name='legal_street'></IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 City
                             </IonLabel>
-                            <IonInput onIonInput={updateForm} value={formData.legal_city} name='legal_city'></IonInput>
+                            <IonItem>
+                                <IonInput onIonInput={updateForm} value={formData.legal_city} name='legal_city'></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -262,15 +290,19 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Physical State
                             </IonLabel>
-                            <IonSelect interface='action-sheet' onIonChange={updateForm} value={formData.legal_state} name='legal_state'>
+                            <IonItem>
+                                <IonSelect interface='action-sheet' onIonChange={updateForm} value={formData.legal_state} name='legal_state'>
                                 {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
-                            </IonSelect>
+                                </IonSelect>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 Zip
                             </IonLabel>
-                            <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm}></IonInput>
+                            <IonItem>
+                                <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm}></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -295,23 +327,31 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                         <IonRow>
                             <IonCol>
                                 <IonLabel>Mailing Street Address</IonLabel>
-                                <IonInput value={formData.mailing_street} name='mailing_street' onIonInput={updateForm}></IonInput>
+                                <IonItem>
+                                    <IonInput value={formData.mailing_street} name='mailing_street' onIonInput={updateForm}></IonInput>
+                                </IonItem>
                             </IonCol>
                             <IonCol>
                                 <IonLabel>Mailing City</IonLabel>
-                                <IonInput value={formData.mailing_city} name='mailing_city' onIonInput={updateForm}></IonInput>
+                                <IonItem>
+                                    <IonInput value={formData.mailing_city} name='mailing_city' onIonInput={updateForm}></IonInput>
+                                </IonItem>
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol>
                                 <IonLabel>Mailing State</IonLabel>
-                                <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} onIonChange={updateForm}>
+                                <IonItem>
+                                    <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} onIonChange={updateForm}>
                                 {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
-                                </IonSelect>
+                                    </IonSelect>
+                                </IonItem>
                             </IonCol>
                             <IonCol>
                                 <IonLabel> Mailing Zip</IonLabel>
-                                <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm}></IonInput>
+                                <IonItem>
+                                    <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm}></IonInput>
+                                </IonItem>
                             </IonCol>
                         </IonRow>
                     </React.Fragment>}
@@ -325,30 +365,38 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonLabel>
                                 Primary Phone
                             </IonLabel>
-                            <IonInput value={formData.primary_phone} name='primary_phone' onIonInput={updateForm}></IonInput>
+                            <IonItem>
+                                <IonInput value={formData.primary_phone} name='primary_phone' onIonInput={updateForm}></IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>
                                 Preferred Contact Method
                             </IonLabel>
-                            <IonSelect interface='action-sheet' value={formData.preferred_contact_method} name='preferred_contact_method' onIonChange={updateForm}>
-                                <IonSelectOption value='Email'>Email</IonSelectOption>
-                                <IonSelectOption value='Mail'>Mail</IonSelectOption>
-                                <IonSelectOption value='Phone (Home)'>Phone (Home)</IonSelectOption>
-                                <IonSelectOption value='Phone (Mobile)'>Phone (Mobile)</IonSelectOption>
-                                <IonSelectOption value='Phone (Work)'>Phone (Work)</IonSelectOption>
-                            </IonSelect>
+                            <IonItem>
+                                <IonSelect interface='action-sheet' value={formData.preferred_contact_method} name='preferred_contact_method' onIonChange={updateForm}>
+                                    <IonSelectOption value='Email'>Email</IonSelectOption>
+                                    <IonSelectOption value='Mail'>Mail</IonSelectOption>
+                                    <IonSelectOption value='Phone (Home)'>Phone (Home)</IonSelectOption>
+                                    <IonSelectOption value='Phone (Mobile)'>Phone (Mobile)</IonSelectOption>
+                                    <IonSelectOption value='Phone (Work)'>Phone (Work)</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
                         <IonCol>
                             <IonLabel>Email</IonLabel>
+                            <IonItem>
                             <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' onIonInput={updateForm} required={true} clearInput>
                             </IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>Confirm Email</IonLabel>
-                            <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail}></IonInput>
+                            <IonItem>
+                                <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail}></IonInput>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                     <IonRow>
@@ -359,15 +407,19 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                     <IonRow>
                         <IonCol>
                             <IonLabel>Alternate Phone</IonLabel>
-                            <IonInput value={formData.alternate_phone} name='alternate_phone' onIonInput={updateForm}></IonInput>
+                            <IonItem>
+                                <IonInput value={formData.alternate_phone} name='alternate_phone' onIonInput={updateForm}></IonInput>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel>Alternate Phone Type</IonLabel>
-                            <IonSelect value={formData.alternate_phone_type} interface='action-sheet' name='alternate_phone_type' onIonChange={updateForm}>
-                                <IonSelectOption value='Home'>Home</IonSelectOption>
-                                <IonSelectOption value='Mobile'>Mobile</IonSelectOption>
-                                <IonSelectOption value='Office'>Office</IonSelectOption>
-                            </IonSelect>
+                            <IonItem>
+                                <IonSelect value={formData.alternate_phone_type} interface='action-sheet' name='alternate_phone_type' onIonChange={updateForm}>
+                                    <IonSelectOption value='Home'>Home</IonSelectOption>
+                                    <IonSelectOption value='Mobile'>Mobile</IonSelectOption>
+                                    <IonSelectOption value='Office'>Office</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                 </IonGrid>
