@@ -294,22 +294,10 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   }
 
   //figure out what page they're on
-  initializeApplication(welcomePageData.data, res);
+  saveStateHandlers.initializeApplication(welcomePageData.data, res, client)
 });
 
-function initializeApplication(welcomePageData : applicationInterfaces.welcomePageParameters, res: express.Response){
-  //need to resolve offering_id and owner_id
-  let sessionId : string = uuidv4();
-  const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-    values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, sessionId],
-  }
-  client.query(insertAppDataQuery, function(err : any, response : any){
-    console.log(err);
-    console.log(response);
-    res.json({'sessionId': sessionId});
-  });
-}
+
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : applicationInterfaces.requestBody = req.body;
