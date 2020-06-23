@@ -42,7 +42,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   console.log(location);
 
   return (
-    <IonMenu contentId="main" type="overlay" hidden={location.pathname.includes('docusign')}>
+    <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN')}>
       <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
           {menuSections.map((appSection, index) => {
