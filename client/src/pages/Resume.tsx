@@ -3,6 +3,7 @@ import {requestBody} from '../helpers/Utils'
 import {useLocation, useParams} from 'react-router-dom';
 import {IonPage, IonHeader, IonToolbar, IonThumbnail, IonImg, IonTitle, IonContent, IonInput, IonButton} from '@ionic/react'
 import { json } from 'body-parser';
+import { useHistory } from 'react-router-dom';
 
 interface resume{
     last_name:string,
@@ -18,6 +19,7 @@ interface resumeRequest{
 }
 
 const Resume: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
+    const history = useHistory();
     const { herokuToken } = useParams<{ herokuToken: string; }>();
     console.log(herokuToken)
     const [authInput, setAuthInput] = useState<resume>({
@@ -46,6 +48,7 @@ const Resume: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
                 response.json().then((data:any)=>{
                     console.log(data.sessionId);
                     setSessionId(data.sessionId);
+                    history.push('/page/Welcome')
                 })
                 setLoading(false);
             }else{
