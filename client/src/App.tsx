@@ -55,7 +55,7 @@ const App: React.FC = () => {
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
             <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
-            <Route path='/docusignReturn' exact>
+            <Route path='/docusignReturn/:sessionId'>
               <DocusignReturn/>
             </Route>
             <Redirect from="/" to="/page/Welcome" exact />
