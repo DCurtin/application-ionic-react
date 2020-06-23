@@ -4,7 +4,7 @@ CREATE TABLE salesforce.Applicant(salutation text,first_name text,middle_name te
 DROP TABLE IF EXISTS salesforce.Beneficiary;
 CREATE TABLE salesforce.Beneficiary(first_name text,last_name text,ssn text,dob text,email text,phone text,type text,relationship text,share_percentage float(2),mailing_street text,mailing_city text,mailing_state text,mailing_zip text,position integer,bene_uuid text UNIQUE NOT NULL,token uuid NOT NULL);
 DROP TABLE IF EXISTS salesforce.Body;
-CREATE TABLE salesforce.Body(account_type text,offering_id text,investment_type text,owner_id text,referred_by text,case_management text,investment_amount float(2),credit_card json,bank_account json,transfer_form boolean,rollover_form boolean,cash_contribution_form boolean,token uuid UNIQUE NOT NULL);
+CREATE TABLE salesforce.Body(account_type text,referral_code text,investment_type text,sales_rep text,referred_by text,case_management text,investment_amount float(2),credit_card json,bank_account json,transfer_form boolean,rollover_form boolean,cash_contribution_form boolean,session_id uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Rollover;
 CREATE TABLE salesforce.Rollover(cash_amount float(2),institution_name text,account_type text,account_number text,rollover_type text,name text,phone text,mailing_street text,mailing_city text,mailing_state text,mailing_zip text,index integer,key text UNIQUE NOT NULL,token uuid NOT NULL);
 DROP TABLE IF EXISTS salesforce.Transfer;
