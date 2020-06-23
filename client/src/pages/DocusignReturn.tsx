@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonRow, IonCol, IonButton } from '@ionic/react';
+import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonRow, IonCol, IonButton, IonLoading } from '@ionic/react';
 import {downloadPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
 
@@ -44,17 +44,16 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
-                <IonRow>
-                    <IonCol>
-                    <a className="btn btn-primary" href={downloadUrl} download = 'Midland_Application_Documents.pdf'>
-                        <IonButton disabled={downloadUrl === ''}>
-                            {downloadUrl === '' ? 'loading...' : 'Download'}
-                        </IonButton>
-                    </a>
-                
-                    </IonCol>    
-                </IonRow>
-                
+                <IonLoading isOpen={downloadUrl === ''} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
+                {downloadUrl !== '' &&
+                    <IonRow>
+                        <IonCol>
+                            <a className="btn btn-primary" href={downloadUrl} download = 'Midland_Application_Documents.pdf'>
+                                <IonButton>Download My Signature Document</IonButton>
+                            </a>
+                        </IonCol>    
+                    </IonRow>
+                }
             </IonContent>
         </IonPage>
     )

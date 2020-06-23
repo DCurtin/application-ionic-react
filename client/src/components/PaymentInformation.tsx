@@ -66,7 +66,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId}) => {
                         </IonRow>
                     </>
                 }               
-                <IonLoading isOpen={formData.creditCardStatus === 'Pending'} message={'Applying Payment...'}></IonLoading>
+                <IonLoading isOpen={formData.creditCardStatus === 'Pending'} message={'Applying Payment...'} spinner="lines"></IonLoading>
                 {formData.creditCardStatus === 'Error' &&
                     <IonRow>
                         Error - {formData.creditCardStatusDetails}

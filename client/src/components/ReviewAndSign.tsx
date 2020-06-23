@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp } from '../helpers/Utils';
-import { IonContent, IonGrid, IonCol, IonRow, IonButton } from '@ionic/react';
+import { IonContent, IonGrid, IonCol, IonRow, IonButton, IonLoading } from '@ionic/react';
 import {getESignUrl} from '../helpers/CalloutHelpers';
 import axios from 'axios'; 
 
@@ -46,16 +46,16 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             </span>
                             </IonCol>
                         </IonRow>
-                        <IonRow>
-                            <IonCol>
-                            <a className="btn btn-primary" href={docusignUrl === '' ? undefined: docusignUrl}>
-                                <IonButton disabled={docusignUrl === ''}>
-                                {docusignUrl === '' ? 'loading...' : 'Proceed to E-Signature'}
-                                </IonButton>
-                            </a>
-                        
-                            </IonCol>    
-                        </IonRow>
+                        <IonLoading isOpen={docusignUrl === ''} message={'Loading Signing Information...'} spinner="lines"></IonLoading>
+                        {docusignUrl !== '' &&
+                            <IonRow>
+                                <IonCol>
+                                    <a className="btn btn-primary" href={docusignUrl}>
+                                        <IonButton>Proceed to E-Signature</IonButton>
+                                    </a>
+                                </IonCol>    
+                            </IonRow>
+                        }
                     </React.Fragment>
                 )}
                 {docusignSignAttempts >= 2 && (
