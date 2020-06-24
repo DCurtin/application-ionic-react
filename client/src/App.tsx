@@ -38,9 +38,18 @@ const App: React.FC = () => {
     newContribution: false,
     initialInvestment: false,
     is401k: false, 
-    isWelcomePageValid: false, 
-    isDisclosurePageValid: false,
-    isOwnerInfoPageValid: false
+    is_welcome_page_valid: false,
+    is_disclosure_page_valid: false,
+    is_owner_info_page_valid: false,
+    is_beneficiaries_page_valid: false,
+    is_fee_arrangement_page_valid: false,
+    is_account_notifications_page_valid: false,
+    is_transfer_ira_page_valid: false,
+    is_rollover_plan_page_valid: false,
+    is_investment_details_page_valid: false,
+    is_new_contribution_page_valid: false,
+    is_payment_information_page_valid: false,
+    is_review_and_sign_page_valid: false,
   });
 
 
