@@ -21,7 +21,7 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
       values: [sessionId]
     }
     client.query(sessionQuery).then( function(appSessionResult:pg.QueryResult){
-      if(appSessionResult.rowCount == 0)
+      if(appSessionResult.rowCount == 0 && serverConn.accessToken != 'test_conn')
       {
         console.log('found no app')
         serverConn.sobject("Online_Application__c").create({'First_Name__c': applicantForm.first_name, 
