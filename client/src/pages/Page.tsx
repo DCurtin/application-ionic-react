@@ -1,6 +1,5 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton } from '@ionic/react';
-import {AppPage} from '../components/Menu';
-import React, {useState, useEffect} from 'react';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
+import React, {useState, useEffect, useRef} from 'react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
@@ -9,7 +8,10 @@ import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {AppSection, MenuParamters} from '../helpers/MenuGenerator'
+import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
+import {updateValidationTable} from '../helpers/CalloutHelpers'
+import { chevronBackCircleOutline, chevronForwardCircleOutline
+  } from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -32,15 +34,19 @@ export interface userState {
 export interface session{
   sessionId: string,
   setSessionId: Function,
-  menuSections: AppSection[],
-  setMenuParams: Function
+  menuSections: MenuSection[],
+  setMenuParams: Function,
+  setMenuSections: Function,
+  menuParams: MenuParameters
 }
 
-const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuParams}) => {
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams, menuParams}) => {
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
-  })
+  });
+
+  const formRef = useRef<HTMLFormElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     account_type: '',
@@ -50,7 +56,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     referred_by: '',
     cash_contribution_form: false,
     rollover_form: false,
-    transfer_form: false
+    transfer_form: false,
+    has_read_diclosure: false
   });
 
   const [currentState, setCurrentState] = useState<userState>({
@@ -60,19 +67,13 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   });
 
   useEffect(function(){
-    let formParams : MenuParamters = {
-      initialInvestment : false,
-      newContribution : false,
-      planInfo : false,
-      rolloverForm : false,
-      transferForm : false
-    }
-    console.log('use effect on page');
+    let formParams = {...menuParams};
     
     formParams.transferForm = welcomePageFields.transfer_form;
     formParams.rolloverForm = welcomePageFields.rollover_form;
     formParams.newContribution = welcomePageFields.cash_contribution_form;
     formParams.planInfo = welcomePageFields.account_type.includes('SEP');
+    formParams.is401k = welcomePageFields.account_type.includes('401k');
 
     formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
@@ -100,6 +101,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   },[sessionId])
 
   const { name } = useParams<{ name: string; }>();
+
+  useEffect(() => {    
+    let updatedState = getPageStateFromPage(name);
+    setCurrentState(updatedState);
+  }, [name,menuSections]);
 
   const getPageStateFromPage = (currentPageName:string) => {
     const appPagesArr = [...appPages];
@@ -130,39 +136,74 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const displayPage = (pageName:string) => {
-    if (!currentState.currentPage.url.includes(pageName)) {
-      let updatedState = getPageStateFromPage(pageName);
-      setCurrentState(updatedState);
-    }
-
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       case 'Disclosures':
-        return <Disclosures selectedAccountType={welcomePageFields.account_type}/>;
+        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'AccountNotifications':
-        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'TransferIRA':
-        return <Transfers sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'RolloverPlan':
-        return <Rollovers sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'NewContribution':
-        return <NewContribution sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'PaymentInformation':
-        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections}/>;
       default: 
-        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
     }
+  }
+
+
+  const goToNextPage = () => {
+    if (formRef !== null && formRef.current !== null) {
+      formRef.current.dispatchEvent(new Event('submit'));
+    }
+  }
+
+
+  const updateMenuSections = (page: string, isPageValid:boolean) => {
+    let currentPage  = {...currentState.currentPage};
+    let newPage = {...currentPage, isValid: isPageValid};
+    setCurrentState(prevState => {
+      return {
+        ...prevState,
+        currentPage: newPage
+      } 
+    });
+    
+    updateMenuParams(page, isPageValid);
+    
+    if(page !== 'is_welcome_page_valid')
+    {
+      updateValidationTable(page, isPageValid, sessionId);
+    }
+
+    if (isPageValid){
+      let path = currentState.nextPage?.url;
+      if (path){
+        history.push(path);
+      }
+    }
+  }
+
+
+  const updateMenuParams = (page: string, isValid: boolean) => {
+    let currentMenuParams : any = {...menuParams};
+    currentMenuParams[page] = isValid; 
+    setMenuParams(currentMenuParams);
   }
 
   return (
@@ -172,15 +213,23 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
+            <IonButton slot='end' routerLink={currentState.prevPage?.url} color='secondary'>
+              <IonIcon icon={chevronBackCircleOutline} slot='start'/>
+              Prev
+            </IonButton>
+              <IonButton slot='end' onClick={goToNextPage} color='secondary'>
+                <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
+              Next
+              </IonButton>
           <IonThumbnail slot="start">
             <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
           </IonThumbnail>
-          <IonTitle>{currentState.currentPage.title}</IonTitle>
+          <IonTitle>
+          {currentState.currentPage.title}
+          </IonTitle>
         </IonToolbar>
-        <IonButtons>
-            <IonButton routerLink={currentState.prevPage?.url}>Prev</IonButton>
-            <IonButton routerLink={currentState.nextPage?.url}>Next</IonButton>
-        </IonButtons>
+            
+           
       </IonHeader>
 
       <IonContent>

@@ -10,5 +10,6 @@ credit_card,json,,
 bank_account,json,,
 transfer_form,boolean,,
 rollover_form,boolean,,
+has_read_diclosure,boolean,,
 cash_contribution_form,boolean,,
 session_id,uuid,yes,yes

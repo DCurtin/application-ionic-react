@@ -1,7 +1,7 @@
 require("dotenv").config();
 var path = require('path');
+let https = require('https');
 import express from 'express';
-import { Http2SecureServer } from 'http2';
 import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import {transformRolloverClientToServer} from './server/utils/transformRollovers'
@@ -13,6 +13,8 @@ import {createAppSession} from './server/utils/appSessionHandler';
 import jsforce, {Connection as jsfConnection} from 'jsforce'
 import pg, { Client, Connection } from 'pg'
 import { create } from 'domain';
+import { Session } from 'inspector';
+import { queryParameters } from './server/utils/helperSchemas';
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
@@ -77,29 +79,6 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 });
 
 app.use(router);
-
-app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
-
-    console.log(serverConn.accessToken);
-    let accountNumber = '1234567';
-    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
-    let options = {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + serverConn.accessToken,
-        'Content-Type':  'application/pdf',
-      }
-    }
-
-    let https = require('https');
-
-    let request = https.request(url, options, function(response: any) { 
-      response.pipe(res);
-  }); 
-  
-  request.end();
-
-});
 
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
   let sessionId = req.body.sessionId;
@@ -180,11 +159,14 @@ app.post('/getESignUrl', (req, res) => {
       res.status(500).send('no application');
       return;
     }
+    
     let application_session : salesforceSchema.application_session = result.rows[0];
-    console.log('account num ' + application_session.account_number)
-    let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3030'
-    console.log(returnurl);
-    serverConn.apex.get('/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/docusignReturn`, function(err: any, data: any) {
+    let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
+    let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
+    console.log('getESignUrl sessionId: ' + sessionId);
+    console.log('getESignUrl enpoint: ' + endpoint);
+
+    serverConn.apex.get(endpoint, function(err: any, data: any) {
       if (err) { return console.error(err); }
       else {
         console.log("eSignUrl: ", data.eSignUrl);
@@ -192,6 +174,55 @@ app.post('/getESignUrl', (req, res) => {
         return
       }
     })
+  })
+});
+
+app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
+  console.log('getPenSignDocs running on server' );
+
+  let sessionId = req.query['sessionId'];
+  
+  if(sessionId === '' || sessionId === undefined){
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return
+  }
+  
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(sessionQuery).then(function(result:pg.QueryResult) {
+    if(result.rowCount == 0)
+    {
+      console.log('no application')
+      res.status(500).send('no application');
+      return;
+    }
+    
+    let application_session : salesforceSchema.application_session = result.rows[0];
+    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
+    console.log('getPenSignDoc enpoint: ' + url);
+
+    let options = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + serverConn.accessToken,
+        'Content-Type':  'application/pdf',
+      }
+    }
+
+    let request = https.request(url, options, function(response: any) { 
+      if (response.statusCode === 200) {
+        response.pipe(res);
+      }
+      else {
+        res.status(response.statusCode).send(response.statusMessage);
+      }
+    })
+
+    request.end();
   })
 });
 
@@ -252,6 +283,7 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
       serverConn.sobject("Online_Application__c").retrieve(record.Id).then((onlineAppresult:any)=>{
       let sessionId : string = uuidv4();
       let bodyInfo : Partial<salesforceSchema.body> ={
+        has_read_diclosure: onlineAppresult.Disclosures_Viewed__c,
         account_type: onlineAppresult.Account_Type__c,
         transfer_form: onlineAppresult.Existing_IRA_Transfer__c,
         rollover_form: onlineAppresult.Existing_Employer_Plan_Rollover__c,
@@ -296,10 +328,20 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
         token: sessionId
       }
       console.log(ownerInfo)
-      let queryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'token')
-      saveStateHandlers.runQueryReturnPromise(queryParams, client).then((result:pg.QueryResult)=>{
-        saveStateHandlers.runQueryReturnPromise(bodyParams,client).then((bodyResult: pg.QueryResult)=>{
-          createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
+      let applicantQueryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'token')
+
+      let validatedPages : salesforceSchema.validated_pages = {
+        ...JSON.parse(onlineAppresult.heroku_validated_pages__c),
+        session_id:sessionId}
+      console.log(validatedPages)
+      let validatedPagesQueryParams = saveStateHandlers.generateQueryString('validated_pages', validatedPages, 'session_id')
+      console.log(validatedPagesQueryParams)
+      
+      saveStateHandlers.runQueryReturnPromise(applicantQueryParams, client).then((result:pg.QueryResult)=>{
+        saveStateHandlers.runQueryReturnPromise(bodyParams, client).then((bodyResult: pg.QueryResult)=>{
+          saveStateHandlers.runQueryReturnPromise(validatedPagesQueryParams, client).then((validatedPagesResult: pg.QueryResult)=>{
+            createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
+          })
         })
       })
     })
@@ -412,9 +454,34 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
     saveStateHandlers.saveInitialInvestment(sessionId, initInvestmentData, res, client);
     return
   }
-
   res.status(500).send('no handler for this page');
 });
+
+app.post('/validatePage', function(req: express.Request, res: express.Response){
+  let packet : applicationInterfaces.requestBody = req.body;
+  let sessionId : string = packet.session.sessionId;
+
+  if(sessionId === undefined || sessionId === '')
+  {
+    console.log('sessionId or page not set in request');
+    res.status(500).send('invalid arguments');
+    return
+  }
+
+  let pageValidation : Partial<salesforceSchema.validated_pages> = {
+    ...packet.data,
+    session_id:sessionId
+  }
+  let queryParam :queryParameters = saveStateHandlers.generateQueryString('validated_pages',pageValidation,'session_id');
+  saveStateHandlers.runQueryReturnPromise(queryParam, client).then((response:pg.QueryResult)=>{
+    res.send('ok');
+  }).catch(err=>{
+    console.log(err);
+    console.log('failed to update validated pages table');
+    res.status(500).send('Failed to update validated pages');
+  })
+
+})
 
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
   var session = req.body.session;

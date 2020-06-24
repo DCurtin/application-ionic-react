@@ -1,6 +1,7 @@
 export interface SessionApp {
     sessionId : string,
-    setSessionId : Function
+    setSessionId : Function, 
+    updateMenuSections:Function
 }
 
 export interface welcomePageParameters {
@@ -11,7 +12,8 @@ export interface welcomePageParameters {
     investment_type: string,
     sales_rep: string,
     referred_by: string,
-    referral_code: string
+    referral_code: string,
+    has_read_diclosure: boolean
 }
 
 //component client <-> server fetch paramters
@@ -58,7 +60,7 @@ export interface applicantIdForm{
     preferred_contact_method?: string, 
     alternate_phone?: string, 
     alternate_phone_type?: string
-}
+}  
 
 export interface FormData {
     [key:string] : any

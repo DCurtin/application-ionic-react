@@ -15,18 +15,10 @@ export function initializeApplication(welcomeParameters : applicationInterfaces.
   runQueryReturnPromise(welcomePageUpsertQuery,pgClient).then((result:pg.QueryResult)=>{
     res.json({'sessionId': sessionId});
   }).catch(err=>{
+    console.log(err);
     console.log('failed to start app')
     res.status(500).send('unable to initialize application')
   })
-  /*const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, sales_rep, referred_by, referral_code, session_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-    values: [welcomePageData.account_type, welcomePageData.transfer_form, welcomePageData.rollover_form, welcomePageData.cash_contribution_form, welcomePageData.investment_type, welcomePageData.sales_rep, welcomePageData.referred_by, welcomePageData.referral_code, sessionId],
-  }
-  client.query(insertAppDataQuery, function(err : any, response : any){
-    console.log(err);
-    console.log(response);
-    res.json({'sessionId': sessionId});
-  });*/
 }
 
 export function saveWelcomeParameters(sessionId: string, welcomeParameters: applicationInterfaces.welcomePageParameters, res: express.Response, pgClient: pg.Client)

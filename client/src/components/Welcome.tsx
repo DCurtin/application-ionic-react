@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react'; 
+import React, { useEffect, useRef } from 'react'; 
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
+import {useForm} from 'react-hook-form';
 
 import {useHistory} from 'react-router-dom';
 
 import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes} from "../helpers/Utils";
-import { Interface } from 'readline';
+
+import {updateValidationTable} from '../helpers/CalloutHelpers'
 
 interface InitSessionApp extends SessionApp {
     welcomePageFields: welcomePageParameters,
     setWelcomePageFields: Function,
+    updateMenuSections: Function,
+    formRef: any
 }
 
 const Welcome: React.FC<InitSessionApp> = props => {
@@ -22,14 +26,27 @@ const Welcome: React.FC<InitSessionApp> = props => {
         'Inherited IRA - Roth'
     ]
 
-    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
-    
+    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
+
+    const {register, handleSubmit, watch, errors} = useForm(); 
+
     const handleAccountTypeSelected = (event: CustomEvent) => {
-        let updatedwelcomePageFields : welcomePageParameters = props.welcomePageFields
-        updatedwelcomePageFields.account_type = event.detail.value
-        props.setWelcomePageFields({
-            ...updatedwelcomePageFields
-        });
+        if (event.detail.value.includes('Inherited')) {
+            props.welcomePageFields.account_type = event.detail.value
+            props.welcomePageFields.rollover_form = false
+            props.welcomePageFields.cash_contribution_form = false
+            props.setWelcomePageFields(
+                {...props.welcomePageFields,
+                }
+            )
+        } else {
+            props.setWelcomePageFields(
+                {
+                    ...props.welcomePageFields,
+                    account_type: event.detail.value
+                }
+            )
+        }
     }
 
     const handleInitialInvestmentChange = (event: CustomEvent) => {
@@ -89,8 +106,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
     }
 
     const handleChecked = (event: CustomEvent) => {
-        console.log(event.detail.value);
-        console.log(event.detail.checked);
         let updatedwelcomePageFields : welcomePageParameters = props.welcomePageFields
         if(event.detail.value === 'TransferIra'){
             updatedwelcomePageFields.transfer_form = event.detail.checked
@@ -114,20 +129,14 @@ const Welcome: React.FC<InitSessionApp> = props => {
         }
     }
 
-
     useEffect(()=>{
-        //save state on page change
         return history.listen(()=>{
             //save initial data
-            //return session id
-            console.log('saving welcome page');
-            
+            //return session id            
             var url = '/startApplication'
             if(props.sessionId !== ''){
                 url = '/saveState'
             }
-            console.log(url);
-            console.log(props.sessionId);
             let body : saveWelcomeParameters ={
                 session: {sessionId: props.sessionId, page: 'welcomePage'},
                 data: props.welcomePageFields
@@ -147,9 +156,43 @@ const Welcome: React.FC<InitSessionApp> = props => {
         })
     },[props.welcomePageFields])
 
+
+    const validateFields = (e: any) => {         
+        var url = '/startApplication'
+        if(props.sessionId !== ''){
+            url = '/saveState'
+        }
+        let body : saveWelcomeParameters ={
+                session: {sessionId: props.sessionId, page: 'welcomePage'},
+                data: props.welcomePageFields
+            }
+            let options = {
+                method : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            }
+
+            fetch(url, options).then((response)=>{
+                response.json().then(function(data: any){
+                    console.log(data);
+                    props.setSessionId(data.sessionId);
+                    updateValidationTable('is_welcome_page_valid', true, data.sessionId)
+                })
+            })
+            props.updateMenuSections('is_welcome_page_valid', true);
+        
+    }
+
+    const showError = (fieldName: string) => {
+            let errorsArr = (Object.keys(errors));
+            let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
+            return className;
+    };
+
     return (
         <IonContent className="ion-padding">
-            <IonGrid>
+            <form ref={props.formRef} onSubmit={handleSubmit(validateFields)}>
+             <IonGrid>
                 <IonRow color="medium" className="well">
                     <IonCol>
                         <p>
@@ -173,18 +216,20 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel color="primary">
                             <strong>
                                 What type of account would you like to open?
                             </strong>
                         </IonLabel>
-                       <IonSelect value={props.welcomePageFields.account_type} onIonChange={handleAccountTypeSelected}>
-                           {accountTypes.map((accountType, index) => 
-                           (<IonSelectOption key={index} value={accountType}>
-                               {accountType}
-                           </IonSelectOption>))}
-                        </IonSelect> 
+                        <IonItem className={showError('accountType')}>
+                            <IonSelect interface='action-sheet' value={props.welcomePageFields.account_type} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
+                            {accountTypes.map((accountType, index) => 
+                            (<IonSelectOption key={index} value={accountType}>
+                                {accountType}
+                            </IonSelectOption>))}
+                            </IonSelect>
+                        </IonItem> 
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -200,7 +245,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
                                 How would you like to fund your account?
@@ -220,53 +265,61 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
-                                Do you have an initial investment in mind?
+                                Do you have an initial investment in mind? *
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.welcomePageFields.investment_type} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}}>
-                            {initialInvestmentTypes.map((investmentType, index) => (
-                            <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
-                            ))}
-                        </IonSelect>
+                        <IonItem className={showError('initialInvestment')}>
+                            <IonSelect interface='action-sheet' value={props.welcomePageFields.investment_type} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}} name='initialInvestment' ref={register({required: true})}>
+                                {initialInvestmentTypes.map((investmentType, index) => (
+                                <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                                ))}
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
                                 Have you been working with a Midland rep?
                             </strong>
                         </IonLabel>
-                        <IonSelect value={props.welcomePageFields.sales_rep} onIonChange={handleSalesRepChange}>
-                            {midlandReps.map((rep, index) => (
-                                <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
-                            ))}
-                        </IonSelect>
+                        <IonItem>
+                            <IonSelect value={props.welcomePageFields.sales_rep} onIonChange={handleSalesRepChange}>
+                                {midlandReps.map((rep, index) => (
+                                    <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
+                                ))}
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong> 
                                 How did you hear about us?
                             </strong>
                         </IonLabel>
+                        <IonItem>
                         <IonInput value={props.welcomePageFields.referred_by} onIonChange={handleSpecifiedSourceChange}>
-
                         </IonInput>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6">
                         <IonLabel>
                             <strong>
                                 Referral / Group Code
                             </strong>
                         </IonLabel>
+                        <IonItem>
                         <IonInput value={props.welcomePageFields.referral_code} onIonChange={handleReferralCodeChange}></IonInput>
+                        </IonItem>
+                        <br/>
                         <IonButton color="primary">Apply Code</IonButton>
                     </IonCol>
                 </IonRow>
@@ -277,7 +330,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
                        </p>
                    </IonCol>
                </IonRow>
-            </IonGrid>
+             </IonGrid>
+            </form>
         </IonContent>
     );
 }
