@@ -9,13 +9,15 @@ import pg from 'pg';
 export function handleWelcomePageRequest(sessionId: string, res: express.Response, client: pg.Client)
 {
     let bodyQuery = {
-        text : 'SELECT * FROM salesforce.body WHERE token = $1',
+        text : 'SELECT * FROM salesforce.body WHERE session_id = $1',
         values : [sessionId]
       }
+      console.log('before query')
       client.query(bodyQuery).then( function(result:pg.QueryResult){
+        console.log('after query')
       //get data from database
       //load into response
-      let welcomePage : welcomePageParameters;
+      let welcomePage : Partial<welcomePageParameters> = {};
       let row :salesforceSchema.body = result.rows[0];
       welcomePage.account_type = row.account_type;
       welcomePage.transfer_form = row.transfer_form;
@@ -25,9 +27,10 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       welcomePage.sales_rep = row.sales_rep;
       welcomePage.referred_by = row.referred_by;
       welcomePage.referral_code = row.referral_code;
-      
-      res.json(welcomePage);
+      console.log(welcomePage)
+      res.json({data: welcomePage});
     }).catch(err=>{
+      console.log(err)
       res.status(500).send('failed getting body data');
     })
 }
