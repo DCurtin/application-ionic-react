@@ -28,6 +28,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
     const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
 
     const {register, handleSubmit, watch, errors} = useForm(); 
+    let watchAllFields = watch();
 
     const handleAccountTypeSelected = (event: CustomEvent) => {
         if (event.detail.value.includes('Inherited')) {
@@ -193,6 +194,9 @@ const Welcome: React.FC<InitSessionApp> = props => {
     const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
             let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
+            if (watchAllFields[fieldName]) {
+                className = 'ion=no-padding';
+            }
             return className;
     };
 

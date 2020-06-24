@@ -18,10 +18,15 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
             home_and_mailing_address_different: false
         });
 
+    const watchAllFields = watch();
+
     const [confirmEmail, setConfirmEmail] = useState<string>('')
 
         const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
+            console.log(e.target.className);
+            let originalClass = e.target.className;
+            e.target.className = originalClass.replace('danger', '');
             setFormData(previousState =>({
             ...previousState,
               [e.target.name]: newValue
@@ -69,9 +74,11 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
         const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
+            if (watchAllFields[fieldName]) {
+                className = '';
+            }
             return className;
         };
-
 
     return (
         <IonContent className="ion-padding">
