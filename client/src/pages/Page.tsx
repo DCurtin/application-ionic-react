@@ -93,11 +93,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     fetch(url, options).then((response)=>{
       response.json().then((data:any)=>{
         console.log(data)
-        setWelcomePageFields(data.welcomePageFields);
+        setWelcomePageFields(data.data);
       })
     })
     
-  },[])
+  },[sessionId])
 
   const { name } = useParams<{ name: string; }>();
 
