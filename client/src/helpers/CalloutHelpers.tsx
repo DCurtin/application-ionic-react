@@ -182,3 +182,26 @@ function makeGetPageInfoCallout(sessionId: string, page: string)
             })
         })
 }
+
+export function updateValidationTable(page: string, isValid: boolean, sessionId: string){
+    let validated_page :any = {}
+    validated_page[page] = isValid
+    let body: requestBody ={
+      session: {
+        page: 'root',
+        sessionId: sessionId
+      },
+      data: validated_page
+    }
+    let options = {
+      method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    fetch('/validatePage', options).then(function(response:any){
+      response?.json().then((data: any)=>{//this is probably not necessary
+        console.log(data);
+      })
+    })
+
+  }
