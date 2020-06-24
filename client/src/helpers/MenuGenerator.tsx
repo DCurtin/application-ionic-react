@@ -125,10 +125,10 @@ export  interface MenuSection {
 
     if(menuParams.initialInvestment)
     {
-        appSections.push(generateInvestmentDetailsSection());
+        appSections.push(generateInvestmentDetailsSection(menuParams));
     }
 
-    appSections.push(generateFinishingUpSection());
+    appSections.push(generateFinishingUpSection(menuParams));
 
     return appSections;
 
@@ -204,23 +204,50 @@ export  interface MenuSection {
     let updatedFundAccountPages = fundAccountPages.map(page => {
       let newPage = {...page}; 
       let url = page.url; 
-
+      if (url === '/page/TransferIRA') {
+        newPage.isValid = menuParams.isTransferIRAPageValid; 
+      }
+      if (url === '/page/RolloverPlan'){
+        newPage.isValid = menuParams.isRolloverPlanPageValid; 
+      }
+      if (url === '/page/NewContribution') {
+        newPage.isValid = menuParams.isNewContributionPageValid; 
+      }
       return newPage; 
     })
     return {
         header: 'Fund Account',
-        pages: pages
+        pages: updatedFundAccountPages
     }
   }
 
-  function generateInvestmentDetailsSection(){
-      return {
+  function generateInvestmentDetailsSection(menuParams: MenuParameters){
+    let investmentDetailsPages =  [...appPages.filter(page => page.header === 'Make Investment')]
+    let updatedInvestmentDetailsPages = investmentDetailsPages.map(page => {
+      let newPage = {...page};
+      if (page.url === '/page/InvestmentDetails'){
+        newPage.isValid = menuParams.isInvestmentDetailsValid; 
+      }
+      return newPage;
+    });
+    
+    return {
         header: 'Make Investment', 
-        pages: [...appPages.filter(page => page.header === 'Make Investment')]
+        pages: updatedInvestmentDetailsPages
       }
   }
 
-  function generateFinishingUpSection(){
+  function generateFinishingUpSection(menuParams: MenuParameters){
+    let finishingUpPages = [...appPages.filter(page => page.header === 'Finishing Up')];
+    let updatedFinishingUpPages = finishingUpPages.map(page => {
+      let newPage = {...page};
+      if (page.url === '/page/PaymentInformation'){
+        newPage.isValid = menuParams.isPaymentInfoPageValid; 
+      }
+
+      return newPage; 
+    })
+
     return {
       header: 'Finishing Up', 
       pages: [...appPages.filter(page => page.header === 'Finishing Up')]

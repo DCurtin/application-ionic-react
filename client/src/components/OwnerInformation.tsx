@@ -11,7 +11,10 @@ interface PageReference extends SessionApp {
 
 const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm(); 
+    const {register, handleSubmit, watch, errors} = useForm({
+        mode: 'onBlur',
+        reValidateMode: 'onBlur'
+    }); 
     const [formData, setFormData] = useState<applicantIdForm>({
             is_self_employed: false,
             has_hsa: false,

@@ -37,8 +37,8 @@ const Disclosures: React.FC<InitSessionApp> = props => {
     const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
             let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
-            if (watchAllFields[fieldName]) {
-                className = 'ion-no-padding';
+            if (watchAllFields[fieldName] !== true) {
+                className = 'danger ion-no-padding';
             }
             return className;
     };
