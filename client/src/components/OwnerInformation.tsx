@@ -1,15 +1,11 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
+import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
-interface PageReference extends SessionApp {
-    formRef : any
-}
-
-const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
+const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
     const history = useHistory();
     const {register, handleSubmit, watch, errors} = useForm({
         mode: 'onBlur',
@@ -76,7 +72,9 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
 
         const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
+            console.log(errors);
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
+            console.log(watchAllFields);
             if (watchAllFields[fieldName]) {
                 className = '';
             }
@@ -312,7 +310,12 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                                 Zip *
                             </IonLabel>
                             <IonItem className={showError('legal_zip')}>
-                                <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({required: true})}></IonInput>
+                                <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({
+                                        pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
+                                })} type='number'></IonInput>
+                                {errors.legal_zip ? (
+                                    <IonText color='danger'>Invalid Zip</IonText>
+                                ) : null}
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -362,7 +365,13 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
                             <IonCol>
                                 <IonLabel> Mailing Zip *</IonLabel>
                                 <IonItem className={showError('mailing_zip')}>
-                                    <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm} ref={register({required: true})}></IonInput>
+                                    <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm} ref={register({
+                                        pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
+                                    })}></IonInput>
+                                    {errors.mailing_zip ? (<IonText color='danger'>
+                                        Error Message
+                                    </IonText>
+                                    ): ''}
                                 </IonItem>
                             </IonCol>
                         </IonRow>
