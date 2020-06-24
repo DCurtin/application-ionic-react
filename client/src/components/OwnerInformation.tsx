@@ -64,7 +64,7 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
 
         const validateFields = (e: any) => {
             saveAppPage(sessionId, formData);
-            updateMenuSections('isOwnerInfoPageValid', true);
+            updateMenuSections('is_owner_info_page_valid', true);
         }
 
         const showError = (fieldName: string) => {
