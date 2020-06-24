@@ -89,18 +89,28 @@ export interface AppPage {
 
 let appPages: AppPage[] = Object.values(appPagesMap);
   
+  export interface PageValidationParamters{
+    is_welcome_page_valid: Boolean,
+    is_disclosure_page_valid: Boolean,
+    is_owner_info_page_valid: Boolean,
+    is_beneficiaries_page_valid: Boolean,
+    is_fee_arrangement_page_valid: Boolean,
+    is_account_notifications_page_valid: Boolean,
+    is_transfer_ira_page_valid: Boolean,
+    is_rollover_plan_page_valid: Boolean,
+    is_investment_details_page_valid: Boolean,
+    is_new_contribution_page_valid: Boolean,
+    is_payment_information_page_valid: Boolean,
+    is_review_and_sign_page_valid: Boolean,
+  }
 
-  export interface MenuParameters{
+  export interface MenuParameters extends PageValidationParamters{
     planInfo: Boolean,
     transferForm: Boolean,
     rolloverForm: Boolean,
     newContribution: Boolean,
     initialInvestment: Boolean,
-    is401k: Boolean,
-    isWelcomePageValid: Boolean, 
-    isDisclosurePageValid: Boolean, 
-    isOwnerInfoPageValid: Boolean,
-    [key:string] : any
+    is401k: Boolean
   }
 
     
@@ -137,10 +147,10 @@ export  interface MenuSection {
     let updatedWelcomePages = welcomePages.map(page => {
       let newPage = {...page};
      if (page.url === '/page/Welcome') {
-       newPage.isValid = menuParams.isWelcomePageValid;
+       newPage.isValid = menuParams.is_welcome_page_valid;
      }
      if (page.url === '/page/Disclosures') {
-       newPage.isValid = menuParams.isDisclosurePageValid;
+       newPage.isValid = menuParams.is_disclosure_page_valid;
      }
       return newPage; 
     })
@@ -153,7 +163,7 @@ export  interface MenuSection {
   function generateOpenAccountSection(menuParams : MenuParameters){
     let openAccountPages = [...appPages.filter(page => page.header === 'Open Account')];
     
-    if(!menuParams.includePlanInfo){
+    if(!menuParams.planInfo){
       console.log('no plan info')
       openAccountPages = [...appPages.filter(page => page.header === 'Open Account' && page.title !== 'Plan Information')]
     }
@@ -161,7 +171,7 @@ export  interface MenuSection {
     let updatedOpenAccountPages = openAccountPages.map(page => {
       let newPage = {...page};
       if (page.url === '/page/OwnerInformation') {
-        newPage.isValid = menuParams.isOwnerInfoPageValid; 
+        newPage.isValid = menuParams.is_owner_info_page_valid; 
       }
 
       return newPage; 
