@@ -51,7 +51,6 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
 
         useEffect(()=>{
             return history.listen(()=>{
-                console.log(formData)
               saveAppPage(sessionId, formData);
             })
           }, [formData]);
