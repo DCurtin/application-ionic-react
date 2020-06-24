@@ -249,7 +249,19 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
     if(dateOfBirthsMatch && emailsMatch && lastNamesMatch && lastFourSocialMatch)
     {
       console.log('success')
+      serverConn.sobject("Online_Application__c").retrieve(record.Id).then((onlineAppresult:any)=>{
       let sessionId : string = uuidv4();
+      let bodyInfo : Partial<salesforceSchema.body> ={
+        account_type: onlineAppresult.Account_Type__c,
+        transfer_form: onlineAppresult.Existing_IRA_Transfer__c,
+        rollover_form: onlineAppresult.Existing_Employer_Plan_Rollover__c,
+        cash_contribution_form: onlineAppresult.New_IRA_Contribution__c,
+        investment_type: onlineAppresult.Initial_Investment_Type__c,
+        referred_by: onlineAppresult.Referred_By__c,
+        session_id: sessionId
+      }
+      let bodyParams = saveStateHandlers.generateQueryString('body',bodyInfo,'session_id')
+
       let ownerInfo : Partial<salesforceSchema.applicant> ={
         application_id: record.Id,
         account_number: record.AccountNew__c,
@@ -257,13 +269,16 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
         email: record.Email__c,
         ssn: record.SSN__c,
         dob: record.DOB__c,
-        token: record.heroku_token__c
+        token: sessionId
       }
       let queryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'token')
       saveStateHandlers.runQueryReturnPromise(queryParams, client).then((result:pg.QueryResult)=>{
-        createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
+        saveStateHandlers.runQueryReturnPromise(bodyParams,client).then((bodyResult: pg.QueryResult)=>{
+          createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, client, userInstances, res)
+        })
       })
-      return
+    })
+    return
     }
     console.group('fail')
     res.status(500).send('failed to authenticate');
@@ -404,6 +419,7 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
 
   if(page === 'rootPage')
   {
+    console.log('sessiong ' + sessionId)
     getPageInfoHandlers.handleWelcomePageRequest(sessionId, res, client);
     return
   }
