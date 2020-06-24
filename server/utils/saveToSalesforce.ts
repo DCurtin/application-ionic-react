@@ -10,14 +10,35 @@ const { v4: uuidv4 } = require('uuid');
 
 export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, appQueryUpsert : queryParameters, res: express.Response){
     let welcomeParamsQuery = {
-        text:'SELECT * FROM salesforce.body WHERE session_id = $1', 
+        text:'SELECT * FROM salesforce.body,salesforce.validated_pages WHERE body.session_id=validated_pages.session_id AND body.session_id = $1',
         values:[sessionId]
     }
 
-    pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<salesforceSchema.body>)=>{
+    /*let validatedPages = {
+        text: 'SELECT * FROM salesforce.validated_pages WHERE session_id = $1',
+        values:[sessionId]
+    }*/
+    type joinedInterface = salesforceSchema.body & salesforceSchema.validated_pages
+    pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<joinedInterface>)=>{
         let appBody = appBodyResult.rows[0];
+        let validatedPages : Partial<salesforceSchema.validated_pages> = {
+            is_welcome_page_valid : appBody.is_welcome_page_valid,
+            is_disclosure_page_valid: appBody.is_disclosure_page_valid,
+            is_owner_info_page_valid: appBody.is_owner_info_page_valid,
+            is_beneficiaries_page_valid: appBody.is_beneficiaries_page_valid,
+            is_fee_arrangement_page_valid: appBody.is_fee_arrangement_page_valid,
+            is_account_notifications_page_valid: appBody.is_account_notifications_page_valid,
+            is_transfer_ira_page_valid: appBody.is_transfer_ira_page_valid,
+            is_rollover_plan_page_valid: appBody.is_rollover_plan_page_valid,
+            is_investment_details_page_valid: appBody.is_investment_details_page_valid,
+            is_payment_information_page_valid: appBody.is_payment_information_page_valid,
+            is_new_contribution_page_valid: appBody.is_new_contribution_page_valid,
+            is_review_and_sign_page_valid: appBody.is_review_and_sign_page_valid
+        }
+
         let herokuToken = uuidv4();
         console.log('found no app')
+        
         let insertValues = {'heroku_token__c':herokuToken, 
         'IntegrationOwner__c':'0052i000000Mz0CAAS',
         'Salutation__c':applicantForm.salutation,//applicant fields start here
@@ -53,7 +74,9 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
         'Existing_Employer_Plan_Rollover__c':appBody.rollover_form,
         'New_IRA_Contribution__c':appBody.cash_contribution_form,
         'Initial_Investment_Type__c':appBody.investment_type,
-        'Referred_By__c':appBody.referred_by
+        'Referred_By__c':appBody.referred_by,
+        'Disclosures_Viewed__c':appBody.has_read_diclosure,
+        'heroku_validated_pages__c':JSON.stringify(validatedPages)
         //still need salesRep, Referallcode if that goes here
         }
         console.log(insertValues)
