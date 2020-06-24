@@ -1,3 +1,5 @@
+import { pathToFileURL } from "url";
+
 export interface AppPage {
     header?: string;
     url: string;
@@ -160,8 +162,21 @@ export  interface MenuSection {
 
     let updatedOpenAccountPages = openAccountPages.map(page => {
       let newPage = {...page};
-      if (page.url === '/page/OwnerInformation') {
+      let url = page.url; 
+      if (url === '/page/OwnerInformation') {
         newPage.isValid = menuParams.isOwnerInfoPageValid; 
+      }
+      if (url === '/page/PlanInformation') {
+        newPage.isValid = menuParams.isPlanInfoPageValid; 
+      }
+      if (url === '/page/Beneficiaries') {
+        newPage.isValid = menuParams.isBenificiariesPageValid;
+      }
+      if (url === '/page/FeeArrangement') {
+        newPage.isValid = menuParams.isFeeArrangementPageValid;
+      }
+      if (url === '/page/AccountNotifications'){
+        newPage.isValid = menuParams.isAccountNotificationsPageValid; 
       }
 
       return newPage; 
@@ -185,6 +200,13 @@ export  interface MenuSection {
         pages.push(appPagesMap['NewContribution'])
     }
 
+    let fundAccountPages = [...pages]; 
+    let updatedFundAccountPages = fundAccountPages.map(page => {
+      let newPage = {...page}; 
+      let url = page.url; 
+
+      return newPage; 
+    })
     return {
         header: 'Fund Account',
         pages: pages
