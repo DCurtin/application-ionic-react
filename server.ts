@@ -261,16 +261,41 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
         session_id: sessionId
       }
       let bodyParams = saveStateHandlers.generateQueryString('body',bodyInfo,'session_id')
-
+      console.log(onlineAppresult)
       let ownerInfo : Partial<salesforceSchema.applicant> ={
-        application_id: record.Id,
-        account_number: record.AccountNew__c,
-        last_name: record.Last_Name__c,
-        email: record.Email__c,
-        ssn: record.SSN__c,
-        dob: record.DOB__c,
+        application_id: onlineAppresult.Id,
+        account_number: onlineAppresult.AccountNew__c,
+        salutation: onlineAppresult.Salutation__c,
+        first_name: onlineAppresult.First_Name__c,
+        last_name: onlineAppresult.Last_Name__c,
+        ssn: onlineAppresult.SSN__c,
+        dob: onlineAppresult.DOB__c,
+        marital_status: onlineAppresult.Marital_Status__c,
+        mothers_maiden_name: onlineAppresult.Mother_s_Maiden_Name__c,
+        occupation: onlineAppresult.Occupation__c,
+        is_self_employed: onlineAppresult.IsSelfEmployed__c,
+        has_hsa: onlineAppresult.HasHSA__c,
+        id_type: onlineAppresult.ID_Type__c,
+        id_number: onlineAppresult.ID_Number__c,
+        id_issued_by: onlineAppresult.Issued_By__c,
+        id_issued_date: onlineAppresult.Issue_Date__c,
+        id_expiration_date: onlineAppresult.Expiration_Date__c,
+        legal_street: onlineAppresult.Legal_Address__c,
+        legal_city: onlineAppresult.Legal_City__c,
+        legal_state: onlineAppresult.Legal_State__c,
+        legal_zip: onlineAppresult.Legal_Zip__c,
+        mailing_street: onlineAppresult.Mailin_Address__c,
+        mailing_city: onlineAppresult.Mailin_City__c,
+        mailing_state: onlineAppresult.Mailin_State__c,
+        mailing_zip: onlineAppresult.Mailin_Zip__c,
+        primary_phone: onlineAppresult.Primary_Phone__c,
+        preferred_contact_method: onlineAppresult.Preferred_Contact_Method__c,
+        email: onlineAppresult.Email__c,
+        alternate_phone: onlineAppresult.Alternate_Phone__c,
+        alternate_phone_type: onlineAppresult.Alternate_Phone_Type__c,
         token: sessionId
       }
+      console.log(ownerInfo)
       let queryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'token')
       saveStateHandlers.runQueryReturnPromise(queryParams, client).then((result:pg.QueryResult)=>{
         saveStateHandlers.runQueryReturnPromise(bodyParams,client).then((bodyResult: pg.QueryResult)=>{
