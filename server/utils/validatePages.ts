@@ -3,7 +3,7 @@ import express from 'express'
 import {validated_pages} from './salesforce'
 import {requestBody} from '../../client/src/helpers/Utils'
 import {generateQueryString, runQueryReturnPromise} from './saveStateHandlers'
-import { queryParameters } from './server/utils/helperSchemas';
+import { queryParameters } from './helperSchemas';
 
 export function getValidatedPages(sessionId: string, pgClient: pg.Client, res: express.Response){
   
