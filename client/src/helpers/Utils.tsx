@@ -84,8 +84,8 @@ mailing_city: string,
 mailing_state: string,
 mailing_zip: string,
 phone: string,
-email: string
-token: string
+email: string,
+index: number
 }
 
 export interface saveFeeArrangement extends requestBody{
