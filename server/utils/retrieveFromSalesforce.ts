@@ -113,9 +113,13 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
             })
           })
         })
-      })
-      return
-      }
+    }).catch(err=>{
+        console.log(err)
+        console.group('fail')
+        res.status(500).send('failed to authenticate');
+    })
+    return
+    }
       console.group('fail')
       res.status(500).send('failed to authenticate');
     })
