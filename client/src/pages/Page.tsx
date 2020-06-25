@@ -93,11 +93,28 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
     fetch(url, options).then((response)=>{
       response.json().then((data:any)=>{
-        console.log(data)
         setWelcomePageFields(data.data);
       })
     })
-    
+
+    let urlValidation = '/getValidatedPages'
+    let bodyValidation : requestBody ={
+        session: {sessionId: sessionId, page: 'rootPage'},
+        data: undefined
+    }
+    let optionsValidation = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(bodyValidation)
+    }
+    fetch(urlValidation, optionsValidation).then((response)=>{
+      response.json().then((data:any)=>{
+        console.log(data);
+        let menuParamsUpdate :MenuParameters = {...menuParams, ...data.data}
+        console.log(menuParamsUpdate);
+        setMenuParams(menuParamsUpdate)
+      })
+    })
   },[sessionId])
 
   const { name } = useParams<{ name: string; }>();
