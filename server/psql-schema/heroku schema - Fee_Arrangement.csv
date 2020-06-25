@@ -3,4 +3,4 @@ fee_schedule,text,,
 payment_method,text,,
 cc_number,text,,
 cc_exp_date,text,,
-token,uuid,yes,yes
+session_id,uuid,yes,yes

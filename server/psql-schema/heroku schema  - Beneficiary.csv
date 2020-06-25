@@ -13,5 +13,5 @@ mailing_city,text,"",""
 mailing_state,text,"",""
 mailing_zip,text,"",""
 position,integer,,
-bene_uuid,text,yes,yes
-token,uuid,,yes
+key,text,yes,yes
+session_id,uuid,,yes

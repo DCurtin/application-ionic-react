@@ -7,4 +7,4 @@ routing_number,text,,
 account_number,text,,
 bank_name,text,,
 account_type,text,,
-token,uuid,yes,yes
+session_id,uuid,yes,yes
