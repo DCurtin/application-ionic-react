@@ -3,12 +3,12 @@ import jsforce from 'jsforce'
 import express from 'express'
 import * as salesforceSchema from './salesforce'
 import * as applicationInterfaces from '../../client/src/helpers/Utils'
-import {runQueryReturnPromise} from './saveStateHandlers'
+import {runQueryReturnPromise, insertApplicant} from './saveStateHandlers'
 import {queryParameters} from './helperSchemas';
 import { createAppSession } from './appSessionHandler';
 const { v4: uuidv4 } = require('uuid');
 
-export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, appQueryUpsert : queryParameters, res: express.Response){
+export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response){
     let welcomeParamsQuery = {
         text:'SELECT * FROM salesforce.body,salesforce.validated_pages WHERE body.session_id=validated_pages.session_id AND body.session_id = $1',
         values:[sessionId]
@@ -39,7 +39,7 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
         let herokuToken = uuidv4();
         console.log('found no app')
         
-        let insertValues = {'heroku_token__c':herokuToken, 
+        let insertValues = {'HerokuToken__c':herokuToken, 
         'IntegrationOwner__c':'0052i000000Mz0CAAS',
         'Salutation__c':applicantForm.salutation,//applicant fields start here
         'First_Name__c': applicantForm.first_name,
@@ -60,10 +60,11 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
         'Legal_City__c':applicantForm.legal_city,
         'Legal_State__c':applicantForm.legal_state,
         'Legal_Zip__c':applicantForm.legal_zip,
-        'Mailin_Address__c': applicantForm.mailing_street,
-        'Mailin_City__c':applicantForm.mailing_city,
-        'Mailin_State__c':applicantForm.mailing_state,
-        'Mailin_Zip__c':applicantForm.mailing_zip,
+        'Home_and_Mailing_Address_Different__c':applicantForm.home_and_mailing_address_different,
+        'Mailing_Address__c': applicantForm.mailing_street,
+        'Mailing_City__c':applicantForm.mailing_city,
+        'Mailing_State__c':applicantForm.mailing_state,
+        'Mailing_Zip__c':applicantForm.mailing_zip,
         'Primary_Phone__c':applicantForm.primary_phone,
         'Preferred_Contact_Method__c':applicantForm.preferred_contact_method,
         'Email__c': applicantForm.email,
@@ -76,20 +77,18 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
         'Initial_Investment_Type__c':appBody.investment_type,
         'Referred_By__c':appBody.referred_by,
         'Disclosures_Viewed__c':appBody.has_read_diclosure,
-        'heroku_validated_pages__c':JSON.stringify(validatedPages)
+        'HerokuValidatedPages__c':JSON.stringify(validatedPages)
         //still need salesRep, Referallcode if that goes here
         }
-        console.log(insertValues)
+
+        let appQueryUpsert:queryParameters = insertApplicant(sessionId, herokuToken, applicantForm)
+
         serverConn.sobject("Online_Application__c").create(insertValues).then((result:any)=>{
-        console.log(' getting fields')
             serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
-            //console.log(queryResult);
-            console.log(queryResult['First_Name__c']);
-            console.log(queryResult['AccountNew__c']);
-            console.log(queryResult['SSN__c'])
             runQueryReturnPromise(appQueryUpsert,pgClient).then((queryUpsertResult:pg.QueryResult)=>{
                 createAppSession(queryResult['AccountNew__c'], result.id, sessionId,pgClient, {},res)
                 }).catch((err:any)=>{
+                console.log(err);
                 console.log('could not upsert app')
                 res.status(500).send('failed inserting app')
                 });
