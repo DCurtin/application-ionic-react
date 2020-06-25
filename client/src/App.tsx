@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
-import generateAppPages, { AppSection, MenuParamters} from './helpers/MenuGenerator';
+import generateAppPages, { MenuSection, MenuParameters} from './helpers/MenuGenerator';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -29,28 +29,33 @@ import DocusignReturn from './pages/DocusignReturn';
 
 const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('');
-  const [appSections, setAppSections] = useState<AppSection[]>([]);
-  const[menuParams, setMenuParams] = useState<MenuParamters>({
+  const [menuSections, setMenuSections] = useState<MenuSection[]>([]);
+  const[menuParams, setMenuParams] = useState<MenuParameters>({
     planInfo: false,
     transferForm: false,
     rolloverForm: false,
     newContribution: false,
-    initialInvestment: false
-  })
+    initialInvestment: false,
+    is401k: false, 
+    isWelcomePageValid: false, 
+    isDisclosurePageValid: false,
+    isOwnerInfoPageValid: false
+  });
+
 
   useEffect(()=>{
-    let appSections:AppSection[] = generateAppPages(menuParams)
-    setAppSections(appSections);    
-  },[menuParams,sessionId])
+    let menuSections:MenuSection[] = generateAppPages(menuParams);
+    setMenuSections(menuSections);    
+  },[menuParams,sessionId]);
 
   return (
     <IonApp>
       <IonReactRouter>
         <IonSplitPane contentId="main">
-          <Menu sessionId={sessionId} menuSections={appSections}/>
+          <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={appSections}  setMenuParams={setMenuParams}/>} /> 
-            <Route path='/docusignReturn' exact>
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
+            <Route path='/docusignReturn/:sessionId'>
               <DocusignReturn/>
             </Route>
             <Redirect from="/" to="/page/Welcome" exact />

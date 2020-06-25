@@ -1,7 +1,7 @@
 require("dotenv").config();
 var path = require('path');
+let https = require('https');
 import express from 'express';
-import { Http2SecureServer } from 'http2';
 import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import {transformRolloverClientToServer} from './server/utils/transformRollovers'
@@ -73,28 +73,6 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 
 app.use(router);
 
-app.get('/getPenSignDoc', (req : express.Request, res : express.Response) => {
-    console.log(serverConn.accessToken);
-    let accountNumber = '1234567';
-    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + accountNumber + '/pen-sign-documents';
-    let options = {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + serverConn.accessToken,
-        'Content-Type':  'application/pdf',
-      }
-    }
-
-    let https = require('https');
-
-    let request = https.request(url, options, function(response: any) { 
-      response.pipe(res);
-  }); 
-  
-  request.end();
-
-});
-
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
   let sessionId = req.body.sessionId;
 
@@ -151,11 +129,12 @@ app.post('/getESignUrl', (req, res) => {
       res.status(500).send('no application');
       return;
     }
-    let application_session : salesforceSchema.application_session = result.rows[0];
     
-    let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3030'
-    let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/docusignReturn`;
-    console.log(endpoint);
+    let application_session : salesforceSchema.application_session = result.rows[0];
+    let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
+    let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
+    console.log('getESignUrl sessionId: ' + sessionId);
+    console.log('getESignUrl enpoint: ' + endpoint);
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
       if (err) { return console.error(err); }
@@ -168,10 +147,58 @@ app.post('/getESignUrl', (req, res) => {
   })
 });
 
+app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
+  console.log('getPenSignDocs running on server' );
+
+  let sessionId = req.query['sessionId'];
+  
+  if(sessionId === '' || sessionId === undefined){
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return
+  }
+  
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
+
+  client.query(sessionQuery).then(function(result:pg.QueryResult) {
+    if(result.rowCount == 0)
+    {
+      console.log('no application')
+      res.status(500).send('no application');
+      return;
+    }
+    
+    let application_session : salesforceSchema.application_session = result.rows[0];
+    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
+    console.log('getPenSignDoc enpoint: ' + url);
+
+    let options = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + serverConn.accessToken,
+        'Content-Type':  'application/pdf',
+      }
+    }
+
+    let request = https.request(url, options, function(response: any) { 
+      if (response.statusCode === 200) {
+        response.pipe(res);
+      }
+      else {
+        res.status(response.statusCode).send(response.statusMessage);
+      }
+    })
+
+    request.end();
+  })
+});
+
 app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
-
 
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
