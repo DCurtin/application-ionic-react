@@ -1,5 +1,5 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
@@ -8,7 +8,7 @@ import './Page.css';
 import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
+import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
 import {updateValidationTable} from '../helpers/CalloutHelpers'
 import { chevronBackCircleOutline, chevronForwardCircleOutline
   } from 'ionicons/icons';
@@ -66,8 +66,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
-  useEffect(function(){
+  useLayoutEffect(function(){
     let formParams = {...menuParams};
+
     
     formParams.transferForm = welcomePageFields.transfer_form;
     formParams.rolloverForm = welcomePageFields.rollover_form;
@@ -78,9 +79,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
     setMenuParams(formParams);
-  },[welcomePageFields, setMenuParams])
+  },[welcomePageFields]) //setMenuParams is this a required dependency?
   
-  useEffect(function(){
+  useLayoutEffect(function(){
     let url = '/getPageFields'
     let body : requestBody ={
         session: {sessionId: sessionId, page: 'rootPage'},
@@ -110,7 +111,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     fetch(urlValidation, optionsValidation).then((response)=>{
       response.json().then((data:any)=>{
         console.log(data);
-        let menuParamsUpdate :MenuParameters = {...menuParams, ...data.data}
+        let validationParamters : PageValidationParamters = data.data;
+        let menuParamsUpdate :MenuParameters = {...menuParams, ...validationParamters
+        }
         console.log(menuParamsUpdate);
         setMenuParams(menuParamsUpdate)
       })
