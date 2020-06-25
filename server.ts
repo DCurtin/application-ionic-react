@@ -53,7 +53,6 @@ if(qaUser === 'test' || qaPw === 'test')
   })
 }
 
-console.log('query url: ' +  connectionString)
 client.connect();
 client.query('DELETE FROM salesforce.application_session')
 
@@ -90,7 +89,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
   }
 
   let paymentQuery = {
-    text: 'SELECT * FROM salesforce.payment WHERE token = $1 AND status= $2',
+    text: 'SELECT * FROM salesforce.payment WHERE session_id = $1 AND status= $2',
     values: [sessionId, 'Completed']
   }
   
@@ -124,7 +123,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
         console.log("response: ", data);
         if(data.status === 'Completed')
         {
-          let insertString = 'INSERT INTO salesforce.payment(statusdetails, status, paymentamount, discountamount, token) VALUES($1, $2, $3, $4, $5)';
+          let insertString = 'INSERT INTO salesforce.payment(statusdetails, status, paymentamount, discountamount, session_id) VALUES($1, $2, $3, $4, $5)';
           let queryInsert = {text: insertString, values: [data.StatusDetails, data.Status, data.PaymentAmount, data.DiscountAmount]}
 
           client.query(queryInsert);
@@ -163,13 +162,10 @@ app.post('/getESignUrl', (req, res) => {
     let application_session : salesforceSchema.application_session = result.rows[0];
     let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
     let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
-    console.log('getESignUrl sessionId: ' + sessionId);
-    console.log('getESignUrl enpoint: ' + endpoint);
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
       if (err) { return console.error(err); }
       else {
-        console.log("eSignUrl: ", data.eSignUrl);
         res.json({eSignUrl: data.eSignUrl}); 
         return
       }
@@ -189,7 +185,7 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   }
   
   let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -203,7 +199,6 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     
     let application_session : salesforceSchema.application_session = result.rows[0];
     let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
-    console.log('getPenSignDoc enpoint: ' + url);
 
     let options = {
       method: 'GET',
@@ -245,7 +240,7 @@ interface resumeRequest{
 app.post('/resume', (req: express.Request, res: express.Response)=>{
   let authParams : resumeRequest = req.body;
   let options :jsforce.ExecuteOptions ={}
-  let token = authParams.appExternalId
+  let herokuToken = authParams.appExternalId
 
   interface salesforceResumeResponse{
     attributes:{
@@ -260,18 +255,16 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
     DOB__c:string,
     heroku_token__c:string
   }
-  serverConn.sobject('Online_Application__C').findOne({heroku_token__c:token}, ['Id','AccountNew__c','Last_Name__c','Email__c', 'SSN__c', 'DOB__c', 'heroku_token__c']).execute(options,(err, record : any)=>{
-    console.log(record);
+  serverConn.sobject('Online_Application__C').findOne({HerokuToken__c:herokuToken}, ['Id','AccountNew__c','Last_Name__c','Email__c', 'SSN__c', 'DOB__c', 'HerokuToken__c']).execute(options,(err, record : any)=>{
     let salesforceOnlineApp:salesforceResumeResponse= record
-    //let lastFourSocial = onlineAppResponse.SSN__c.substring()
-    
+
+    console.log(salesforceOnlineApp)
     let lastFourSocial = salesforceOnlineApp.SSN__c?.match(/\d{4}/)
     if(lastFourSocial === null || lastFourSocial === undefined){
       console.group('failed, application likely does not have ssn')
       res.status(500).send('failed to authenticate');  
     }
 
-    console.log(lastFourSocial)
     let dateOfBirthsMatch = authParams.data.date_of_birth === salesforceOnlineApp.DOB__c;
     let emailsMatch = authParams.data.email.toLowerCase() === salesforceOnlineApp.Email__c.toLowerCase()
     let lastNamesMatch = authParams.data.last_name.toLowerCase() === salesforceOnlineApp.Last_Name__c.toLowerCase()
@@ -279,7 +272,6 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
 
     if(dateOfBirthsMatch && emailsMatch && lastNamesMatch && lastFourSocialMatch)
     {
-      console.log('success')
       serverConn.sobject("Online_Application__c").retrieve(record.Id).then((onlineAppresult:any)=>{
       let sessionId : string = uuidv4();
       let bodyInfo : Partial<salesforceSchema.body> ={
@@ -293,7 +285,6 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
         session_id: sessionId
       }
       let bodyParams = saveStateHandlers.generateQueryString('body',bodyInfo,'session_id')
-      console.log(onlineAppresult)
       let ownerInfo : Partial<salesforceSchema.applicant> ={
         application_id: onlineAppresult.Id,
         account_number: onlineAppresult.AccountNew__c,
@@ -316,26 +307,25 @@ app.post('/resume', (req: express.Request, res: express.Response)=>{
         legal_city: onlineAppresult.Legal_City__c,
         legal_state: onlineAppresult.Legal_State__c,
         legal_zip: onlineAppresult.Legal_Zip__c,
-        mailing_street: onlineAppresult.Mailin_Address__c,
-        mailing_city: onlineAppresult.Mailin_City__c,
-        mailing_state: onlineAppresult.Mailin_State__c,
-        mailing_zip: onlineAppresult.Mailin_Zip__c,
+        home_and_mailing_address_different:onlineAppresult.Home_and_Mailing_Address_Different__c,
+        mailing_street: onlineAppresult.Mailing_Address__c,
+        mailing_city: onlineAppresult.Mailing_City__c,
+        mailing_state: onlineAppresult.Mailing_State__c,
+        mailing_zip: onlineAppresult.Mailing_Zip__c,
         primary_phone: onlineAppresult.Primary_Phone__c,
         preferred_contact_method: onlineAppresult.Preferred_Contact_Method__c,
         email: onlineAppresult.Email__c,
         alternate_phone: onlineAppresult.Alternate_Phone__c,
         alternate_phone_type: onlineAppresult.Alternate_Phone_Type__c,
-        token: sessionId
+        heroku_token: onlineAppresult.HerokuToken__c,
+        session_id:sessionId
       }
-      console.log(ownerInfo)
-      let applicantQueryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'token')
+      let applicantQueryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'session_id')
 
       let validatedPages : salesforceSchema.validated_pages = {
-        ...JSON.parse(onlineAppresult.heroku_validated_pages__c),
+        ...JSON.parse(onlineAppresult.HerokuValidatedPages__c),
         session_id:sessionId}
-      console.log(validatedPages)
       let validatedPagesQueryParams = saveStateHandlers.generateQueryString('validated_pages', validatedPages, 'session_id')
-      console.log(validatedPagesQueryParams)
       
       saveStateHandlers.runQueryReturnPromise(applicantQueryParams, client).then((result:pg.QueryResult)=>{
         saveStateHandlers.runQueryReturnPromise(bodyParams, client).then((bodyResult: pg.QueryResult)=>{
@@ -357,9 +347,6 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   let welcomePageData : applicationInterfaces.saveWelcomeParameters = req.body;
   let sessionId : string = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
-
-  console.log("sessionId");
-  console.log(sessionId);
 
   if(sessionId !== ''){
     console.log('application has already been started');
@@ -385,7 +372,6 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : applicationInterfaces.requestBody = req.body;
   let sessionId : string = packet.session.sessionId;
   let page : string = packet.session.page;
-  console.log('saving state ' + sessionId + ' page ' + page)
 
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
@@ -413,7 +399,6 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'beneficiary'){
-    //console.log(packet.data)
     let beneficiaryData : applicationInterfaces.beneficiaryForm = transformBeneClientToServer(packet.data)
     saveStateHandlers.saveBeneficiaryPage(sessionId, beneficiaryData, res, client);
     return 
@@ -483,6 +468,33 @@ app.post('/validatePage', function(req: express.Request, res: express.Response){
 
 })
 
+app.post('/getValidatedPages', function(req: express.Request, res: express.Response){
+  let packet : applicationInterfaces.requestBody = req.body;
+  let sessionId : string = packet.session.sessionId;
+
+  if(sessionId === undefined || sessionId === '')
+  {
+    console.log('sessionId or page not set in request');
+    res.status(500).send('invalid arguments');
+    return
+  }
+
+  let validationQuery ={
+    text: 'SELECT * FROM salesforce.validated_pages WHERE session_id = $1',
+    values: [sessionId]
+  }
+  client.query(validationQuery).then(function(result:pg.QueryResult<salesforceSchema.validated_pages>){
+    let validationFields = result.rows[0];
+    console.log(validationFields)
+    res.send({data: validationFields});
+  }).catch(err=>{
+    console.log(err);
+    console.log('failed to update validated pages table');
+    res.status(500).send('Failed to update validated pages');
+  })
+
+})
+
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
   var session = req.body.session;
 
@@ -511,7 +523,6 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
 
   if(page === 'rootPage')
   {
-    console.log('sessiong ' + sessionId)
     getPageInfoHandlers.handleWelcomePageRequest(sessionId, res, client);
     return
   }
