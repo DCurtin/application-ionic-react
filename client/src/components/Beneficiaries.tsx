@@ -26,7 +26,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
     },[sessionId])
 
     useEffect(() => {
-        updateMenuSections(isValid);
+        //updateMenuSections(isValid);
     }, [isValid]);
 
     useEffect(() => {
@@ -41,7 +41,6 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
 
     useEffect(()=>{
       return history.listen(()=>{
-        console.log('saving bene');
         saveBenePage(sessionId, formData);
       })
     },[formData]);

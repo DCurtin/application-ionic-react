@@ -53,18 +53,15 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 ImportForm(data);
             })
         }
-        console.log(sessionId + 'this is my sessionId');
     },[sessionId])
 
     function ImportForm(data : any){
         let importedForm : contributionForm = data;
-        console.log(importedForm);
         setFormData(importedForm);
     }
     
     useEffect(()=>{
       return history.listen(()=>{
-          console.log(formData)
           saveContributionPage(sessionId, formData);
       })
     },[formData])

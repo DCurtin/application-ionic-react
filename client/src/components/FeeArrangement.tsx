@@ -22,7 +22,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 {
                     return;
                 }
-                console.log(data);
                 ImportForm(data);
             })
         }
@@ -36,7 +35,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
     useEffect(()=>{
       return history.listen(()=>{
-        console.log('saving bene');
         saveFeeArangementPage(sessionId, formData);
       })
     },[formData])

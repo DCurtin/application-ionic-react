@@ -19,8 +19,7 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
         });
 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
-
-        const updateForm = (e : any) => {
+    const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
             setFormData(previousState =>({
             ...previousState,
@@ -51,7 +50,6 @@ const OwnerInformation: React.FC<PageReference> = ({sessionId, setSessionId, upd
 
         useEffect(()=>{
             return history.listen(()=>{
-                console.log(formData)
               saveAppPage(sessionId, formData);
             })
           }, [formData]);

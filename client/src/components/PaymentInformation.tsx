@@ -15,7 +15,6 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId}) => {
     const updateForm = (e:any) => {
         let newValue = e.target.value;
         setFormData(prevState => {
-            console.log(prevState);
             return {...prevState, [e.target.name]:newValue}});
     }
 

@@ -21,7 +21,6 @@ interface resumeRequest{
 const Resume: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
     const history = useHistory();
     const { herokuToken } = useParams<{ herokuToken: string; }>();
-    console.log(herokuToken)
     const [authInput, setAuthInput] = useState<resume>({
         last_name:'',
         last_4_ssn:'',
@@ -46,7 +45,6 @@ const Resume: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
         fetch(url, options).then((response: Response)=>{
             if(response.ok){
                 response.json().then((data:any)=>{
-                    console.log(data.sessionId);
                     setSessionId(data.sessionId);
                     history.push('/page/Welcome')
                 })
@@ -62,7 +60,6 @@ const Resume: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
     
     function updateForm(event:any){
         setAuthInput(prevState => {
-            console.log(prevState);
             return {...prevState, [event.target.name]:event.target.value}});
     }
 

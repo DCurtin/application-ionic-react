@@ -149,7 +149,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
 
             fetch(url, options).then((response)=>{
                 response.json().then(function(data: any){
-                    console.log(data);
                     props.setSessionId(data.sessionId);
                   })
             })
@@ -174,7 +173,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
 
             fetch(url, options).then((response)=>{
                 response.json().then(function(data: any){
-                    console.log(data);
                     props.setSessionId(data.sessionId);
                     updateValidationTable('is_welcome_page_valid', true, data.sessionId)
                 })

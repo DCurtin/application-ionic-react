@@ -49,7 +49,6 @@ export function chargeCreditCard(formData: FormData, sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('status from server ' + data.Status)
             return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);
@@ -70,7 +69,6 @@ export function getESignUrl(sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('eSignUrl from server ' + data.eSignUrl)
             return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);
@@ -119,7 +117,6 @@ export function getTransferPage(sessionId: string){
 }
 
 export function saveContributionPage(sessionId: string, formData: FormData){
-    console.log(formData);
     return makeSaveStateCallout(sessionId, 'contribution', formData)
 }
 
@@ -128,7 +125,6 @@ export function getContributionPage(sessionId: string){
 }
 
 export function saveRolloverPage(sessionId: string, formData: FormData){
-    console.log(formData);
     return makeSaveStateCallout(sessionId, 'rollover', formData)
 }
 
@@ -174,10 +170,7 @@ function makeGetPageInfoCallout(sessionId: string, page: string)
             body: JSON.stringify(body)
         }
         return fetch(url, options).then(function(response: any){
-            console.log('before json parse')
             return response.json().then(function(data: any){
-                console.log('after json parse')
-                console.log(data.data);
                 return data.data;
             })
         })
@@ -200,7 +193,6 @@ export function updateValidationTable(page: string, isValid: boolean, sessionId:
     }
     fetch('/validatePage', options).then(function(response:any){
       response?.json().then((data: any)=>{//this is probably not necessary
-        console.log(data);
       })
     })
 

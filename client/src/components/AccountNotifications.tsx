@@ -45,7 +45,6 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId}) =
 
     useEffect(()=>{
       return history.listen(()=>{
-        console.log('saving bene');
         saveAccountNotificationsPage(sessionId, formData);
       })
     },[formData])

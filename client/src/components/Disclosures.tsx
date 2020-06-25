@@ -43,7 +43,6 @@ const Disclosures: React.FC<InitSessionApp> = props => {
 
         fetch('/saveState', options).then((response)=>{
             response.json().then(function(data: any){
-                console.log(data);
                 props.setWelcomePageFields(data.sessionId);
             })
         })

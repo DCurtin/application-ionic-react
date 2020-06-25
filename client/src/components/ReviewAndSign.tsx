@@ -12,7 +12,6 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
             getESignUrl(sessionId).then((data) =>
             {
                 let url = data.eSignUrl;
-                console.log('done here');
                 setDocusignUrl(url);
             }
             ).catch(() =>

@@ -31,14 +31,12 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
     function ImportForm(data : any){
         let conditionalParameters : initialInvestmentConditionalParameters = data.parameters;
         let formData : initialInvestmentForm = data.formData;
-        console.log(data);
         setFormData(formData);
         setconditionalParameters(conditionalParameters)
     }
 
     useEffect(()=>{
       return history.listen(()=>{
-        console.log('saving bene');
         saveInitialInvestmentPage(sessionId, formData);
       })
     },[formData])
