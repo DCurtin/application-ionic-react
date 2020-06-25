@@ -10,7 +10,6 @@ const { v4: uuidv4 } = require('uuid');
 export function initializeApplication(welcomeParameters : applicationInterfaces.welcomePageParameters, res: express.Response, pgClient: pg.Client){
   //need to resolve offering_id and owner_id
   let sessionId : string = uuidv4();
-  console.log(welcomeParameters)
   let welcomePageUpsertQuery : queryParameters = updateWelcomeForm(sessionId, welcomeParameters);
   runQueryReturnPromise(welcomePageUpsertQuery,pgClient).then((result:pg.QueryResult)=>{
     res.json({'sessionId': sessionId});
@@ -38,19 +37,13 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
     pgClient.query(sessionQuery).then( function(appSessionResult:pg.QueryResult){
       if(appSessionResult.rowCount == 0 && serverConn.accessToken !== 'test_conn')
       {
-        let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
-        startSFOnlineApp(sessionId,pgClient, serverConn,applicantForm,appQueryUpsert,res)
+        let appQueryUpsert : queryParameters = updateApplicant(sessionId, applicantForm);
+        startSFOnlineApp(sessionId,pgClient, serverConn,applicantForm,res)
         //insert salesforce app
       }else
       {
-        let appQueryUpsert : queryParameters = updateAppId(sessionId, applicantForm);
+        let appQueryUpsert : queryParameters = updateApplicant(sessionId, applicantForm);
         runQuery(appQueryUpsert, res, pgClient);
-        /*runQueryReturnPromise(appQueryUpsert,pgClient).then((queryUpsertResult:pg.QueryResult)=>{
-                createAppSession('', '', sessionId,pgClient, userInstances,res)
-              }).catch(err=>{
-                console.log('could not upsert app')
-                res.status(500).send('failed inserting app')
-              });*/
       }
     }).catch(err=>{
       console.log(err)
@@ -81,8 +74,6 @@ export function saveTransferPage(sessionId: string, transferForm: applicationInt
 
 export function saveContributionPage(sessionId: string, contributionForm: applicationInterfaces.contributionForm,  res: express.Response, pgClient: pg.Client){
   let contributionQueryUpsert : queryParameters = updateContributionsPage(sessionId, contributionForm);
-  console.log(contributionForm);
-  console.log(contributionQueryUpsert);
   runQuery(contributionQueryUpsert, res, pgClient);
 }
 
@@ -96,54 +87,53 @@ export function saveInitialInvestment(sessionId: string, initialInvestmentForm: 
   runQuery(initialInvestmentUpsert, res, pgClient);
 }
 //HELPERS
-function updateInitialInvestmentPage(token: string,  initialInvestmentForm: applicationInterfaces.initialInvestmentForm,): queryParameters
+function updateInitialInvestmentPage(session_id: string,  initialInvestmentForm: applicationInterfaces.initialInvestmentForm,): queryParameters
 {
-  console.log(initialInvestmentForm)
-  let upsertInitialInvestmentParameters: Partial<salesforceSchema.initial_investment> ={...initialInvestmentForm, token:token}
-  return generateQueryString('initial_investment', upsertInitialInvestmentParameters, 'token')
+  let upsertInitialInvestmentParameters: Partial<salesforceSchema.initial_investment> ={...initialInvestmentForm, session_id:session_id}
+  return generateQueryString('initial_investment', upsertInitialInvestmentParameters, 'session_id')
 }
 
-function updateRolloverPage(token: string, rolloverForm: applicationInterfaces.rolloverForm): queryParameters{
+function updateRolloverPage(session_id: string, rolloverForm: applicationInterfaces.rolloverForm): queryParameters{
   let upsertTransferList  : Array<salesforceSchema.rollover> = []
   rolloverForm.rollovers.forEach((element : applicationInterfaces.rollover) => {
-    let upsertRollover: salesforceSchema.rollover = {...element, key: token+element.index, token: token}
+    let upsertRollover: salesforceSchema.rollover = {...element, key: session_id+element.index, session_id: session_id}
     upsertTransferList.push(upsertRollover)
   });
   return generateQueryStringFromList('rollover', upsertTransferList, 'key');
 }
 
-function updateTransfer(token: string, transferForm: applicationInterfaces.transferForm): queryParameters{
+function updateTransfer(session_id: string, transferForm: applicationInterfaces.transferForm): queryParameters{
   let upsertTransferList  : Array<salesforceSchema.transfer> = []
   transferForm.transfers.forEach((element : applicationInterfaces.transfer) => {
-    let upsertTransfer: salesforceSchema.transfer = {...element, key: token+element.index, token: token}
+    let upsertTransfer: salesforceSchema.transfer = {...element, key: session_id+element.index, session_id: session_id}
     upsertTransferList.push(upsertTransfer)
   });
   return generateQueryStringFromList('transfer', upsertTransferList, 'key');
 }
 
-function updateContributionsPage(token: string,  contributionForm: applicationInterfaces.contributionForm): queryParameters
+function updateContributionsPage(session_id: string,  contributionForm: applicationInterfaces.contributionForm): queryParameters
 {
-  let upsertContributionParameters: salesforceSchema.contribution ={...contributionForm, token:token}
-  return generateQueryString('contribution', upsertContributionParameters, 'token')
+  let upsertContributionParameters: salesforceSchema.contribution ={...contributionForm, session_id:session_id}
+  return generateQueryString('contribution', upsertContributionParameters, 'session_id')
 }
 
-function updateAccountNotifications(token: string, accountNotificationsForm: applicationInterfaces.accountNotificationsForm): queryParameters
+function updateAccountNotifications(session_id: string, accountNotificationsForm: applicationInterfaces.accountNotificationsForm): queryParameters
 {
-  let upsertAccountNotificationsParameters: salesforceSchema.interested_party ={...accountNotificationsForm, token:token}
-  return generateQueryString('interested_party', upsertAccountNotificationsParameters, 'token')
+  let upsertAccountNotificationsParameters: salesforceSchema.interested_party ={...accountNotificationsForm, session_id:session_id}
+  return generateQueryString('interested_party', upsertAccountNotificationsParameters, 'session_id')
 }
 
-function updateFeeArrangementPage(token: string, feeArrangementForm: applicationInterfaces.feeArrangementForm): queryParameters{
+function updateFeeArrangementPage(session_id: string, feeArrangementForm: applicationInterfaces.feeArrangementForm): queryParameters{
   let upsertFeeArrangementParamters : Partial<salesforceSchema.fee_arrangement> =
   {//need to remove initial investment type, this should really be saved elsewhere or not carried over
     cc_number: feeArrangementForm.cc_number,
     cc_exp_date: feeArrangementForm.cc_exp_date,
     fee_schedule: feeArrangementForm.fee_schedule,
     payment_method: feeArrangementForm.payment_method,
-    token: token
+    session_id: session_id
   }
 
-  return generateQueryString('fee_arrangement', upsertFeeArrangementParamters, 'token')
+  return generateQueryString('fee_arrangement', upsertFeeArrangementParamters, 'session_id')
 }
 
 function updateWelcomeForm(session_id: string, welcomeParameters: applicationInterfaces.welcomePageParameters): queryParameters{
@@ -159,29 +149,29 @@ function updateWelcomeForm(session_id: string, welcomeParameters: applicationInt
   return generateQueryString('body', upsertWelcomeParameters, 'session_id');
 }
 
-function updateAppId(sessionId : string, applicantForm : applicationInterfaces.applicantIdForm): queryParameters{
-    let upsertApplicantv2 : Partial<salesforceSchema.applicant> = applicantForm
-    console.log(upsertApplicantv2)
-    upsertApplicantv2.token = sessionId;
-    return generateQueryString('applicant', upsertApplicantv2, 'token')
+export function insertApplicant(sessionId : string, herokuToken: string, applicantForm : applicationInterfaces.applicantIdForm): queryParameters{
+  let upsertApplicant : Partial<salesforceSchema.applicant> = applicantForm
+  upsertApplicant.session_id = sessionId;
+  upsertApplicant.heroku_token = herokuToken;
+  return generateQueryString('applicant', upsertApplicant, 'session_id')
 }
 
-function updateBeneficiaries(token: string, beneficiaryData: applicationInterfaces.beneficiaryForm): queryParameters{
+function updateApplicant(sessionId : string, applicantForm : applicationInterfaces.applicantIdForm): queryParameters{
+    let upsertApplicant : Partial<salesforceSchema.applicant> = applicantForm
+    upsertApplicant.session_id = sessionId;
+    return generateQueryString('applicant', upsertApplicant, 'session_id')
+}
+
+function updateBeneficiaries(session_id: string, beneficiaryData: applicationInterfaces.beneficiaryForm): queryParameters{
   let beneCount = beneficiaryData.beneficiary_count
   let beneficiaryDataList : Array<Partial<salesforceSchema.beneficiary>> = [];
   let count = 0;
   beneficiaryData.beneficiaries.forEach((bene : applicationInterfaces.beneficiary) =>{
-    let pgBene : Partial<salesforceSchema.beneficiary> =  bene
-    count++;
-    console.log('dob')
-    console.log(bene.dob)
-    pgBene.position = count;
-    pgBene.bene_uuid = token+count;
-    pgBene.token = token;
+    let pgBene : Partial<salesforceSchema.beneficiary> =  {...bene, key: session_id+bene.index, session_id: session_id}
     beneficiaryDataList.push(pgBene);
   })
 
-  return generateQueryStringFromList('beneficiary', beneficiaryDataList, 'bene_uuid');
+  return generateQueryStringFromList('beneficiary', beneficiaryDataList, 'key');
 }
 
 export function generateQueryString(table : string, upsertObject : any , constraint: string = undefined) : queryParameters{
