@@ -114,7 +114,7 @@ export function chargeCreditCard(formData: FormData, sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('status from server ' + data.Status)
+            console.log('status from server ' + data.Status);
             return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);
@@ -135,7 +135,28 @@ export function getESignUrl(sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('eSignUrl from server ' + data.eSignUrl)
+            console.log('eSignUrl from server ' + data.eSignUrl);
+            return data;
+        }).catch(function(error: any) {
+            console.log('error: ' + error);
+        })
+    })
+}
+
+export function handleDocusignReturn(sessionId: string, eSignResult: string)
+{
+    let url = '/handleDocusignReturn'
+    let body = {
+        sessionId: sessionId,
+        eSignResult: eSignResult
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)     
+    }
+    return fetch(url, options).then(function(response: any){
+        return response.json().then(function(data: any){
             return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);

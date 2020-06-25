@@ -96,7 +96,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
     }
     let application_session : salesforceSchema.application_session = result.rows[0];
 
-    let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
+    let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString};
   
     serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
       if (err) { return console.error(err); }
@@ -147,6 +147,31 @@ app.post('/getESignUrl', (req, res) => {
   })
 });
 
+app.post('/handleDocusignReturn', (req : express.Request, res : express.Response) => {
+  let sessionId = req.body.sessionId;
+
+  validateSessionId(res, sessionId);
+
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
+  
+  client.query(sessionQuery).then(function(result: pg.QueryResult){
+    result = validateApplicationSessionQuery(res, result);
+    let application_session : salesforceSchema.application_session = result.rows[0];
+
+    let body = {'eSignResult': req.body.eSignResult};
+  
+    serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
+      if (err) { return console.error(err); }
+      console.log("response: ", data);
+      res.json({docusignAttempts: data.DocusignAttempts, docusignUrl: data.DocusignUrl, accountType: data.AccountType}); 
+      return
+    })
+  }).catch()
+});
+
 app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   console.log('getPenSignDocs running on server' );
 
@@ -164,8 +189,7 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   }
 
   client.query(sessionQuery).then(function(result:pg.QueryResult) {
-    if(result.rowCount == 0)
-    {
+    if(result.rowCount == 0) {
       console.log('no application')
       res.status(500).send('no application');
       return;
@@ -195,6 +219,23 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     request.end();
   })
 });
+
+function validateSessionId(res : express.Response, sessionId: String) {
+  if(sessionId === '' || sessionId === undefined) {
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return
+  }  
+}
+
+function validateApplicationSessionQuery(res : express.Response, result: pg.QueryResult) {
+  if(result.rowCount == 0) {
+    console.log('no application')
+    res.status(500).send('no application');
+    return;
+  }
+  return result;
+}
 
 app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));

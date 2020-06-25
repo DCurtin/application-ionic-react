@@ -1,18 +1,31 @@
 import React, {useEffect, useState} from 'react';
+import { FormData } from '../helpers/Utils';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonRow, IonCol, IonButton, IonLoading } from '@ionic/react';
-import {downloadPenSignDocs} from '../helpers/CalloutHelpers'
+import {handleDocusignReturn, downloadPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
 
 const DocusignReturn: React.FC = () => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
     const [downloadUrl, setDownloadUrl] = useState(''); 
 
+    const [formData, setFormData] = useState<FormData>({
+        docusignAttempts: '',
+        docusignUrl: '', 
+        accountType: ''
+    });
+
     let queryStringParams = new URLSearchParams(useLocation().search);
-    let docusignEvent = queryStringParams.get('event');
+    let docusignResult = (queryStringParams.get('event') || '{}');
     
     useEffect(() => {
-        downloadPenSignDocs(sessionId).then((response : any) => {
-            setDownloadUrl(response);
+        setFormData(prevState => {return {...prevState, docusignAttempts: 0}});
+        handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
+            setFormData(prevState => {return {...prevState, docusignAttempts: response.DocusignAttempts, docusignUrl: response.DocusignUrl, accountType: response.AccountType}});
+            if (docusignResult = 'signing_complete') {
+                downloadPenSignDocs(sessionId).then((response : any) => {
+                    setDownloadUrl(response);
+                })  
+            }
         })    
     },[])
 
@@ -30,7 +43,7 @@ const DocusignReturn: React.FC = () => {
             </IonHeader>
 
             <IonContent className='ion-padding'>
-                {docusignEvent === 'signing_complete' &&
+                {docusignResult === 'signing_complete' &&
                     <>
                         <h3 color='primary'>
                             ONLINE APPLICATION: IMPORTANT FINAL STEPS
