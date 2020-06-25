@@ -12,9 +12,7 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
         text : 'SELECT * FROM salesforce.body WHERE session_id = $1',
         values : [sessionId]
       }
-      console.log('before query')
       client.query(bodyQuery).then( function(result:pg.QueryResult){
-        console.log('after query')
       //get data from database
       //load into response
       let welcomePage : Partial<welcomePageParameters> = {};
@@ -27,7 +25,6 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       welcomePage.sales_rep = row.sales_rep;
       welcomePage.referred_by = row.referred_by;
       welcomePage.referral_code = row.referral_code;
-      console.log(welcomePage)
       res.json({data: welcomePage});
     }).catch(err=>{
       console.log(err)
@@ -37,20 +34,17 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
 
 export function handleApplicationIdPage(sessionId: string, res: express.Response, client: pg.Client){
     let applicantQuery = {
-        text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
+        text : 'SELECT * FROM salesforce.applicant WHERE session_id = $1',
         values : [sessionId]
       }
-      console.log(sessionId);
       client.query(applicantQuery).then( function(applicantResult:pg.QueryResult ){
         let applicantInfo : salesforceSchema.applicant = applicantResult.rows[0]
         if(applicantInfo === undefined){
-          console.log('hello does it hit here? ');
           res.json({data:applicantInfo});
           return;
         }
  
         let data : applicantIdForm = applicantInfo as applicantIdForm ; 
-        console.log(data);      
         res.json({'data': data})
       }).catch(err=>{
         console.log(err);
@@ -60,7 +54,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
   let beneQuery = {
-    text: 'SELECT * FROM salesforce.beneficiary WHERE token = $1',
+    text: 'SELECT * FROM salesforce.beneficiary WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -75,12 +69,12 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
 
 export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
   let feeArrangementQuery = {
-    text: 'SELECT * FROM salesforce.fee_arrangement WHERE token = $1',
+    text: 'SELECT * FROM salesforce.fee_arrangement WHERE session_id = $1',
     values: [sessionId]
   }
 
   let bodyQuery = {
-    text: 'SELECT investment_type FROM salesforce.body WHERE token = $1',
+    text: 'SELECT investment_type FROM salesforce.body WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -105,7 +99,7 @@ export function handleFeeArrangementPage(sessionId:string, res: express.Response
 
 export function handleAccountNotificationPage(sessionId:string, res: express.Response, client: pg.Client){
   let interestedPartyQuery = {
-    text: 'SELECT * FROM salesforce.interested_party WHERE token = $1',
+    text: 'SELECT * FROM salesforce.interested_party WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -120,12 +114,12 @@ export function handleAccountNotificationPage(sessionId:string, res: express.Res
 
 export function handleTransferPage(sessionId:string, res: express.Response, client: pg.Client){
   let transferQuery = {
-    text: 'SELECT * FROM salesforce.transfer WHERE token = $1',
+    text: 'SELECT * FROM salesforce.transfer WHERE session_id = $1',
     values: [sessionId]
   }
 
   let bodyQuery = {
-    text: 'SELECT account_type FROM salesforce.body WHERE token = $1',
+    text: 'SELECT account_type FROM salesforce.body WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -145,7 +139,7 @@ export function handleTransferPage(sessionId:string, res: express.Response, clie
 
 export function handleContributionPage(sessionId: string, res: express.Response, client: pg.Client){
   let contributionQuery = {
-    text: 'SELECT * FROM salesforce.contribution WHERE token = $1',
+    text: 'SELECT * FROM salesforce.contribution WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -157,7 +151,7 @@ export function handleContributionPage(sessionId: string, res: express.Response,
 
 export function handleRolloverPage(sessionId: string, res: express.Response, client: pg.Client){
   let rolloverQuery = {
-    text: 'SELECT * FROM salesforce.rollover WHERE token = $1',
+    text: 'SELECT * FROM salesforce.rollover WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -170,19 +164,19 @@ export function handleRolloverPage(sessionId: string, res: express.Response, cli
 
 export function handleInitialInvestmentPage(sessionId: string, res: express.Response, client: pg.Client){
   let initialInvestmentQuery = {
-    text: 'SELECT * FROM salesforce.initial_investment WHERE token = $1',
+    text: 'SELECT * FROM salesforce.initial_investment WHERE session_id = $1',
     values: [sessionId]
   }
   let rolloverQuery = {
-    text: 'SELECT * FROM salesforce.rollover WHERE token = $1',
+    text: 'SELECT * FROM salesforce.rollover WHERE session_id = $1',
     values: [sessionId]
   }
   let transferQuery = {
-    text: 'SELECT * FROM salesforce.transfer WHERE token = $1 AND transfer_type= $2',
+    text: 'SELECT * FROM salesforce.transfer WHERE session_id = $1 AND transfer_type= $2',
     values: [sessionId, 'cash Transfer']
   }
   let contributionQuery = {
-    text: 'SELECT * FROM salesforce.contribution WHERE token = $1',
+    text: 'SELECT * FROM salesforce.contribution WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -198,7 +192,6 @@ export function handleInitialInvestmentPage(sessionId: string, res: express.Resp
       client.query(transferQuery).then((transferResult:pg.QueryResult)=>{
         client.query(contributionQuery).then((contributionResult:pg.QueryResult)=>{
           let initialInvestmentInfo : salesforceSchema.initial_investment = result.rows[0];
-          console.log(initialInvestmentInfo)
           res.json({data : {formData: initialInvestmentInfo, parameters : gatherInitialInvestmentParameters(rolloverResult, transferResult, contributionResult) }});
         })
       })
