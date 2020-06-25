@@ -14,6 +14,7 @@ import * as validatedPages from './server/utils/validatePages'
 import {createAppSession} from './server/utils/appSessionHandler';
 import jsforce, {Connection as jsfConnection} from 'jsforce'
 import pg, { Client, Connection } from 'pg'
+import fs from 'fs'
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
@@ -218,6 +219,15 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
 
     request.end();
   })
+});
+
+app.get('/loaderio-18abbe8b69ba76fa08ae8d129f865a2f/', (req : express.Request, res : express.Response) => {
+  console.log('deliver loader file')
+  let fileLocation = __dirname + '/loaderio-18abbe8b69ba76fa08ae8d129f865a2f.txt';
+  var file = fs.readFileSync(fileLocation, 'binary');
+  res.setHeader('Content-Length', file.length);
+  res.write(file, 'binary');
+  res.end();
 });
 
 app.get("*", function (req : Express.Response, res : express.Response) {
