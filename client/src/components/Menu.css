@@ -1,13 +1,30 @@
 ion-menu ion-content {
-  /* --background: var(--ion-item-background, var(--ion-background-color, #1A1B3F)); */
+  --background: transparent;
   max-width: 100%;
   border-radius: 10px;
-  /* width: 75%; */
+  background-image: url('../images/sideMenuBackground.jpg');
+  background-color: transparent;
+  background-size: contain cover;
+  background-position: 50% 50%;
+}
+
+
+ion-content {
+  background-color: transparent;
+  background-image: url('../images/sideMenuBackground.jpg');
 }
 
 ion-list {
   border: 1px grey solid;
-  border-radius: 10px;
+  border-radius: 10px;	
+  background: transparent;
+  background: url('../images/sideMenuBackground.jpg');
+}
+
+ion-item {
+  background: transparent;
+  background: url('../images/sideMenuBackground.jpg');
+  
 }
 
 ion-menu.md ion-content {

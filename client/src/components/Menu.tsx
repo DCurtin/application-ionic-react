@@ -16,7 +16,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Menu.css';
 import { AppPage } from '../helpers/MenuGenerator';
-import { checkmarkCircleSharp, checkmarkCircle, alertCircleOutline, alertCircleSharp } from 'ionicons/icons';
+import {  checkmarkCircle, alertCircleOutline } from 'ionicons/icons';
 
 interface AppSection {
   header: string;
@@ -28,6 +28,7 @@ interface session{
   sessionId: string,
   menuSections: AppSection[]
 }
+
 
 const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
@@ -54,7 +55,6 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
             )
           })}
         </IonList>
-        {/* <IonImg src="../../assets/icon/midlandSideBar.PNG"></IonImg> */}
         {/* <IonToolbar color="primary">
             <IonTitle>FAQs</IonTitle>
         </IonToolbar>
