@@ -99,10 +99,14 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
     let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
   
     serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
-      if (err) { return console.error(err); }
-      console.log("response: ", data);
-      res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
-      return
+      if (err) { 
+        res.status(500).send(err.message);  
+        return
+      }
+      else {
+        res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
+        return
+      }
     })
   }).catch()
 });

@@ -17,7 +17,6 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
     const updateForm = (e:any) => {
         let newValue = e.target.value;
         setFormData(prevState => {
-            console.log(prevState);
             return {...prevState, [e.target.name]:newValue}});
     }
 
@@ -25,8 +24,8 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
         setFormData(prevState => {return {...prevState, paymentStatus: 'Pending'}});
         chargeCreditCard(formData,sessionId).then(function(response: any) {
             setFormData(prevState => {return {...prevState, paymentStatus: 'Success', paymentAmount: response.PaymentAmount}});
-        }).catch(function(response: any) {
-            setFormData(prevState => {return {...prevState, paymentStatus: 'Error', paymentStatusDetails: response.StatusDetails}});
+        }).catch(function(error: any) {
+            setFormData(prevState => {return {...prevState, paymentStatus: 'Error', paymentStatusDetails: error.message}});
         })
     }
 
@@ -52,7 +51,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
                             </IonText>
                         </strong>
                     </IonItemDivider>
-                    {formData.paymentStatus !== 'Completed' &&
+                    {formData.paymentStatus !== 'Success' &&
                         <>
                             <IonRow>
                                 <IonCol>
@@ -75,34 +74,21 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
                             </IonRow>
                         </>
                     }               
-                    <IonLoading isOpen={formData.creditCardStatus === 'Pending'} message={'Applying Payment...'} spinner="lines"></IonLoading>
+                    <IonLoading isOpen={formData.paymentStatus === 'Pending'} message={'Applying Payment...'} spinner="lines"></IonLoading>
                     {formData.paymentStatus === 'Error' &&
                         <IonRow>
-                            Error - {formData.creditCardStatusDetails}
+                            Error - {formData.paymentStatusDetails}
                         </IonRow>
                     }
-                    {formData.paymentStatus === 'Completed' &&
+                    {formData.paymentStatus === 'Success' &&
                         <IonRow>
                             Thank you for your payment of ${formData.paymentAmount}.
                             {/*on the card ending
                             in {{application.getLastFourDigitsOfCreditCard()}}.*/}
                         </IonRow>
                     }
-                }               
-                <IonLoading isOpen={formData.paymentStatus === 'Pending'} message={'Applying Payment...'} spinner="lines"></IonLoading>
-                {formData.paymentStatus === 'Error' &&
-                    <IonRow>
-                        Error - {formData.paymentStatusDetails}
-                    </IonRow>
-                }
-                {formData.paymentStatus === 'Success' &&
-                    <IonRow>
-                        Thank you for your payment of ${formData.paymentAmount}.
-                        {/*on the card ending
-                        in {{application.getLastFourDigitsOfCreditCard()}}.*/}
-                    </IonRow>
-                }
-            </IonGrid>
+                </IonGrid>
+            </form>
         </IonContent>
     );
 }

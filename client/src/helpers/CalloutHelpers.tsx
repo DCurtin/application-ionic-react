@@ -48,10 +48,15 @@ export function chargeCreditCard(formData: FormData, sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('status from server ' + data.Status)
-            return data;
+            if (response.status == 200) {
+                return data;
+            }
+            else {
+                console.log('Status Details ' + data.StatusDetails);
+                throw Error(data.StatusDetails);
+            }         
         }).catch(function(error: any) {
-            console.log('error: ' + error);
+            throw Error(error.message);
         })
     })
 }
