@@ -15,7 +15,7 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       client.query(bodyQuery).then( function(result:any){
       //get data from database
       //load into response
-      let welcomePage : welcomePageParameters;
+      let welcomePage : Partial<welcomePageParameters> = {};
       let rows = result['rows'];
       welcomePage.AccountType = rows.account_type;
       welcomePage.TransferIra = rows.transfer_form;
