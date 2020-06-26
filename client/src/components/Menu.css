@@ -19,6 +19,7 @@ ion-list {
   border-radius: 10px;	
   background: transparent;
   background: url('../images/sideMenuBackground.jpg');
+  width:80%;
 }
 
 ion-item {
