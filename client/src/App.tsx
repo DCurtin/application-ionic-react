@@ -30,6 +30,8 @@ import DocusignReturn from './pages/DocusignReturn';
 
 const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('');
+  const [hasNextBeenClicked, setHasNextBeenClicked] = useState(false);
+  const [hasPrevBeenClicked, setHasPrevBeenClicked] = useState(false);
   const [menuSections, setMenuSections] = useState<MenuSection[]>([]);
   const[menuParams, setMenuParams] = useState<MenuParameters>({
     planInfo: false,
@@ -43,7 +45,6 @@ const App: React.FC = () => {
     isOwnerInfoPageValid: false
   });
 
-
   useEffect(()=>{
     let menuSections:MenuSection[] = generateAppPages(menuParams);
     setMenuSections(menuSections);    
@@ -52,11 +53,11 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <Header sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections} setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>
+        <Header sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections} setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>
         <IonSplitPane contentId="main" className='top-space'>
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>} /> 
             <Route path='/docusignReturn/:sessionId'>
               <DocusignReturn/>
             </Route>

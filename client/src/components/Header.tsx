@@ -17,34 +17,29 @@ export interface userState {
     menuSections: MenuSection[],
     setMenuParams: Function,
     setMenuSections: Function,
-    menuParams: MenuParameters
+    menuParams: MenuParameters,
+    hasNextBeenClicked: boolean, 
+    setHasNextBeenClicked: Function,
+    hasPrevBeenClicked: boolean, 
+    setHasPrevBeenClicked: Function
   }
 
-const Header: React.FC<session> = ({menuSections, setMenuSections}) => {
-    const formRef = useRef<HTMLFormElement>(null);
-    let appPages = menuSections.flatMap(e=>{
-        return e.pages
-      });
-
-    const [currentState, setCurrentState] = useState<userState>({
-        prevPage: undefined,
-        currentPage: appPages[0],
-        nextPage: appPages[1]
-      });
-
+const Header: React.FC<session> = ({setHasNextBeenClicked, setHasPrevBeenClicked}) => {
       const goToNextPage = () => {
-        if (formRef !== null && formRef.current !== null) {
-          formRef.current.dispatchEvent(new Event('submit'));
-        }
+       setHasNextBeenClicked(true);
+      }
+
+      const goToPrevPage = () => {
+          setHasPrevBeenClicked(true);
       }
 
     return(
-        <IonHeader translucent={true}>
+        <IonHeader>
         <IonToolbar> 
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-            <IonButton slot='end' routerLink={currentState.prevPage?.url} color='secondary'>
+            <IonButton slot='end' onClick={goToPrevPage} color='secondary'>
               <IonIcon icon={chevronBackCircleOutline} slot='start'/>
               Prev
             </IonButton>
