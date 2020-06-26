@@ -16,6 +16,7 @@ var router = require('express').Router();
 var bodyParser = require('body-parser');
 var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcome@localhost';
 import pg, { Client, Connection } from 'pg'
+var pgPool = new pg.Pool();
 var client  = new pg.Client(connectionString);
 
 var serverConn :Partial<jsfConnection> = new jsforce.Connection({
@@ -240,7 +241,7 @@ function initializeApplication(welcomePageData : applicationInterfaces.welcomePa
     text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
     values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
   }
-  client.query(insertAppDataQuery, function(err : any, response : any){
+  pgPool.query(insertAppDataQuery, function(err : any, response : any){
     console.log(err);
     console.log(response);
     res.json({'sessionId': token});
