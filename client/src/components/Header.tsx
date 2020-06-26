@@ -43,6 +43,11 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
      const displayTitle = () => {
          return (appPages.filter(page => page.url === location.pathname))[0]?.title;
      }
+
+     const displayRoutingButtons = () => {
+         let pathName = location.pathname.toUpperCase();
+         return (!pathName.includes('DOCUSIGN') && !pathName.includes('RESUME'));
+     }
     
 
     return(
@@ -51,6 +56,8 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
+          {displayRoutingButtons() &&
+          (<React.Fragment>
             <IonButton slot='end' onClick={goToPrevPage} color='secondary'>
               <IonIcon icon={chevronBackCircleOutline} slot='start'/>
               Prev
@@ -59,6 +66,7 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
                 <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
               Next
               </IonButton>
+          </React.Fragment>)}
           <IonThumbnail slot="start">
             <IonImg src={midlandLogo}/>
           </IonThumbnail>
