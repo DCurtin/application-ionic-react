@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'; 
+import React, { useEffect, useRef } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 import {useForm} from 'react-hook-form';
@@ -19,24 +19,33 @@ interface InitSessionApp extends SessionApp {
 const Welcome: React.FC<InitSessionApp> = props => {
     const history = useHistory();
     const accountTypes = [
-        'Traditional IRA', 
-        'Roth IRA', 
+        'Traditional IRA',
+        'Roth IRA',
         'SEP IRA',
         'Inherited IRA - Traditional',
         'Inherited IRA - Roth'
     ]
 
-    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`]; 
+    const midlandReps = [`Not Applicable`, `Adam Sypniewski`, `Brad Janitz`, `Daniel Hanlon`, `Danny Grossman`, `Eric Lutz`, `Kelsey Dineen`, `Matt Calhoun`, `Rita Woods`, `Sacha Bretz`];
 
-    const {register, handleSubmit, watch, errors} = useForm(); 
+    const {register, handleSubmit, watch, errors} = useForm();
+    let watchAllFields = watch();
 
     const handleAccountTypeSelected = (event: CustomEvent) => {
         if (event.detail.value.includes('Inherited')) {
+<<<<<<< HEAD
             props.welcomePageFields.account_type = event.detail.value
             props.welcomePageFields.rollover_form = false
             props.welcomePageFields.cash_contribution_form = false
             props.setWelcomePageFields(
                 {...props.welcomePageFields,
+=======
+            props.setInitialValues(
+                {...props.initialValues,
+                AccountType: event.detail.value,
+                RolloverEmployer: false,
+                CashContribution: false
+>>>>>>> c6a7aea1e30e296bd4a1432b2e7a9d523ed8e043
                 }
             )
         } else {
@@ -64,7 +73,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
             ...updatedwelcomePageFields
         });
     }
-    
+
     const handleSpecifiedSourceChange = (event: CustomEvent) => {
         let updatedwelcomePageFields : welcomePageParameters = props.welcomePageFields
         updatedwelcomePageFields.referred_by = event.detail.value
@@ -72,7 +81,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
             ...updatedwelcomePageFields
         });
     }
-    
+
     const handleReferralCodeChange = (event: CustomEvent) => {
         let updatedwelcomePageFields : welcomePageParameters = props.welcomePageFields
         updatedwelcomePageFields.referral_code = event.detail.value
@@ -132,7 +141,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
     useEffect(()=>{
         return history.listen(()=>{
             //save initial data
-            //return session id            
+            //return session id
             var url = '/startApplication'
             if(props.sessionId !== ''){
                 url = '/saveState'
@@ -156,7 +165,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
     },[props.welcomePageFields])
 
 
-    const validateFields = (e: any) => {         
+    const validateFields = (e: any) => {
         var url = '/startApplication'
         if(props.sessionId !== ''){
             url = '/saveState'
@@ -177,13 +186,21 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     updateValidationTable('is_welcome_page_valid', true, data.sessionId)
                 })
             })
+<<<<<<< HEAD
             props.updateMenuSections('is_welcome_page_valid', true);
         
+=======
+            props.updateMenuSections('isWelcomePageValid', true);
+
+>>>>>>> c6a7aea1e30e296bd4a1432b2e7a9d523ed8e043
     }
 
     const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
             let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
+            if (watchAllFields[fieldName]) {
+                className = 'ion=no-padding';
+            }
             return className;
     };
 
@@ -203,7 +220,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                          <strong>
                          IMPORTANT NOTICE:
                         </strong>
-                         Federal law requires all financial institutions to obtain, verify and record information that identifies each person who opens an account. We require that you provide your name, date of birth, and taxpayer ID. 
+                         Federal law requires all financial institutions to obtain, verify and record information that identifies each person who opens an account. We require that you provide your name, date of birth, and taxpayer ID.
                         </p>
                         <p>
                             <strong>
@@ -221,13 +238,18 @@ const Welcome: React.FC<InitSessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonItem className={showError('accountType')}>
+<<<<<<< HEAD
                             <IonSelect interface='action-sheet' value={props.welcomePageFields.account_type} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
                             {accountTypes.map((accountType, index) => 
+=======
+                            <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
+                            {accountTypes.map((accountType, index) =>
+>>>>>>> c6a7aea1e30e296bd4a1432b2e7a9d523ed8e043
                             (<IonSelectOption key={index} value={accountType}>
                                 {accountType}
                             </IonSelectOption>))}
                             </IonSelect>
-                        </IonItem> 
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -297,7 +319,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                 <IonRow>
                     <IonCol size="6">
                         <IonLabel>
-                            <strong> 
+                            <strong>
                                 How did you hear about us?
                             </strong>
                         </IonLabel>
@@ -334,4 +356,4 @@ const Welcome: React.FC<InitSessionApp> = props => {
     );
 }
 
-export default Welcome; 
+export default Welcome;

@@ -259,7 +259,6 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
 });
 
 
-
 app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : applicationInterfaces.requestBody = req.body;
   let sessionId : string = packet.session.sessionId;

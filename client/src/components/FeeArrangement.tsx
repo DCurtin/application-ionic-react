@@ -1,11 +1,17 @@
 import React, {useState, useEffect} from 'react';
+import {useForm} from 'react-hook-form';
 import {SessionApp, feeArrangementForm} from '../helpers/Utils';
 import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers'
+import { fingerPrint } from 'ionicons/icons';
 
-const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
     const history = useHistory();
+    const {register, handleSubmit, watch, errors} = useForm({
+        mode: 'onBlur',
+        reValidateMode: 'onBlur'
+    }); 
     const [formData, setFormData] = useState<feeArrangementForm>({
         initial_investment_type: '',
         fee_schedule: '',
@@ -43,8 +49,16 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
         let newValue = e.target.value;
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
+
+    const validateFields = (e:any) => {
+        saveFeeArangementPage(sessionId, formData);
+        updateMenuSections('isFeeArrangementPageValid', true)
+
+    }
     return (
         <IonContent className='ion-padding'>
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
+                
             <IonGrid>
                 <IonRow className='well'>
                     <IonCol>
@@ -115,6 +129,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                     </IonRow>
                 )}
             </IonGrid>
+            </form>
         </IonContent>
     )
 }

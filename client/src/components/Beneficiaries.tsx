@@ -1,16 +1,20 @@
 import React, {useState, useEffect} from 'react'; 
+import {useForm} from 'react-hook-form';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
 import {SessionApp, states, FormData, requestBody} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
-const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections}) => {
+const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
     const history = useHistory();
+    const {register, handleSubmit, watch, errors} = useForm({
+        mode: 'onBlur',
+        reValidateMode: 'onBlur'
+    }); 
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count: 0
     })
-    const [isValid, setIsValid] = useState(true); 
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -24,14 +28,6 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
             })
         }
     },[sessionId])
-
-    useEffect(() => {
-        //updateMenuSections(isValid);
-    }, [isValid]);
-
-    useEffect(() => {
-        setIsValid(true);
-    }, [])
 
     
     function ImportForm(data : any){
@@ -56,6 +52,11 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
     const updateForm = (e:any) => {
         let newValue = e.target.value;
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
+    }
+
+    const validateFields = (e: any) => {
+        saveBenePage(sessionId, formData);
+        updateMenuSections('isBeneficiariesPageValid', true);
     }
  
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
@@ -170,29 +171,32 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
 
     return (
         <IonContent className='ion-padding'>
-            <IonGrid>
-                <IonRow className='well'>
-                    <IonCol>
-                        <p>
-                            Naming beneficiaries in this online application is optional, but highly recommended. If you skip this step, we will provide you with a beneficiary form at a later date.
-                        </p>
-                        <p>
-                            Naming a beneficiary allows your IRA assets to go to whomever you choose. Primary beneficiaries are the first set of individuals/entities that you wish to leave your retirement assets to. If you are married and leave the retirement account to your spouse, he/she inherits the account as if it were his/her own. Secondary beneficiaries receive the assets if your primary beneficiaries die before you or refuse to accept the inheritance.
-                        </p>
-                        <p>
-                            If you elect not to designate a beneficiary, your assets may pass to your estate - subjecting them to the probate process, estate expenses, and creditor claims, causing delays for your beneficiary to receive these assets.
-                        </p>
-                    </IonCol>
-                </IonRow>
-                {displayBeneficiaryForm(formData.beneficiary_count)}
-                <IonRow>
-                    <IonCol>
-                        {formData.beneficiary_count < 4 && 
-                        <IonButton onClick={addBeneficiary}> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
-                        }
-                    </IonCol>
-                </IonRow>
-            </IonGrid>
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
+                <IonGrid>
+                    <IonRow className='well'>
+                        <IonCol>
+                            <p>
+                                Naming beneficiaries in this online application is optional, but highly recommended. If you skip this step, we will provide you with a beneficiary form at a later date.
+                            </p>
+                            <p>
+                                Naming a beneficiary allows your IRA assets to go to whomever you choose. Primary beneficiaries are the first set of individuals/entities that you wish to leave your retirement assets to. If you are married and leave the retirement account to your spouse, he/she inherits the account as if it were his/her own. Secondary beneficiaries receive the assets if your primary beneficiaries die before you or refuse to accept the inheritance.
+                            </p>
+                            <p>
+                                If you elect not to designate a beneficiary, your assets may pass to your estate - subjecting them to the probate process, estate expenses, and creditor claims, causing delays for your beneficiary to receive these assets.
+                            </p>
+                        </IonCol>
+                    </IonRow>
+                    {displayBeneficiaryForm(formData.beneficiary_count)}
+                    <IonRow>
+                        <IonCol>
+                            {formData.beneficiary_count < 4 && 
+                            <IonButton onClick={addBeneficiary}> <IonIcon icon={addOutline} slot='start'></IonIcon> Add Beneficiary </IonButton>
+                            }
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
+
+            </form>
         </IonContent>
     )
 }

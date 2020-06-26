@@ -1,7 +1,8 @@
 export interface SessionApp {
     sessionId : string,
     setSessionId : Function, 
-    updateMenuSections:Function
+    updateMenuSections:Function,
+    formRef: any
 }
 
 export interface welcomePageParameters {

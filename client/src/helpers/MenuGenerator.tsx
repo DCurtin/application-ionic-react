@@ -1,3 +1,5 @@
+import { pathToFileURL } from "url";
+
 export interface AppPage {
     header?: string;
     url: string;
@@ -93,6 +95,7 @@ let appPages: AppPage[] = Object.values(appPagesMap);
     is_welcome_page_valid: Boolean,
     is_disclosure_page_valid: Boolean,
     is_owner_info_page_valid: Boolean,
+    is_plan_information_page_valid: Boolean,
     is_beneficiaries_page_valid: Boolean,
     is_fee_arrangement_page_valid: Boolean,
     is_account_notifications_page_valid: Boolean,
@@ -133,10 +136,10 @@ export  interface MenuSection {
 
     if(menuParams.initialInvestment)
     {
-        appSections.push(generateInvestmentDetailsSection());
+        appSections.push(generateInvestmentDetailsSection(menuParams));
     }
 
-    appSections.push(generateFinishingUpSection());
+    appSections.push(generateFinishingUpSection(menuParams));
 
     return appSections;
 
@@ -173,6 +176,18 @@ export  interface MenuSection {
       if (page.url === '/page/OwnerInformation') {
         newPage.isValid = menuParams.is_owner_info_page_valid; 
       }
+      if (page.url === '/page/PlanInformation') {
+        newPage.isValid = menuParams.is_plan_information_page_valid; 
+      }
+      if (page.url === '/page/Beneficiaries') {
+        newPage.isValid = menuParams.is_beneficiaries_page_valid;
+      }
+      if (page.url === '/page/FeeArrangement') {
+        newPage.isValid = menuParams.is_fee_arrangement_page_valid;
+      }
+      if (page.url === '/page/AccountNotifications'){
+        newPage.isValid = menuParams.is_account_notifications_page_valid; 
+      }
 
       return newPage; 
     })
@@ -195,23 +210,57 @@ export  interface MenuSection {
         pages.push(appPagesMap['NewContribution'])
     }
 
+    let fundAccountPages = [...pages]; 
+    let updatedFundAccountPages = fundAccountPages.map(page => {
+      let newPage = {...page}; 
+      let url = page.url; 
+      if (url === '/page/TransferIRA') {
+        newPage.isValid = menuParams.is_transfer_ira_page_valid; 
+      }
+      if (url === '/page/RolloverPlan'){
+        newPage.isValid = menuParams.is_rollover_plan_page_valid; 
+      }
+      if (url === '/page/NewContribution') {
+        newPage.isValid = menuParams.is_new_contribution_page_valid; 
+      }
+      return newPage; 
+    })
     return {
         header: 'Fund Account',
-        pages: pages
+        pages: updatedFundAccountPages
     }
   }
 
-  function generateInvestmentDetailsSection(){
-      return {
+  function generateInvestmentDetailsSection(menuParams: MenuParameters){
+    let investmentDetailsPages =  [...appPages.filter(page => page.header === 'Make Investment')]
+    let updatedInvestmentDetailsPages = investmentDetailsPages.map(page => {
+      let newPage = {...page};
+      if (page.url === '/page/InvestmentDetails'){
+        newPage.isValid = menuParams.is_investment_details_page_valid; 
+      }
+      return newPage;
+    });
+    
+    return {
         header: 'Make Investment', 
-        pages: [...appPages.filter(page => page.header === 'Make Investment')]
+        pages: updatedInvestmentDetailsPages
       }
   }
 
-  function generateFinishingUpSection(){
+  function generateFinishingUpSection(menuParams: MenuParameters){
+    let finishingUpPages = [...appPages.filter(page => page.header === 'Finishing Up')];
+    let updatedFinishingUpPages = finishingUpPages.map(page => {
+      let newPage = {...page};
+      if (page.url === '/page/PaymentInformation'){
+        newPage.isValid = menuParams.is_payment_information_page_valid; 
+      }
+
+      return newPage; 
+    })
+
     return {
       header: 'Finishing Up', 
-      pages: [...appPages.filter(page => page.header === 'Finishing Up')]
+      pages: updatedFinishingUpPages
     }
 }
 
