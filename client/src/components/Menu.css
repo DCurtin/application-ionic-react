@@ -1,6 +1,13 @@
 ion-menu ion-content {
-  --background: var(--ion-item-background, var(--ion-background-color, #1A1B3F));
+  /* --background: var(--ion-item-background, var(--ion-background-color, #1A1B3F)); */
   max-width: 100%;
+  border-radius: 10px;
+  /* width: 75%; */
+}
+
+ion-list {
+  border: 1px grey solid;
+  border-radius: 10px;
 }
 
 ion-menu.md ion-content {

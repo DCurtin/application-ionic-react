@@ -3,6 +3,10 @@
     --ion-toolbar-background: var(--ion-color-primary);
 }
 
+ion-split-pane {
+    --border : hidden;
+}
+
 .ios ion-toolbar {
     background-color: #1A1B3F;
 }
