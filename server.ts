@@ -243,7 +243,7 @@ function initializeApplication(welcomePageData : applicationInterfaces.welcomePa
   client.query(insertAppDataQuery, function(err : any, response : any){
     console.log(err);
     console.log(response);
-    res.set('session-id': token);
+    res.set('session-id', token);
     res.json({'sessionId': token});
   });
 }
