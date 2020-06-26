@@ -4,8 +4,10 @@
 }
 
 ion-split-pane {
-    --border : hidden;
+    margin-top: 3rem;
 }
+
+
 
 .ios ion-toolbar {
     background-color: #1A1B3F;

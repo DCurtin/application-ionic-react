@@ -4,12 +4,9 @@ import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import './Page.css';
-import './Page.css';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
-import { chevronBackCircleOutline, chevronForwardCircleOutline
-  } from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -22,7 +19,6 @@ import InitialInvestment from '../components/InitialInvestment';
 import NewContribution from '../components/NewContribution';
 import PaymentInformation from '../components/PaymentInformation';
 import ReviewAndSign from '../components/ReviewAndSign';
-import midlandLogo from '../images/midlandCrestForDarkBg.png';
 
 export interface userState {
   prevPage?:AppPage, 
@@ -200,8 +196,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   return (
-    <IonPage>
-      <IonHeader>
+    <IonPage> 
+      {/* <IonHeader>
         <IonToolbar color="primary">
           <IonButtons slot="start">
             <IonMenuButton />
@@ -223,7 +219,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
         </IonToolbar>
             
            
-      </IonHeader>
+      </IonHeader> */}
 
       <IonContent>
         <IonHeader collapse="condense">
