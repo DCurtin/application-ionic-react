@@ -50,6 +50,7 @@ const App: React.FC = () => {
     is_new_contribution_page_valid: false,
     is_payment_information_page_valid: false,
     is_review_and_sign_page_valid: false,
+    is_plan_information_page_valid: false
   });
 
 
