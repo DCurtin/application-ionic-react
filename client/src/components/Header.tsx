@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React from 'react';
+import { useLocation } from 'react-router';
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
 import { chevronBackCircleOutline, chevronForwardCircleOutline
 } from 'ionicons/icons';
-import midlandLogo from '../images/midlandCrestForDarkBg.png';
+import midlandLogo from '../images/midlandCrest.jpg';
 import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator'; 
 
 export interface userState {
@@ -24,7 +25,11 @@ export interface userState {
     setHasPrevBeenClicked: Function
   }
 
-const Header: React.FC<session> = ({setHasNextBeenClicked, setHasPrevBeenClicked}) => {
+const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasPrevBeenClicked}) => {
+    let appPages = menuSections.flatMap(e=>{
+        return e.pages
+      });
+
       const goToNextPage = () => {
        setHasNextBeenClicked(true);
       }
@@ -32,6 +37,13 @@ const Header: React.FC<session> = ({setHasNextBeenClicked, setHasPrevBeenClicked
       const goToPrevPage = () => {
           setHasPrevBeenClicked(true);
       }
+
+     let location = useLocation();
+
+     const displayTitle = () => {
+         return (appPages.filter(page => page.url === location.pathname))[0]?.title;
+     }
+    
 
     return(
         <IonHeader>
@@ -51,7 +63,7 @@ const Header: React.FC<session> = ({setHasNextBeenClicked, setHasPrevBeenClicked
             <IonImg src={midlandLogo}/>
           </IonThumbnail>
           <IonTitle>
-          {/* {currentState.currentPage.title} */} TEST HEADER
+            {displayTitle()}
           </IonTitle>
         </IonToolbar>
             
