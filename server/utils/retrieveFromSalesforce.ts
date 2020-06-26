@@ -102,6 +102,7 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
         let applicantQueryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'session_id')
   
         let validatedPages : salesforceSchema.validated_pages = {
+          is_welcome_page_valid: false,
           ...JSON.parse(onlineAppresult.HerokuValidatedPages__c),
           session_id:sessionId}
         let validatedPagesQueryParams = saveStateHandlers.generateQueryString('validated_pages', validatedPages, 'session_id')
@@ -110,13 +111,21 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
           saveStateHandlers.runQueryReturnPromise(bodyParams, pgClient).then((bodyResult: pg.QueryResult)=>{
             saveStateHandlers.runQueryReturnPromise(validatedPagesQueryParams, pgClient).then((validatedPagesResult: pg.QueryResult)=>{
               createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, pgClient, userInstances, res)
+            }).catch(err=>{
+              console.log(err)
+              console.group('failed validation query')
+              res.status(500).send('failed to authenticate');
             })
+          }).catch((err)=>{
+            console.log(err)
+            console.group('failed body query')
+            res.status(500).send('failed to authenticate');
           })
+        }).catch(err=>{
+          console.log(err)
+          console.group('failed applicant quey')
+          res.status(500).send('failed to authenticate');
         })
-    }).catch(err=>{
-        console.log(err)
-        console.group('fail')
-        res.status(500).send('failed to authenticate');
     })
     return
     }
