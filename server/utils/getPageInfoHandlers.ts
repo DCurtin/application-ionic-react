@@ -28,6 +28,7 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       
       res.json(welcomePage);
     }).catch(err=>{
+      console.log(err)
       res.status(500).send('failed getting body data');
     })
 }
