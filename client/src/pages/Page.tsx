@@ -175,6 +175,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const updateMenuSections = (page: string, isPageValid:boolean) => {
     let currentPage  = {...currentState.currentPage};
     let newPage = {...currentPage, isValid: isPageValid};
+    console.log(currentPage);
     setCurrentState(prevState => {
       return {
         ...prevState,

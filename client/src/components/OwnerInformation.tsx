@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
@@ -65,7 +65,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
         }
 
 
-        const validateFields = (e: any) => {
+        const validateFields = () => {
             saveAppPage(sessionId, formData);
             updateMenuSections('isOwnerInfoPageValid', true);
         }

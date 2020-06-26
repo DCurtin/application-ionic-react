@@ -34,7 +34,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   let appPages = menuSections.flatMap(menuSection => menuSection.pages);
   return (
     <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN')}>
-      <IonContent forceOverscroll={true}>
+      <IonContent forceOverscroll={false}>
         <IonList id="inbox-list">
           {menuSections.map((menuSection, index) => {
             return (
@@ -44,7 +44,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
                     return (
                       <IonMenuToggle key={index} autoHide={false}>
                         <IonItem className={location.pathname === appPage.url ? 'selected' : ''} routerLink={getLink( appPage.url, appPages)} routerDirection="none" lines="none" detail={false}>
-                          <IonIcon slot="start" icon={appPage.isValid ? checkmarkCircle : alertCircleOutline} />
+                          <IonIcon slot="start" color={appPage.isValid ? 'success' : 'primary'} icon={appPage.isValid ? checkmarkCircle : alertCircleOutline} />
                           <IonLabel className='ion-text-wrap'>{appPage.title}</IonLabel>
                         </IonItem>
                       </IonMenuToggle>
@@ -54,13 +54,13 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
             )
           })}
         </IonList>
-        <IonImg src="../../assets/icon/midlandSideBar.PNG"></IonImg>
-        <IonToolbar color="primary">
+        {/* <IonImg src="../../assets/icon/midlandSideBar.PNG"></IonImg> */}
+        {/* <IonToolbar color="primary">
             <IonTitle>FAQs</IonTitle>
         </IonToolbar>
         <IonToolbar color="primary">
           <IonTitle> Contact Us </IonTitle>
-        </IonToolbar>
+        </IonToolbar> */}
       </IonContent>
     </IonMenu>
   );

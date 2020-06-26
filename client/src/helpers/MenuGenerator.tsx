@@ -170,7 +170,7 @@ export  interface MenuSection {
         newPage.isValid = menuParams.isPlanInfoPageValid; 
       }
       if (url === '/page/Beneficiaries') {
-        newPage.isValid = menuParams.isBenificiariesPageValid;
+        newPage.isValid = menuParams.isBeneficiariesPageValid;
       }
       if (url === '/page/FeeArrangement') {
         newPage.isValid = menuParams.isFeeArrangementPageValid;
@@ -250,7 +250,7 @@ export  interface MenuSection {
 
     return {
       header: 'Finishing Up', 
-      pages: [...appPages.filter(page => page.header === 'Finishing Up')]
+      pages: updatedFinishingUpPages
     }
 }
 
