@@ -33,19 +33,11 @@ const Welcome: React.FC<InitSessionApp> = props => {
 
     const handleAccountTypeSelected = (event: CustomEvent) => {
         if (event.detail.value.includes('Inherited')) {
-<<<<<<< HEAD
             props.welcomePageFields.account_type = event.detail.value
             props.welcomePageFields.rollover_form = false
             props.welcomePageFields.cash_contribution_form = false
             props.setWelcomePageFields(
                 {...props.welcomePageFields,
-=======
-            props.setInitialValues(
-                {...props.initialValues,
-                AccountType: event.detail.value,
-                RolloverEmployer: false,
-                CashContribution: false
->>>>>>> c6a7aea1e30e296bd4a1432b2e7a9d523ed8e043
                 }
             )
         } else {
@@ -186,13 +178,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     updateValidationTable('is_welcome_page_valid', true, data.sessionId)
                 })
             })
-<<<<<<< HEAD
             props.updateMenuSections('is_welcome_page_valid', true);
         
-=======
-            props.updateMenuSections('isWelcomePageValid', true);
-
->>>>>>> c6a7aea1e30e296bd4a1432b2e7a9d523ed8e043
     }
 
     const showError = (fieldName: string) => {
@@ -238,13 +225,8 @@ const Welcome: React.FC<InitSessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonItem className={showError('accountType')}>
-<<<<<<< HEAD
                             <IonSelect interface='action-sheet' value={props.welcomePageFields.account_type} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
                             {accountTypes.map((accountType, index) => 
-=======
-                            <IonSelect interface='action-sheet' value={props.initialValues.AccountType} onIonChange={handleAccountTypeSelected} name='accountType' ref={register({required: 'Error message'})}>
-                            {accountTypes.map((accountType, index) =>
->>>>>>> c6a7aea1e30e296bd4a1432b2e7a9d523ed8e043
                             (<IonSelectOption key={index} value={accountType}>
                                 {accountType}
                             </IonSelectOption>))}
