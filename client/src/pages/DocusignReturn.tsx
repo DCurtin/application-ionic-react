@@ -22,13 +22,14 @@ const DocusignReturn: React.FC = () => {
     useEffect(() => {    
         setFormData(prevState => {return {...prevState, showSpinner: true, docusignResult: docusignEvent}});
         handleDocusignReturn(sessionId, formData.docusignResult).then((response : any) => {
-            /*if (docusignResult === 'signing_complete') {
-                downloadPenSignDocs(sessionId).then((response : any) => {
+            setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
+            console.log('docusign ' + docusignEvent);
+            if (docusignEvent === 'signing_complete') {
+                downloadPenSignDocs(sessionId, docusignEvent).then((response : any) => {
                     setDownloadUrl(response);
+                    setFormData(prevState => {return {...prevState, showSpinner:false}});
                 })  
-            }*/
-            console.log('docusignAttempts ' + response.docusignAttempts);
-            setFormData(prevState => {return {...prevState, showSpinner:false, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
+            }
         })    
     },[])
 

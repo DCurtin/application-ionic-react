@@ -169,12 +169,12 @@ export function handleDocusignReturn(sessionId: string, eSignResult: string)
     })
 }
 
-export function downloadPenSignDocs(sessionId: string)
+export function downloadPenSignDocs(sessionId: string, eSignResult: string)
 {
     return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
         
-        xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId, true);
+        xhr.open('GET', '/getPenSignDocs?sessionId=' + sessionId + '&eSignResult=' + eSignResult, true);
         xhr.responseType = "arraybuffer";
 
         xhr.onload = function () {
