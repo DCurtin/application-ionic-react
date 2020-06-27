@@ -152,6 +152,8 @@ app.post('/getESignUrl', (req, res) => {
 });
 
 app.post('/handleDocusignReturn', (req : express.Request, res : express.Response) => {
+  console.log('handleDocusignReturn running on server' );
+  
   let sessionId = req.body.sessionId;
 
   validateSessionId(res, sessionId);
@@ -167,11 +169,16 @@ app.post('/handleDocusignReturn', (req : express.Request, res : express.Response
 
     let body = {'eSignResult': req.body.eSignResult};
   
-    serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
-      if (err) { return console.error(err); }
-      console.log("response: ", data);
-      res.json({docusignAttempts: data.DocusignAttempts, docusignUrl: data.DocusignUrl, accountType: data.AccountType}); 
-      return
+    serverConn.apex.post('/applications/' + application_session.application_id + '/docusign-return', body, function(err : any, data : any) {
+      if (err) { 
+        res.status(500).send(err.message);  
+        return
+      }
+      else {
+        console.log("response: ", data);
+        res.json({docusignAttempts: data.DocusignAttempts, docusignUrl: data.DocusignUrl, accountType: data.AccountType}); 
+        return
+      }
     })
   }).catch()
 });

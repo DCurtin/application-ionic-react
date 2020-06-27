@@ -6,28 +6,28 @@ import axios from 'axios';
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-        const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
-        const [docusignUrl, setDocusignUrl] = useState(''); 
-        useEffect(() => {
-            getESignUrl(sessionId).then((data) =>
-            {
-                let url = data.eSignUrl;
-                console.log('done here');
-                setDocusignUrl(url);
-            }
-            ).catch(() =>
-            {
-                setDocusignUrl('/docusignReturn')
-            })
-        },[sessionId])
+    const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
+    const [docusignUrl, setDocusignUrl] = useState(''); 
+    useEffect(() => {
+        getESignUrl(sessionId).then((data) =>
+        {
+            let url = data.eSignUrl;
+            console.log('done here');
+            setDocusignUrl(url);
+        }
+        ).catch(() =>
+        {
+            setDocusignUrl('/docusignReturn')
+        })
+    },[sessionId])
 
-        useEffect(() => {
-            axios.get('/getPenSignDoc').then((res) => {
+    useEffect(() => {
+        axios.get('/getPenSignDoc').then((res) => {
 
-            })
-        },[])
+        })
+    },[])
 
-        return (
+    return (
         <IonContent className='ion-padding'>
             <IonGrid>
                 {docusignSignAttempts < 2 && (

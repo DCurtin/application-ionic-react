@@ -11,21 +11,24 @@ const DocusignReturn: React.FC = () => {
     const [formData, setFormData] = useState<FormData>({
         docusignAttempts: '',
         docusignUrl: '', 
-        accountType: ''
+        accountType: '',
+        showSpinner: false,
+        docusignResult: ''
     });
 
     let queryStringParams = new URLSearchParams(useLocation().search);
-    let docusignResult = (queryStringParams.get('event') || '{}');
-    
-    useEffect(() => {
-        setFormData(prevState => {return {...prevState, docusignAttempts: 0}});
-        handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
-            setFormData(prevState => {return {...prevState, docusignAttempts: response.DocusignAttempts, docusignUrl: response.DocusignUrl, accountType: response.AccountType}});
-            if (docusignResult = 'signing_complete') {
+    let docusignEvent = (queryStringParams.get('event') || '{}');
+
+    useEffect(() => {    
+        setFormData(prevState => {return {...prevState, showSpinner: true, docusignResult: docusignEvent}});
+        handleDocusignReturn(sessionId, formData.docusignResult).then((response : any) => {
+            /*if (docusignResult === 'signing_complete') {
                 downloadPenSignDocs(sessionId).then((response : any) => {
                     setDownloadUrl(response);
                 })  
-            }
+            }*/
+            console.log('docusignAttempts ' + response.docusignAttempts);
+            setFormData(prevState => {return {...prevState, showSpinner:false, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
         })    
     },[])
 
@@ -43,7 +46,12 @@ const DocusignReturn: React.FC = () => {
             </IonHeader>
 
             <IonContent className='ion-padding'>
-                {docusignResult === 'signing_complete' &&
+                {formData.accountType === '' && 
+                    <h3 color='primary'>
+                        LOADING SIGNATURE DOCUMENTS...
+                    </h3>
+                }
+                {formData.docusignResult === 'signing_complete' && formData.docusignAttempts === 0 &&
                     <>
                         <h3 color='primary'>
                             ONLINE APPLICATION: IMPORTANT FINAL STEPS
@@ -57,7 +65,7 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
-                <IonLoading isOpen={downloadUrl === ''} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
+                <IonLoading isOpen={formData.showSpinner} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
                 {downloadUrl !== '' &&
                     <IonRow>
                         <IonCol>

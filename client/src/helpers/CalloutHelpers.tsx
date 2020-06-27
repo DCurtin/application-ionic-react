@@ -163,6 +163,7 @@ export function handleDocusignReturn(sessionId: string, eSignResult: string)
         return response.json().then(function(data: any){
             return data;
         }).catch(function(error: any) {
+            console.log('error in handleDocusignReturn in callout helpers');
             console.log('error: ' + error);
         })
     })
