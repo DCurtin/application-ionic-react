@@ -17,22 +17,42 @@ const DocusignReturn: React.FC = () => {
         downloadUrl: ''
     });
 
-    useEffect(() => {    
+    useEffect(() => { 
         const searchParams = new URLSearchParams(location.search);
         const docusignResult = searchParams.get('event') || '{}';
         setFormData(prevState => {return {...prevState, showSpinner: true, docusignResult: docusignResult}});
         
         handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
             setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
-            console.log(docusignResult);
-            console.log(response.docusignAttempts);
-            if (docusignResult === 'signing_complete' || (docusignResult === 'id_check_failed' && response.docusignAttempts >= 1)) {
+            if (docusignResult === 'signing_complete' || (docusignResult === 'id_check_failed' && response.docusignAttempts >= 2)) {
                 downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
                     setFormData(prevState => {return {...prevState, downloadUrl: response, showSpinner:false}});
                 })  
             }
-        })    
+            else if (docusignResult === 'id_check_failed' && response.docusignAttempts === 1) {
+                setFormData(prevState => {return {...prevState, showSpinner:false}});    
+            }
+        }).catch(function(error: any) {
+            //setFormData(prevState => {return {...prevState, paymentStatus: 'Error', paymentStatusDetails: error.message}});
+            console.log('docusign return error ' + error);
+        })
     },[])
+
+    const downloadFullSigningDoc = (formData: any) => {
+        const searchParams = new URLSearchParams(location.search);
+        const docusignResult = searchParams.get('event') || '{}';
+        setFormData(prevState => {return {...prevState, showSpinner: true}});
+
+        downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
+            const link = document.createElement('a');
+            link.href = response;
+            link.setAttribute('download', 'Midland_Application_Documents.pdf');
+            document.body.appendChild(link);
+            link.click();
+            //link.parentNode.removeChild(link);
+            setFormData(prevState => {return {...prevState, showSpinner:false}});
+        })      
+    }
 
     return (
         <IonPage>
@@ -81,7 +101,7 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
-                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts === 0 &&
+                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts === 1 &&
                     <>
                         <b>Whoops!  Midland was unable to verify your identity.</b>
                         <br/>
@@ -108,18 +128,15 @@ const DocusignReturn: React.FC = () => {
                                 <br/>
                             </>
                         }
-                    {/*<p>
-                        <a class="btn btn-primary" href="{!DocusignUrl}">Proceed to E-Signature</a>
-                        
-                        <apex:outputPanel rendered="{!NOT(CONTAINS(appl.Account_Type__c, '401k'))}">
-                            <apex:outputLink styleClass="btn btn-primary" rendered="{!signatureCardAttachmentId != null}" value="services/apexrest/ApplicationAttachment/getAttachmentDoc?applicationId={!appl.Id}&token={!appl.Token__c}">Download My Signature Document</apex:outputLink>
-                            <apex:outputText rendered="{!signatureCardAttachmentId == null}" value="">Downloading Signature Document...</apex:outputText>
-                            <apex:actionPoller action="{!setSignatureCardAttachmentId}" interval="10"  reRender="docusignFail1" enabled="{!signatureCardAttachmentId == null}" timeout="180000" />
-                        </apex:outputPanel>
-                    </p>   */}    
+                        <p>
+                            <IonButton color="primary" href={formData.docusignUrl}>Proceed to E-Signature</IonButton>
+                        </p>
+                        <p>
+                            <IonButton color="primary" onClick={() => downloadFullSigningDoc(formData)}>Download My Signature Document</IonButton>
+                        </p>
                     </>
                 }
-                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts >= 1 && formData.accountType.includes('401') === false &&
+                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts >= 2 && formData.accountType.includes('401') === false &&
                     <>
                         <b>Whoops!  Midland was unable to verify your identity.</b>
                         <br/>
@@ -183,7 +200,7 @@ const DocusignReturn: React.FC = () => {
                     </>
                 }        
                 <IonLoading isOpen={formData.showSpinner} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
-                {formData.downloadUrl !== '' &&
+                {formData.downloadUrl !== '' && (formData.docusignResult === 'signing_complete' || (formData.docusignResult === 'id_check_failed' && formData.docusignAttempts >= 2)) &&
                     <IonRow>
                         <IonCol>
                             <a className="btn btn-primary" href={formData.downloadUrl} download = 'Midland_Application_Documents.pdf'>
