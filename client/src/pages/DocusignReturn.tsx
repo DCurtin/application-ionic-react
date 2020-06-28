@@ -24,8 +24,9 @@ const DocusignReturn: React.FC = () => {
         
         handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
             setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
-            
-            if (docusignResult === 'signing_complete' || (docusignResult === 'id_check_failed' && formData.docusignAttempts >= 1)) {
+            console.log(docusignResult);
+            console.log(response.docusignAttempts);
+            if (docusignResult === 'signing_complete' || (docusignResult === 'id_check_failed' && response.docusignAttempts >= 1)) {
                 downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
                     setFormData(prevState => {return {...prevState, downloadUrl: response, showSpinner:false}});
                 })  
@@ -93,7 +94,7 @@ const DocusignReturn: React.FC = () => {
                         <br/>
                         {formData.accountType.includes('401') === false &&
                             <>
-                                You may also skip the verification questions / electronic submission and print your application instead by <a href="services/apexrest/ApplicationAttachment/getAttachmentDoc?applicationId={!appl.Id}&token={!appl.Token__c}">clicking here</a>. If you decide to skip the verification questions, be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
+                                You may also skip the verification questions / electronic submission and print your application instead by clicking the download button below. If you decide to skip the verification questions, be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
                                 <br/>
                                 <a href="https://www.midlandira.com/secure-upload">https://www.midlandira.com/secure-upload/</a>
                                 <br/>
@@ -127,7 +128,7 @@ const DocusignReturn: React.FC = () => {
                             <>
                                 As a financial institution, Midland is required to verify your identity.  During the application process, you were unable to answer some (or all) of the identity verification questions.
                 
-                                Because you were unable to answer the identity verification questions, you will need to print your application by <a href="services/apexrest/ApplicationAttachment/getAttachmentDoc?applicationId={!appl.Id}&token={!appl.Token__c}">clicking here</a>.
+                                Because you were unable to answer the identity verification questions, you will need to print your application by clicking the download button below.
                                 <br/><br/>
                                 Be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
                                 <br/>
@@ -138,8 +139,9 @@ const DocusignReturn: React.FC = () => {
                                 <br/>PO Box 07520
                                 <br/>  Fort Myers, FL 33919.
                                 <br/><br/>
+                                <p>
                                 Thank you for your interest in opening an account with Midland.  Once received, Midland's new account team will review your application and a knowledgeable dedicated representative will reach out to you.  We look forward to a lasting relationship. Feel free to contact Midland at 866-839-0429 if you need anything at all.
-                                <br/>
+                                </p>
                             </>
                         }
                         {formData.accountType.includes('401') &&
