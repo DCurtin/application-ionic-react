@@ -7,14 +7,17 @@ import { useParams, useLocation } from 'react-router';
 const DocusignReturn: React.FC = () => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
     const location = useLocation();
+    const SIGNING_COMPLETE = 'signing_complete';
+    const ID_CHECK_FAILED = 'id_check_failed';
     
     const [formData, setFormData] = useState<FormData>({
         docusignAttempts: '',
         docusignUrl: '', 
         accountType: '',
-        showSpinner: false,
         docusignResult: '',
-        downloadUrl: ''
+        downloadUrl: '',
+        showSpinner: false,
+        errorMsg: ''
     });
 
     useEffect(() => { 
@@ -24,19 +27,24 @@ const DocusignReturn: React.FC = () => {
         
         handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
             setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
-            if (docusignResult === 'signing_complete' || (docusignResult === 'id_check_failed' && response.docusignAttempts >= 2)) {
-                downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
-                    setFormData(prevState => {return {...prevState, downloadUrl: response, showSpinner:false}});
-                })  
+            if (shouldDownloadPenSignDocOnPageLoad(docusignResult, response.docusignAttempts)) {
+                downloadPenSignDocsAfterEsignSuccess(sessionId, docusignResult);    
             }
-            else if (docusignResult === 'id_check_failed' && response.docusignAttempts === 1) {
-                setFormData(prevState => {return {...prevState, showSpinner:false}});    
+            else if (docusignResult === ID_CHECK_FAILED && response.docusignAttempts === 1) {
+                setFormData(prevState => {return {...prevState, showSpinner: false}});    
             }
         }).catch(function(error: any) {
-            //setFormData(prevState => {return {...prevState, paymentStatus: 'Error', paymentStatusDetails: error.message}});
-            console.log('docusign return error ' + error);
+            setFormData(prevState => {return {...prevState, errorMsg:'Error preparing the final application steps.', showSpinner: false}});     
         })
     },[])
+
+    const downloadPenSignDocsAfterEsignSuccess = (formData: any, docusignResult: string) => {
+        downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
+            setFormData(prevState => {return {...prevState, downloadUrl: response, showSpinner:false}});
+        }).catch(function(error: any) {
+            setFormData(prevState => {return {...prevState, errorMsg:'Unable to download the signature document.', showSpinner: false}});           
+        })
+    }
 
     const downloadFullSigningDoc = (formData: any) => {
         const searchParams = new URLSearchParams(location.search);
@@ -49,9 +57,12 @@ const DocusignReturn: React.FC = () => {
             link.setAttribute('download', 'Midland_Application_Documents.pdf');
             document.body.appendChild(link);
             link.click();
-            //link.parentNode.removeChild(link);
             setFormData(prevState => {return {...prevState, showSpinner:false}});
         })      
+    }
+
+    const shouldDownloadPenSignDocOnPageLoad = (docusignResult: string, docusignAttempts: number) => {
+        return docusignResult === SIGNING_COMPLETE || (docusignResult === ID_CHECK_FAILED && docusignAttempts >= 2);
     }
 
     return (
@@ -73,7 +84,12 @@ const DocusignReturn: React.FC = () => {
                         LOADING SIGNATURE DOCUMENTS...
                     </h3>
                 }
-                {formData.docusignResult === 'signing_complete' && formData.accountType.includes('401') === false &&
+                {formData.errorMsg !== '' &&
+                    <IonRow>
+                        Error: {formData.errorMsg}
+                    </IonRow>
+                }
+                {formData.docusignResult === SIGNING_COMPLETE && formData.accountType.includes('401') === false &&
                     <>
                         <h3 color='primary'>
                             ONLINE APPLICATION: IMPORTANT FINAL STEPS
@@ -87,7 +103,7 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
-                {formData.docusignResult === 'signing_complete' && formData.accountType.includes('401') &&
+                {formData.docusignResult === SIGNING_COMPLETE && formData.accountType.includes('401') &&
                     <>
                         <h3 color='primary'>
                             ONLINE APPLICATION: COMPLETED
@@ -101,7 +117,7 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
-                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts === 1 &&
+                {formData.docusignResult === ID_CHECK_FAILED && formData.docusignAttempts === 1 &&
                     <>
                         <b>Whoops!  Midland was unable to verify your identity.</b>
                         <br/>
@@ -136,7 +152,7 @@ const DocusignReturn: React.FC = () => {
                         </p>
                     </>
                 }
-                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts >= 2 && formData.accountType.includes('401') === false &&
+                {formData.docusignResult === ID_CHECK_FAILED && formData.docusignAttempts >= 2 && formData.accountType.includes('401') === false &&
                     <>
                         <b>Whoops!  Midland was unable to verify your identity.</b>
                         <br/>
@@ -200,7 +216,7 @@ const DocusignReturn: React.FC = () => {
                     </>
                 }        
                 <IonLoading isOpen={formData.showSpinner} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
-                {formData.downloadUrl !== '' && (formData.docusignResult === 'signing_complete' || (formData.docusignResult === 'id_check_failed' && formData.docusignAttempts >= 2)) &&
+                {formData.downloadUrl !== '' && (formData.docusignResult === SIGNING_COMPLETE || (formData.docusignResult === ID_CHECK_FAILED && formData.docusignAttempts >= 2)) &&
                     <IonRow>
                         <IonCol>
                             <a className="btn btn-primary" href={formData.downloadUrl} download = 'Midland_Application_Documents.pdf'>
