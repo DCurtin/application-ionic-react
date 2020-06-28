@@ -6,28 +6,28 @@ import { useParams, useLocation } from 'react-router';
 
 const DocusignReturn: React.FC = () => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
-    const [downloadUrl, setDownloadUrl] = useState(''); 
-
+    const location = useLocation();
+    
     const [formData, setFormData] = useState<FormData>({
         docusignAttempts: '',
         docusignUrl: '', 
         accountType: '',
         showSpinner: false,
-        docusignResult: ''
+        docusignResult: '',
+        downloadUrl: ''
     });
 
-    let queryStringParams = new URLSearchParams(useLocation().search);
-    let docusignEvent = (queryStringParams.get('event') || '{}');
-
     useEffect(() => {    
-        setFormData(prevState => {return {...prevState, showSpinner: true, docusignResult: docusignEvent}});
-        handleDocusignReturn(sessionId, formData.docusignResult).then((response : any) => {
+        const searchParams = new URLSearchParams(location.search);
+        const docusignResult = searchParams.get('event') || '{}';
+        setFormData(prevState => {return {...prevState, showSpinner: true, docusignResult: docusignResult}});
+        
+        handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
             setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
-            console.log('docusign ' + docusignEvent);
-            if (docusignEvent === 'signing_complete') {
-                downloadPenSignDocs(sessionId, docusignEvent).then((response : any) => {
-                    setDownloadUrl(response);
-                    setFormData(prevState => {return {...prevState, showSpinner:false}});
+            
+            if (docusignResult === 'signing_complete' || (docusignResult === 'id_check_failed' && formData.docusignAttempts >= 1)) {
+                downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
+                    setFormData(prevState => {return {...prevState, downloadUrl: response, showSpinner:false}});
                 })  
             }
         })    
@@ -118,6 +118,43 @@ const DocusignReturn: React.FC = () => {
                     </p>   */}    
                     </>
                 }
+                {formData.docusignResult === 'id_check_failed' && formData.docusignAttempts >= 1 && formData.accountType.includes('401') === false &&
+                    <>
+                        <b>Whoops!  Midland was unable to verify your identity.</b>
+                        <br/>
+                        <br/>
+                        {formData.accountType.includes('401') === false &&
+                            <>
+                                As a financial institution, Midland is required to verify your identity.  During the application process, you were unable to answer some (or all) of the identity verification questions.
+                
+                                Because you were unable to answer the identity verification questions, you will need to print your application by <a href="services/apexrest/ApplicationAttachment/getAttachmentDoc?applicationId={!appl.Id}&token={!appl.Token__c}">clicking here</a>.
+                                <br/><br/>
+                                Be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
+                                <br/>
+                                <a href="https://www.midlandira.com/secure-upload/">https://www.midlandira.com/secure-upload/</a>
+                                <br/>
+                                <br/>
+                                You may also fax your application to 239-466-5496 or mail it to:
+                                <br/>PO Box 07520
+                                <br/>  Fort Myers, FL 33919.
+                                <br/><br/>
+                                Thank you for your interest in opening an account with Midland.  Once received, Midland's new account team will review your application and a knowledgeable dedicated representative will reach out to you.  We look forward to a lasting relationship. Feel free to contact Midland at 866-839-0429 if you need anything at all.
+                                <br/>
+                            </>
+                        }
+                        {formData.accountType.includes('401') &&
+                            <>
+                                <p>
+                                    As a financial institution, Midland is required to verify your identity. During the application process, you were unable to answer some (or all) of the identifying verification questions. Please contact our new accounts team for assistance completing your application. 
+                                </p>
+                                <br/><br/>
+                                <p>
+                                    Please call 239.333.1032 Option 2.
+                                </p>
+                            </>
+                        }
+                    </>
+                }
                 {formData.docusignResult.includes('session_timeout') || formData.docusignResult.includes('ttl_expired') &&
                     <>
                         <h2>Whoops! We see that the session has timed out.</h2>
@@ -144,10 +181,10 @@ const DocusignReturn: React.FC = () => {
                     </>
                 }        
                 <IonLoading isOpen={formData.showSpinner} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
-                {downloadUrl !== '' &&
+                {formData.downloadUrl !== '' &&
                     <IonRow>
                         <IonCol>
-                            <a className="btn btn-primary" href={downloadUrl} download = 'Midland_Application_Documents.pdf'>
+                            <a className="btn btn-primary" href={formData.downloadUrl} download = 'Midland_Application_Documents.pdf'>
                                 <IonButton>Download My Signature Document</IonButton>
                             </a>
                         </IonCol>    
