@@ -44,6 +44,7 @@ if(qaUser === 'test' || qaPw === 'test')
 }else{
   serverConn.login(process.env.qaUserId, process.env.qaUserPw).then(function(userInfo : any) {
     console.log('token: ' + serverConn.accessToken)
+    console.log(`instance url: ${serverConn.instanceUrl}`
   }).catch((err)=>{
     if (err) {
       console.log(err);
@@ -235,7 +236,9 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     //************************************************************************************************************************** 
     //TODO: THIS IS HARD CODED TO QA RIGHT NOW!!!!!!!!!!!!!!!!!!!!!!!!!
     //
-    let endpoint = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
+    let instanceUrl = serverConn.instanceUrl || 'https://entrust--qa.my.salesforce.com'
+
+    let endpoint = instanceUrl+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
     console.log('getPenSignDoc enpoint: ' + endpoint);
 
     let options = {
