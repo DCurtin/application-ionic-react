@@ -12,11 +12,11 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
         text : 'SELECT * FROM salesforce.body WHERE token = $1',
         values : [sessionId]
       }
-      client.query(bodyQuery).then( function(result:any){
+      client.query(bodyQuery).then( function(result: pg.QueryResult<salesforceSchema.body>){
       //get data from database
       //load into response
-      let welcomePage : welcomePageParameters;
-      let rows = result['rows'];
+      let welcomePage : Partial<welcomePageParameters> = {};
+      let rows = result.rows[0];
       welcomePage.AccountType = rows.account_type;
       welcomePage.TransferIra = rows.transfer_form;
       welcomePage.RolloverEmployer = rows.rollover_form;
@@ -28,6 +28,7 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       
       res.json(welcomePage);
     }).catch(err=>{
+      console.log(err)
       res.status(500).send('failed getting body data');
     })
 }

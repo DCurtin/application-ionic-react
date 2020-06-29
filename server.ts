@@ -332,7 +332,7 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   let requestPacket:applicationInterfaces.requestBody = req.body;
   let sessionId = requestPacket.session.sessionId;
   let page = requestPacket.session.page;
-
+  console.log(`page: ${page} sessionId: ${sessionId}`)
   if(sessionId === ''){
     console.log('no sessionId set');
     res.status(500).send('no sessionId');
