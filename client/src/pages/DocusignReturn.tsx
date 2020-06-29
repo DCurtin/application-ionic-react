@@ -129,7 +129,7 @@ const DocusignReturn: React.FC = () => {
                             <>
                                 You may also skip the verification questions / electronic submission and print your application instead by clicking the download button below. If you decide to skip the verification questions, be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
                                 <br/>
-                                <a href="https://www.midlandira.com/secure-upload">https://www.midlandira.com/secure-upload/</a>
+                                <a href="https://www.midlandtrust.com/secure-upload">https://www.midlandtrust.com/secure-upload/</a>
                                 <br/>
                                 <br/>
                                 You may also fax your application to 239-466-5496 or mail it to:                    <br/>
@@ -162,7 +162,7 @@ const DocusignReturn: React.FC = () => {
                                 <br/><br/>
                                 Be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
                                 <br/>
-                                <a href="https://www.midlandira.com/secure-upload/">https://www.midlandira.com/secure-upload/</a>
+                                <a href="https://www.midlandtrust.com/secure-upload/">https://www.midlandtrust.com/secure-upload/</a>
                                 <br/>
                                 <br/>
                                 You may also fax your application to 239-466-5496 or mail it to:
