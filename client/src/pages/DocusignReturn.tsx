@@ -79,14 +79,11 @@ const DocusignReturn: React.FC = () => {
             </IonHeader>
 
             <IonContent className='ion-padding'>
-                {formData.accountType === '' && 
-                    <h3 color='primary'>
-                        LOADING SIGNATURE DOCUMENTS...
-                    </h3>
-                }
                 {formData.errorMsg !== '' &&
                     <IonRow>
-                        Error: {formData.errorMsg}
+                        <p>
+                            Error: {formData.errorMsg}
+                        </p>
                     </IonRow>
                 }
                 {formData.docusignResult === SIGNING_COMPLETE && formData.accountType.includes('401') === false &&
