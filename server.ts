@@ -44,7 +44,7 @@ if(qaUser === 'test' || qaPw === 'test')
 }else{
   serverConn.login(process.env.qaUserId, process.env.qaUserPw).then(function(userInfo : any) {
     console.log('token: ' + serverConn.accessToken)
-    console.log(`instance url: ${serverConn.instanceUrl}`
+    console.log(`instance url: ${serverConn.instanceUrl}`)
   }).catch((err)=>{
     if (err) {
       console.log(err);
