@@ -11,14 +11,14 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
     const ID_CHECK_FAILED = 'id_check_failed';
 
     const [showSpinner, setShowSpinner] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
     
     const [formData, setFormData] = useState<FormData>({
         docusignAttempts: '',
         docusignUrl: '', 
         accountType: '',
         docusignResult: '',
-        downloadUrl: '',
-        errorMsg: ''
+        downloadUrl: ''
     });
 
     useEffect(() => { 
@@ -44,7 +44,7 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
                 setShowSpinner(false); 
             } 
         }).catch(function() {
-            setFormData(prevState => {return {...prevState, errorMsg:'Error preparing the final application steps.'}});     
+            setErrorMsg('Error preparing the final application steps.');     
             setShowSpinner(false); 
         })
     },[])
@@ -54,7 +54,7 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
             setFormData(prevState => {return {...prevState, downloadUrl: response}});
             setShowSpinner(false);
         }).catch(function() {
-            setFormData(prevState => {return {...prevState, errorMsg:'Unable to download the signature document.'}});           
+            setErrorMsg('Unable to download the signature document.');               
             setShowSpinner(false);
         })
     }
@@ -92,10 +92,10 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
             </IonHeader>
 
             <IonContent className='ion-padding'>
-                {formData.errorMsg !== '' &&
+                {errorMsg !== '' &&
                     <IonRow>
                         <p>
-                            Error: {formData.errorMsg}
+                            Error: {errorMsg}
                         </p>
                     </IonRow>
                 }
