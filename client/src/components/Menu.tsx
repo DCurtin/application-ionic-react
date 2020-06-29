@@ -7,12 +7,12 @@ import {
   IonListHeader,
   IonMenu,
   IonMenuToggle,
-  IonImg,
   IonToolbar,
-  IonTitle,
+  IonFooter,
+  IonText,
 } from '@ionic/react';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import './Menu.css';
 import { AppPage } from '../helpers/MenuGenerator';
@@ -35,7 +35,7 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   let appPages = menuSections.flatMap(menuSection => menuSection.pages);
   return (
     <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN') || location.pathname.toUpperCase().includes('RESUME')}>
-      <IonContent forceOverscroll={true}>
+      <IonContent forceOverscroll={false}>
         <IonList id="inbox-list">
           {menuSections.map((menuSection, index) => {
             return (
@@ -55,13 +55,25 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
             )
           })}
         </IonList>
-        {/* <IonToolbar color="primary">
-            <IonTitle>FAQs</IonTitle>
-        </IonToolbar>
-        <IonToolbar color="primary">
-          <IonTitle> Contact Us </IonTitle>
-        </IonToolbar> */}
       </IonContent>
+      <IonFooter>
+        <IonToolbar color="primary">
+            <IonText color='light' className='ion-padding-start ion-text-center'>
+              <strong>
+                Contact Us <br/>
+              </strong>
+            </IonText>
+              <IonText color='light' className='ion-padding-start'>
+                  (239) 333-1032 
+              </IonText> <br/>
+              <IonText color='light' className='ion-padding-start'>
+                  newaccounts@midlandira.com <br/>
+              </IonText>
+              <IonText color='light' className='ion-padding-start'>
+                www.midlandtrust.com
+              </IonText>
+        </IonToolbar>
+      </IonFooter>
     </IonMenu>
   );
 };

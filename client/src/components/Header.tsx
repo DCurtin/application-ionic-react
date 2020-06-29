@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router';
+import {isPlatform } from '@ionic/react';
 import { IonButtons, IonHeader, IonMenuButton, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
 import { chevronBackCircleOutline, chevronForwardCircleOutline
 } from 'ionicons/icons';
