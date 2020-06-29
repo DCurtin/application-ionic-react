@@ -20,8 +20,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
     const watchAllFields = watch();
 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
-
-        const updateForm = (e : any) => {
+    const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
             console.log(e.target.className);
             let originalClass = e.target.className;
@@ -67,7 +66,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
 
         const validateFields = () => {
             saveAppPage(sessionId, formData);
-            updateMenuSections('isOwnerInfoPageValid', true);
+            updateMenuSections('is_owner_info_page_valid', true);
         }
 
         const showError = (fieldName: string) => {

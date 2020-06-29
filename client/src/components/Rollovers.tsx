@@ -23,7 +23,6 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                 ImportForm(data);
             })
         }
-        console.log(sessionId + 'this is my sessionId');
     },[sessionId])
 
     function ImportForm(data : any){
@@ -32,7 +31,6 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     
     useEffect(()=>{
       return history.listen(()=>{
-          console.log(formData)
         saveRolloverPage(sessionId, formData);
       })
     },[formData])
@@ -51,7 +49,6 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
     const updateForm = (e:any) => {
         let newValue = e.target.value;
         setFormData(prevState => {
-            console.log(prevState);
             return {...prevState, [e.target.name]:newValue}});
     }
 

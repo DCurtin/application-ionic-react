@@ -8,7 +8,6 @@ export function transformTransferClientToServer(transferFlattened: any): transfe
         transfers: []
     }
     let transferCount : number = transferForm.existing_transfers;
-    console.log('existing '+transferFlattened['existing_transfers'])
 
     for(let index = 1; index <= transferCount; ++index){
         let castedTransfer : transfer ={

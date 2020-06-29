@@ -1,12 +1,13 @@
 import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import './Page.css';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
+import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
+import {updateValidationTable} from '../helpers/CalloutHelpers'
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -48,15 +49,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const formRef = useRef<HTMLFormElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
-    AccountType: '',
-    InitialInvestment: '',
-    ReferralCode: '',
-    SalesRep: '',
-    SpecifiedSource: '',
-    CashContribution: false,
-    RolloverEmployer: false,
-    TransferIra: false,
-    HasReadDisclosure: false
+    account_type: '',
+    investment_type: '',
+    referral_code: '',
+    sales_rep: '',
+    referred_by: '',
+    cash_contribution_form: false,
+    rollover_form: false,
+    transfer_form: false,
+    has_read_diclosure: false
   });
 
   const [currentState, setCurrentState] = useState<userState>({
@@ -65,21 +66,22 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
-  useEffect(function(){
+  useLayoutEffect(function(){
     let formParams = {...menuParams};
-    
-    formParams.transferForm = welcomePageFields.TransferIra;
-    formParams.rolloverForm = welcomePageFields.RolloverEmployer;
-    formParams.newContribution = welcomePageFields.CashContribution;
-    formParams.planInfo = welcomePageFields.AccountType.includes('SEP');
-    formParams.is401k = welcomePageFields.AccountType.includes('401k');
 
-    formParams.initialInvestment = (welcomePageFields.InitialInvestment !== "I'm Not Sure" && welcomePageFields.InitialInvestment !== '')
+    
+    formParams.transferForm = welcomePageFields.transfer_form;
+    formParams.rolloverForm = welcomePageFields.rollover_form;
+    formParams.newContribution = welcomePageFields.cash_contribution_form;
+    formParams.planInfo = welcomePageFields.account_type.includes('SEP');
+    formParams.is401k = welcomePageFields.account_type.includes('401k');
+
+    formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
     setMenuParams(formParams);
-  },[welcomePageFields])
+  },[welcomePageFields]) //setMenuParams is this a required dependency?
   
-  useEffect(function(){
+  useLayoutEffect(function(){
     let url = '/getPageFields'
     let body : requestBody ={
         session: {sessionId: sessionId, page: 'rootPage'},
@@ -92,12 +94,32 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
     fetch(url, options).then((response)=>{
       response.json().then((data:any)=>{
-        console.log(data)
-        setWelcomePageFields(data.welcomePageFields);
+        setWelcomePageFields(data.data);
       })
     })
-    
-  },[])
+
+    let urlValidation = '/getValidatedPages'
+    let bodyValidation : requestBody ={
+        session: {sessionId: sessionId, page: 'rootPage'},
+        data: undefined
+    }
+    let optionsValidation = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(bodyValidation)
+    }
+    fetch(urlValidation, optionsValidation).then((response)=>{
+      response.json().then((data:any)=>{
+        console.log(data);
+        let validationParamters : PageValidationParamters = data.data;
+        let menuParamsUpdate :MenuParameters = {...menuParams, ...validationParamters
+        }
+        console.log(menuParamsUpdate);
+        setMenuParams(menuParamsUpdate)
+      })
+    })
+  },[sessionId])
+
   const { name } = useParams<{ name: string; }>();
 
   useEffect(() => {    
@@ -150,9 +172,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       case 'Disclosures':
-        return <Disclosures initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections} formRef={formRef} />;
+        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} />;
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       case 'Beneficiaries':
@@ -174,7 +196,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'ReviewAndSign':
         return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
       default: 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
     }
   }
 
@@ -207,6 +229,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     
     updateMenuParams(page, isPageValid);
     
+    if(page !== 'is_welcome_page_valid')
+    {
+      updateValidationTable(page, isPageValid, sessionId);
+    }
+
     if (isPageValid){
       let path = currentState.nextPage?.url;
       if (path){
@@ -215,8 +242,9 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
   }
 
+
   const updateMenuParams = (page: string, isValid: boolean) => {
-    let currentMenuParams = {...menuParams};
+    let currentMenuParams : any = {...menuParams};
     currentMenuParams[page] = isValid; 
     setMenuParams(currentMenuParams);
   }

@@ -1,4 +1,5 @@
 Identifier,Type,Unique,Required
-account_number,text,yes,yes
-application_id,text,yes,yes
-token,uuid,yes,yes
+account_number,text,,yes
+application_id,text,,yes
+last_active,decimal,,yes
+session_id,uuid,yes,yes

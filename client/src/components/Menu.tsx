@@ -34,8 +34,8 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
   let appPages = menuSections.flatMap(menuSection => menuSection.pages);
   return (
-    <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN')}>
-      <IonContent forceOverscroll={false}>
+    <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN') || location.pathname.toUpperCase().includes('RESUME')}>
+      <IonContent forceOverscroll={true}>
         <IonList id="inbox-list">
           {menuSections.map((menuSection, index) => {
             return (
