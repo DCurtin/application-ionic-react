@@ -118,8 +118,12 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
       let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
     
       serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
-        if (err) { return console.error(err); }
+        if (err) { 
+          res.status(500).send(err.message);  
+          return
+        }
         console.log("response: ", data);
+        
         if(data.status === 'Completed')
         {
           let insertString = 'INSERT INTO salesforce.payment(statusdetails, status, paymentamount, discountamount, session_id) VALUES($1, $2, $3, $4, $5)';
@@ -133,7 +137,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
       })
     }).catch()
   })
-});
+})
 
 app.post('/getESignUrl', (req, res) => {
   console.log('Get ESignUrl on server');
@@ -150,7 +154,7 @@ app.post('/getESignUrl', (req, res) => {
     values: [sessionId]
   }
 
-  client.query(sessionQuery).then(function(result:pg.QueryResult){
+  client.query(sessionQuery).then(function(result:pg.QueryResult<salesforceSchema.application_session>){
     if(result.rowCount == 0)
     {
       console.log('no application')
@@ -158,7 +162,7 @@ app.post('/getESignUrl', (req, res) => {
       return;
     }
     
-    let application_session : salesforceSchema.application_session = result.rows[0];
+    let application_session = result.rows[0];
     let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
     let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
 
@@ -371,7 +375,7 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   let requestPacket:applicationInterfaces.requestBody = req.body;
   let sessionId = requestPacket.session.sessionId;
   let page = requestPacket.session.page;
-
+  console.log(`page: ${page} sessionId: ${sessionId}`)
   if(sessionId === ''){
     console.log('no sessionId set');
     res.status(500).send('no sessionId');

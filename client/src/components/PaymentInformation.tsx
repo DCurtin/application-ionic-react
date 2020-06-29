@@ -5,13 +5,13 @@ import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton
 import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef}) => {
-    const {register, handleSubmit, watch, errors} = useForm(); 
+    const {handleSubmit, errors} = useForm(); 
     const [formData, setFormData] = useState<FormData>({
         creditCardNumber: '',
         expirationDateString: '',
-        creditCardStatus: '', 
         paymentAmount: '', 
-        creditCardStatusDetails: ''
+        paymentStatus: '', 
+        paymentStatusDetails: ''
     });
 
     const updateForm = (e:any) => {
@@ -21,9 +21,11 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
     }
 
     const processCreditCard = (formData: any) => {
-        setFormData(prevState => {return {...prevState, creditCardStatus: 'Pending'}});
+        setFormData(prevState => {return {...prevState, paymentStatus: 'Pending'}});
         chargeCreditCard(formData,sessionId).then(function(response: any) {
-            setFormData(prevState => {return {...prevState, creditCardStatus: response.Status, creditCardStatusDetails: response.StatusDetails, paymentAmount: response.PaymentAmount}});
+            setFormData(prevState => {return {...prevState, paymentStatus: 'Success', paymentAmount: response.PaymentAmount}});
+        }).catch(function(error: any) {
+            setFormData(prevState => {return {...prevState, paymentStatus: 'Error', paymentStatusDetails: error.message}});
         })
     }
 
@@ -49,7 +51,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
                             </IonText>
                         </strong>
                     </IonItemDivider>
-                    {formData.creditCardStatus !== 'Completed' &&
+                    {formData.paymentStatus !== 'Success' &&
                         <>
                             <IonRow>
                                 <IonCol>
@@ -72,13 +74,13 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
                             </IonRow>
                         </>
                     }               
-                    <IonLoading isOpen={formData.creditCardStatus === 'Pending'} message={'Applying Payment...'} spinner="lines"></IonLoading>
-                    {formData.creditCardStatus === 'Error' &&
+                    <IonLoading isOpen={formData.paymentStatus === 'Pending'} message={'Applying Payment...'} spinner="lines"></IonLoading>
+                    {formData.paymentStatus === 'Error' &&
                         <IonRow>
-                            Error - {formData.creditCardStatusDetails}
+                            Error - {formData.paymentStatusDetails}
                         </IonRow>
                     }
-                    {formData.creditCardStatus === 'Completed' &&
+                    {formData.paymentStatus === 'Success' &&
                         <IonRow>
                             Thank you for your payment of ${formData.paymentAmount}.
                             {/*on the card ending
