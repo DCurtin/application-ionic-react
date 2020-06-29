@@ -54,10 +54,8 @@ const App: React.FC = () => {
         <IonSplitPane contentId="main">
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
-            <Route path='/docusignReturn/:sessionId'>
-              <DocusignReturn/>
-            </Route>
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections} setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
+            <Route path='/docusignReturn/:sessionId' render={(props) => <DocusignReturn {...props} setSessionId={setSessionId}/>}/> 
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>

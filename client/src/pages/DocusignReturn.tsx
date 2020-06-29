@@ -4,11 +4,13 @@ import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonCont
 import {handleDocusignReturn, downloadPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
 
-const DocusignReturn: React.FC = () => {
+const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
     const location = useLocation();
     const SIGNING_COMPLETE = 'signing_complete';
     const ID_CHECK_FAILED = 'id_check_failed';
+
+    const [showSpinner, setShowSpinner] = useState(false);
     
     const [formData, setFormData] = useState<FormData>({
         docusignAttempts: '',
@@ -16,40 +18,51 @@ const DocusignReturn: React.FC = () => {
         accountType: '',
         docusignResult: '',
         downloadUrl: '',
-        showSpinner: false,
         errorMsg: ''
     });
 
     useEffect(() => { 
+        setShowSpinner(true);
+        setSessionId(sessionId);
         const searchParams = new URLSearchParams(location.search);
         const docusignResult = searchParams.get('event') || '{}';
-        setFormData(prevState => {return {...prevState, showSpinner: true, docusignResult: docusignResult}});
+        setFormData(prevState => {return {...prevState, docusignResult: docusignResult}});
         
         handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
             setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
+            
+            console.log(docusignResult);
+            console.log(docusignResult.includes('session_timeout'));
+
             if (shouldDownloadPenSignDocOnPageLoad(docusignResult, response.docusignAttempts)) {
                 downloadPenSignDocsAfterEsignSuccess(sessionId, docusignResult);    
             }
             else if (docusignResult === ID_CHECK_FAILED && response.docusignAttempts === 1) {
-                setFormData(prevState => {return {...prevState, showSpinner: false}});    
+                setShowSpinner(false);  
             }
-        }).catch(function(error: any) {
-            setFormData(prevState => {return {...prevState, errorMsg:'Error preparing the final application steps.', showSpinner: false}});     
+            else {
+                setShowSpinner(false); 
+            } 
+        }).catch(function() {
+            setFormData(prevState => {return {...prevState, errorMsg:'Error preparing the final application steps.'}});     
+            setShowSpinner(false); 
         })
     },[])
 
     const downloadPenSignDocsAfterEsignSuccess = (formData: any, docusignResult: string) => {
         downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
-            setFormData(prevState => {return {...prevState, downloadUrl: response, showSpinner:false}});
-        }).catch(function(error: any) {
-            setFormData(prevState => {return {...prevState, errorMsg:'Unable to download the signature document.', showSpinner: false}});           
+            setFormData(prevState => {return {...prevState, downloadUrl: response}});
+            setShowSpinner(false);
+        }).catch(function() {
+            setFormData(prevState => {return {...prevState, errorMsg:'Unable to download the signature document.'}});           
+            setShowSpinner(false);
         })
     }
 
     const downloadFullSigningDoc = (formData: any) => {
         const searchParams = new URLSearchParams(location.search);
         const docusignResult = searchParams.get('event') || '{}';
-        setFormData(prevState => {return {...prevState, showSpinner: true}});
+        setShowSpinner(true);
 
         downloadPenSignDocs(sessionId, docusignResult).then((response : any) => {
             const link = document.createElement('a');
@@ -57,7 +70,7 @@ const DocusignReturn: React.FC = () => {
             link.setAttribute('download', 'Midland_Application_Documents.pdf');
             document.body.appendChild(link);
             link.click();
-            setFormData(prevState => {return {...prevState, showSpinner:false}});
+            setShowSpinner(false);
         })      
     }
 
@@ -187,16 +200,15 @@ const DocusignReturn: React.FC = () => {
                         }
                     </>
                 }
-                {formData.docusignResult.includes('session_timeout') || formData.docusignResult.includes('ttl_expired') &&
+                {(formData.docusignResult === 'session_timeout' || formData.docusignResult.includes('ttl_expired')) &&
                     <>
                         <h2>Whoops! We see that the session has timed out.</h2>
                         <p>
                             <br/>
                             Your signing session has timed out. Click here to pick up where you left off.
                         </p>
-    
                         <p>
-                            <a href="{!$Page.Application + '?id=' + Online_Application__c.Id}">Go Back To My Application</a>
+                            <a href={`${sessionId}/Welcome`}>Go Back To My Application</a>
                         </p>
                     </>
                 }          
@@ -208,11 +220,11 @@ const DocusignReturn: React.FC = () => {
                             You have chosen to decline providing an electronic signature for this application. Our office will be contacting you within 1 business day to provide alternate signature options. If you did not intend to decline, you can click here to return to the application and e-sign the application documents.
                         </p>
                         <p>
-                            <a href="{!$Page.Application + '?id=' + Online_Application__c.Id}">Go Back To My Application</a>
+                            <a href={`${sessionId}/Welcome`}>Go Back To My Application</a>
                         </p>
                     </>
                 }        
-                <IonLoading isOpen={formData.showSpinner} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
+                <IonLoading isOpen={showSpinner} message={'Loading Signature Document...'} spinner="lines"></IonLoading>
                 {formData.downloadUrl !== '' && (formData.docusignResult === SIGNING_COMPLETE || (formData.docusignResult === ID_CHECK_FAILED && formData.docusignAttempts >= 2)) &&
                     <IonRow>
                         <IonCol>
