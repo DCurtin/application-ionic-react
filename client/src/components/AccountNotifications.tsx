@@ -60,7 +60,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
     }
 
     const validateFields = (data: any, e: any) => {
-        updateMenuSections('isAccountNotificationsPageValid', true);
+        updateMenuSections('is_account_notifications_page_valid', true);
 
     }
 

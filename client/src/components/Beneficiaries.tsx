@@ -56,7 +56,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
 
     const validateFields = (e: any) => {
         saveBenePage(sessionId, formData);
-        updateMenuSections('isBeneficiariesPageValid', true);
+        updateMenuSections('is_beneficiaries_page_valid', true);
     }
  
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
