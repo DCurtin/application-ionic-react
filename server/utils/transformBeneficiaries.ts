@@ -32,7 +32,7 @@ function getBeneficiaryByIndex(index:number, flattenedBenes: any) : beneficiary{
             relationship: flattenedBenes[`relationship__${index}`],
             share_percentage: flattenedBenes[`share__${index}`],
             ssn: flattenedBenes[`ssn__${index}`],
-            token: flattenedBenes[`token__${index}`]
+            index: index
         }
         return castedBene;
 }
@@ -50,13 +50,13 @@ export function transformBeneficiariesServerToClient(beneficiaryList : Array<sal
       returnData[`phone__${count}`] = element.phone
       returnData[`relationship__${count}`] = element.relationship
       returnData[`share__${count}`] = element.share_percentage
-      returnData[`ssn_${count}`] = element.ssn
+      returnData[`ssn__${count}`] = element.ssn
       returnData[`mailing_street__${count}`] = element.mailing_street
       returnData[`mailing_city__${count}`] = element.mailing_city
       returnData[`mailing_state__${count}`] = element.mailing_state
       returnData[`mailing_zip__${count}`] = element.mailing_zip
-      returnData[`beneficiary__token_${count}`] = element.token
-      returnData[`beneficiary__type_${count}`] = element.type
+      returnData[`type__${count}`] = element.type
+      returnData[`index__${count}`]
     })
     return returnData;
   }

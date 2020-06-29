@@ -28,7 +28,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                 {
                     return;
                 }
-                console.log(data);
                 ImportForm(data);
             })
         }

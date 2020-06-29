@@ -17,4 +17,4 @@ full_or_partial_cash_transfer,text,,
 cash_amount,float(2),,
 index,integer,,yes
 key,text,yes,yes
-token,uuid,,yes
+session_id,uuid,,yes

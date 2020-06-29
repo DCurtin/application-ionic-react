@@ -1,4 +1,5 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
+import { FromTo } from 'moment';
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
@@ -139,7 +140,6 @@ export function getESignUrl(sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('eSignUrl from server ' + data.eSignUrl);
             return data;
         }).catch(function(error: any) {
             console.log('error: ' + error);
@@ -190,3 +190,34 @@ export function downloadPenSignDocs(sessionId: string, eSignResult: string)
         xhr.send();
     })
 }
+
+export function getInitialInvestmentPage(sessionId: string){
+    return makeGetPageInfoCallout(sessionId, 'initial_investment');
+}
+
+export function saveInitialInvestmentPage(sessionId: string, formData: FormData){
+    return makeSaveStateCallout(sessionId, 'initial_investment', formData)
+}
+
+export function updateValidationTable(page: string, isValid: boolean, sessionId: string){
+    let validated_page :any = {}
+    validated_page[page] = isValid
+    let body: requestBody ={
+      session: {
+        page: 'root',
+        sessionId: sessionId
+      },
+      data: validated_page
+    }
+    let options = {
+      method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    fetch('/validatePage', options).then(function(response:any){
+      response?.json().then((data: any)=>{//this is probably not necessary
+      })
+    })
+
+}
+

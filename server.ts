@@ -5,18 +5,23 @@ import express from 'express';
 import {transformBeneClientToServer} from './server/utils/transformBeneficiaries'
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import {transformRolloverClientToServer} from './server/utils/transformRollovers'
+import {resumeApplication} from './server/utils/retrieveFromSalesforce'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
 import * as salesforceSchema from './server/utils/salesforce'
+import * as validatedPages from './server/utils/validatePages'
+import {createAppSession} from './server/utils/appSessionHandler';
 import jsforce, {Connection as jsfConnection} from 'jsforce'
+import pg, { Client, Connection } from 'pg'
 const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 var router = require('express').Router();
 var bodyParser = require('body-parser');
 var connectionString = process.env.DATABASE_URL || 'postgresql://postgres:welcome@localhost';
-import pg, { Client, Connection } from 'pg'
 var client  = new pg.Client(connectionString);
+
+var userInstances: any = {}
 
 var serverConn :Partial<jsfConnection> = new jsforce.Connection({
   oauth2 : {
@@ -39,6 +44,7 @@ if(qaUser === 'test' || qaPw === 'test')
 }else{
   serverConn.login(process.env.qaUserId, process.env.qaUserPw).then(function(userInfo : any) {
     console.log('token: ' + serverConn.accessToken)
+    console.log(`instance url: ${serverConn.instanceUrl}`)
   }).catch((err)=>{
     if (err) {
       console.log(err);
@@ -47,8 +53,8 @@ if(qaUser === 'test' || qaPw === 'test')
   })
 }
 
-console.log('query url: ' +  connectionString)
 client.connect();
+client.query('DELETE FROM salesforce.application_session')
 
 var app = express();
 app.use(session({
@@ -81,13 +87,26 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
     res.status(500).send('no session id');
     return;
   }
-  
-  let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
-    values: [sessionId]
+
+  let paymentQuery = {
+    text: 'SELECT * FROM salesforce.payment WHERE session_id = $1 AND status= $2',
+    values: [sessionId, 'Completed']
   }
   
-  client.query(sessionQuery).then(function(result:pg.QueryResult){
+  //may want to move this to another end point that triggered when the user lands on payment info 
+  //could also call this endpoint and supply a null parameter for creditcard/
+  client.query(paymentQuery).then(function(paymentResult: pg.QueryResult){
+    if(paymentResult.rowCount > 0){
+      let completedPayment = paymentResult.rows[0]
+      res.json({Status: completedPayment.status, statusdetails: completedPayment.status_details, PaymentAmount: completedPayment.payment_amount});
+      return
+    }
+    let sessionQuery = {
+      text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
+      values: [sessionId]
+    }
+    
+    client.query(sessionQuery).then(function(result:pg.QueryResult){
     if(result.rowCount == 0)
     {
       console.log('no application')
@@ -103,13 +122,32 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
         res.status(500).send(err.message);  
         return
       }
-      else {
-        res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount}); 
-        return
-      }
+      let application_session : salesforceSchema.application_session = result.rows[0];
+
+      let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString}
+    
+      serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
+        if (err) { 
+          res.status(500).send(err.message);  
+          return
+        }
+        console.log("response: ", data);
+        
+        if(data.status === 'Completed')
+        {
+          let insertString = 'INSERT INTO salesforce.payment(status_details, status, payment_amount, discount_amount, session_id) VALUES($1, $2, $3, $4, $5)';
+          let queryInsert = {text: insertString, values: [data.StatusDetails, data.Status, data.PaymentAmount, data.DiscountAmount]}
+
+          client.query(queryInsert);
+        }
+
+        res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount});
+          return
+        })
+      }).catch()
     })
-  }).catch()
-});
+  })
+})
 
 app.post('/getESignUrl', (req, res) => {
   console.log('Get ESignUrl on server');
@@ -122,11 +160,11 @@ app.post('/getESignUrl', (req, res) => {
   }
   
   let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
     values: [sessionId]
   }
 
-  client.query(sessionQuery).then(function(result:pg.QueryResult){
+  client.query(sessionQuery).then(function(result:pg.QueryResult<salesforceSchema.application_session>){
     if(result.rowCount == 0)
     {
       console.log('no application')
@@ -134,16 +172,13 @@ app.post('/getESignUrl', (req, res) => {
       return;
     }
     
-    let application_session : salesforceSchema.application_session = result.rows[0];
+    let application_session = result.rows[0];
     let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
     let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
-    console.log('getESignUrl sessionId: ' + sessionId);
-    console.log('getESignUrl enpoint: ' + endpoint);
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
       if (err) { return console.error(err); }
       else {
-        console.log("eSignUrl: ", data.eSignUrl);
         res.json({eSignUrl: data.eSignUrl}); 
         return
       }
@@ -189,7 +224,7 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   validateSessionId(res, sessionId.toString());
   
   let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -201,7 +236,9 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     //************************************************************************************************************************** 
     //TODO: THIS IS HARD CODED TO QA RIGHT NOW!!!!!!!!!!!!!!!!!!!!!!!!!
     //
-    let endpoint = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
+    let instanceUrl = serverConn.instanceUrl || 'https://entrust--qa.my.salesforce.com'
+
+    let endpoint = instanceUrl+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
     console.log('getPenSignDoc enpoint: ' + endpoint);
 
     let options = {
@@ -251,14 +288,15 @@ app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
+app.post('/resume', (req: express.Request, res: express.Response)=>{
+  resumeApplication(client, userInstances, serverConn, req.body, res)
+})
+
 app.post('/startApplication', function(req : express.Request, res : express.Response){
   
   let welcomePageData : applicationInterfaces.saveWelcomeParameters = req.body;
-  let sessionId : String = welcomePageData.session.sessionId;
+  let sessionId : string = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
-
-  console.log("sessionId");
-  console.log(sessionId);
 
   if(sessionId !== ''){
     console.log('application has already been started');
@@ -275,29 +313,14 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   }
 
   //figure out what page they're on
-  var token = uuidv4();
-  initializeApplication(welcomePageData.data, res, token);
+  saveStateHandlers.initializeApplication(welcomePageData.data, res, client)
 });
 
-function initializeApplication(welcomePageData : applicationInterfaces.welcomePageParameters, res: express.Response, token : string){
-  //need to resolve offering_id and owner_id
-  const insertAppDataQuery = {
-    text: 'INSERT INTO salesforce.body(account_type, transfer_form, rollover_form, cash_contribution_form, investment_type, owner_id, referred_by, offering_id, token) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-    values: [welcomePageData.AccountType, welcomePageData.TransferIra, welcomePageData.RolloverEmployer, welcomePageData.CashContribution, welcomePageData.InitialInvestment, welcomePageData.SalesRep, welcomePageData.SpecifiedSource, welcomePageData.ReferralCode, token],
-  }
-  client.query(insertAppDataQuery, function(err : any, response : any){
-    console.log(err);
-    console.log(response);
-    res.set('session-id', token);
-    res.json({'sessionId': token});
-  });
-}
 
 app.post('/saveState', function(req : express.Request, res : express.Response){
   let packet : applicationInterfaces.requestBody = req.body;
   let sessionId : string = packet.session.sessionId;
   let page : string = packet.session.page;
-  console.log('saving state ' + sessionId + ' page ' + page)
 
   if(sessionId === ''){
     console.log('application must be started first, a step was skipped or the session was lost');
@@ -320,12 +343,11 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'appId'){
-    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn);
+    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn, userInstances);
     return
   }
 
   if(page === 'beneficiary'){
-    //console.log(packet.data)
     let beneficiaryData : applicationInterfaces.beneficiaryForm = transformBeneClientToServer(packet.data)
     saveStateHandlers.saveBeneficiaryPage(sessionId, beneficiaryData, res, client);
     return 
@@ -361,8 +383,38 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
     return
   }
 
+  if(page === 'initial_investment'){
+    let initInvestmentData : applicationInterfaces.initialInvestmentForm = packet.data;
+    saveStateHandlers.saveInitialInvestment(sessionId, initInvestmentData, res, client);
+    return
+  }
   res.status(500).send('no handler for this page');
 });
+
+app.post('/validatePage', function(req: express.Request, res: express.Response){
+  let packet : applicationInterfaces.requestBody = req.body;
+  let sessionId : string = packet.session.sessionId;
+
+  if(sessionId === undefined || sessionId === '')
+  {
+    console.log('sessionId or page not set in request');
+    res.status(500).send('invalid arguments');
+    return
+  }
+  validatedPages.saveValidatedPages(sessionId, packet.data, client, res);
+})
+
+app.post('/getValidatedPages', function(req: express.Request, res: express.Response){
+  let packet : applicationInterfaces.requestBody = req.body;
+  let sessionId : string = packet.session.sessionId;
+  if(sessionId === undefined || sessionId === '')
+  {
+    console.log('sessionId or page not set in request');
+    res.status(500).send('invalid arguments');
+    return
+  }
+  validatedPages.getValidatedPages(sessionId, client, res);
+})
 
 app.post('/saveApplication', function(req : express.Request, res : express.Response){
   var session = req.body.session;
@@ -430,6 +482,11 @@ app.post('/getPageFields', function(req : express.Request, res : express.Respons
   
   if(page === 'rollover'){
     getPageInfoHandlers.handleRolloverPage(sessionId, res, client);
+    return
+  }
+
+  if(page === 'initial_investment'){
+    getPageInfoHandlers.handleInitialInvestmentPage(sessionId, res, client);
     return
   }
 

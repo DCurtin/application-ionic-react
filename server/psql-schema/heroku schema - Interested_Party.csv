@@ -13,4 +13,4 @@
 "mailing_zip","text","",""
 "online_access","boolean","",""
 "include_interested_party","boolean","",""
-"token","uuid","yes","yes"
+"session_id","uuid","yes","yes"

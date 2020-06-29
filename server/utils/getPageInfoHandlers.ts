@@ -1,4 +1,4 @@
-import {welcomePageParameters, applicantIdForm, feeArrangementForm, accountNotificationsForm} from '../../client/src/helpers/Utils'
+import {welcomePageParameters, applicantIdForm, feeArrangementForm, accountNotificationsForm, initialInvestmentConditionalParameters, rollover, transfer, contributionForm} from '../../client/src/helpers/Utils'
 import * as salesforceSchema from './salesforce'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
 import {transformTransferServerToClient} from '../utils/transformTransfers'
@@ -9,24 +9,23 @@ import pg from 'pg';
 export function handleWelcomePageRequest(sessionId: string, res: express.Response, client: pg.Client)
 {
     let bodyQuery = {
-        text : 'SELECT * FROM salesforce.body WHERE token = $1',
+        text : 'SELECT * FROM salesforce.body WHERE session_id = $1',
         values : [sessionId]
       }
-      client.query(bodyQuery).then( function(result: pg.QueryResult<salesforceSchema.body>){
+      client.query(bodyQuery).then( function(result:pg.QueryResult){
       //get data from database
       //load into response
       let welcomePage : Partial<welcomePageParameters> = {};
-      let rows = result.rows[0];
-      welcomePage.AccountType = rows.account_type;
-      welcomePage.TransferIra = rows.transfer_form;
-      welcomePage.RolloverEmployer = rows.rollover_form;
-      welcomePage.CashContribution = rows.cash_contribution_form;
-      welcomePage.InitialInvestment = rows.investment_type;
-      welcomePage.SalesRep = rows.owner_id;
-      welcomePage.SpecifiedSource = rows.referred_by;
-      welcomePage.ReferralCode = rows.offering_id;
-      
-      res.json(welcomePage);
+      let row :salesforceSchema.body = result.rows[0];
+      welcomePage.account_type = row.account_type;
+      welcomePage.transfer_form = row.transfer_form;
+      welcomePage.rollover_form = row.rollover_form;
+      welcomePage.cash_contribution_form = row.cash_contribution_form;
+      welcomePage.investment_type = row.investment_type;
+      welcomePage.sales_rep = row.sales_rep;
+      welcomePage.referred_by = row.referred_by;
+      welcomePage.referral_code = row.referral_code;
+      res.json({data: welcomePage});
     }).catch(err=>{
       console.log(err)
       res.status(500).send('failed getting body data');
@@ -35,20 +34,17 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
 
 export function handleApplicationIdPage(sessionId: string, res: express.Response, client: pg.Client){
     let applicantQuery = {
-        text : 'SELECT * FROM salesforce.applicant WHERE token = $1',
+        text : 'SELECT * FROM salesforce.applicant WHERE session_id = $1',
         values : [sessionId]
       }
-      console.log(sessionId);
       client.query(applicantQuery).then( function(applicantResult:pg.QueryResult ){
         let applicantInfo : salesforceSchema.applicant = applicantResult.rows[0]
         if(applicantInfo === undefined){
-          console.log('hello does it hit here? ');
           res.json({data:applicantInfo});
           return;
         }
  
         let data : applicantIdForm = applicantInfo as applicantIdForm ; 
-        console.log(data);      
         res.json({'data': data})
       }).catch(err=>{
         console.log(err);
@@ -58,7 +54,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
   let beneQuery = {
-    text: 'SELECT * FROM salesforce.beneficiary WHERE token = $1',
+    text: 'SELECT * FROM salesforce.beneficiary WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -73,12 +69,12 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
 
 export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
   let feeArrangementQuery = {
-    text: 'SELECT * FROM salesforce.fee_arrangement WHERE token = $1',
+    text: 'SELECT * FROM salesforce.fee_arrangement WHERE session_id = $1',
     values: [sessionId]
   }
 
   let bodyQuery = {
-    text: 'SELECT investment_type FROM salesforce.body WHERE token = $1',
+    text: 'SELECT investment_type FROM salesforce.body WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -103,7 +99,7 @@ export function handleFeeArrangementPage(sessionId:string, res: express.Response
 
 export function handleAccountNotificationPage(sessionId:string, res: express.Response, client: pg.Client){
   let interestedPartyQuery = {
-    text: 'SELECT * FROM salesforce.interested_party WHERE token = $1',
+    text: 'SELECT * FROM salesforce.interested_party WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -118,12 +114,12 @@ export function handleAccountNotificationPage(sessionId:string, res: express.Res
 
 export function handleTransferPage(sessionId:string, res: express.Response, client: pg.Client){
   let transferQuery = {
-    text: 'SELECT * FROM salesforce.transfer WHERE token = $1',
+    text: 'SELECT * FROM salesforce.transfer WHERE session_id = $1',
     values: [sessionId]
   }
 
   let bodyQuery = {
-    text: 'SELECT account_type FROM salesforce.body WHERE token = $1',
+    text: 'SELECT account_type FROM salesforce.body WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -143,7 +139,7 @@ export function handleTransferPage(sessionId:string, res: express.Response, clie
 
 export function handleContributionPage(sessionId: string, res: express.Response, client: pg.Client){
   let contributionQuery = {
-    text: 'SELECT * FROM salesforce.contribution WHERE token = $1',
+    text: 'SELECT * FROM salesforce.contribution WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -155,7 +151,7 @@ export function handleContributionPage(sessionId: string, res: express.Response,
 
 export function handleRolloverPage(sessionId: string, res: express.Response, client: pg.Client){
   let rolloverQuery = {
-    text: 'SELECT * FROM salesforce.rollover WHERE token = $1',
+    text: 'SELECT * FROM salesforce.rollover WHERE session_id = $1',
     values: [sessionId]
   }
 
@@ -164,4 +160,73 @@ export function handleRolloverPage(sessionId: string, res: express.Response, cli
     let returnData = transformRolloverServerToClient(rolloverInfo, 'Traditional IRA')
     res.json({data : returnData});
   })
+}
+
+export function handleInitialInvestmentPage(sessionId: string, res: express.Response, client: pg.Client){
+  let initialInvestmentQuery = {
+    text: 'SELECT * FROM salesforce.initial_investment WHERE session_id = $1',
+    values: [sessionId]
+  }
+  let rolloverQuery = {
+    text: 'SELECT * FROM salesforce.rollover WHERE session_id = $1',
+    values: [sessionId]
+  }
+  let transferQuery = {
+    text: 'SELECT * FROM salesforce.transfer WHERE session_id = $1 AND transfer_type= $2',
+    values: [sessionId, 'cash Transfer']
+  }
+  let contributionQuery = {
+    text: 'SELECT * FROM salesforce.contribution WHERE session_id = $1',
+    values: [sessionId]
+  }
+
+  
+  //need to get other info
+
+  client.query(initialInvestmentQuery).then(function(result: pg.QueryResult){
+    if(result.rowCount == 0){
+      res.json({data : {formData: undefined, parameters : undefined}})
+    }
+
+    client.query(rolloverQuery).then((rolloverResult:pg.QueryResult)=>{
+      client.query(transferQuery).then((transferResult:pg.QueryResult)=>{
+        client.query(contributionQuery).then((contributionResult:pg.QueryResult)=>{
+          let initialInvestmentInfo : salesforceSchema.initial_investment = result.rows[0];
+          res.json({data : {formData: initialInvestmentInfo, parameters : gatherInitialInvestmentParameters(rolloverResult, transferResult, contributionResult) }});
+        })
+      })
+    })
+  })
+}
+
+function gatherInitialInvestmentParameters(rolloverResult:pg.QueryResult, transferResult:pg.QueryResult, contributionResult:pg.QueryResult){
+  let initialInvestmentParams : Partial<initialInvestmentConditionalParameters> = {}
+  if(rolloverResult.rowCount > 0){
+    let rollovers : Array<rollover> = rolloverResult.rows;
+    initialInvestmentParams.existing_employer_plan_rollover = true;
+    initialInvestmentParams.employer_cash_amount_1 = rollovers[0].cash_amount;
+    initialInvestmentParams.employer_cash_amount_2 = rollovers[1]?.cash_amount;
+  }
+
+  if(transferResult.rowCount > 0){
+    let transfers : Array<transfer> = transferResult.rows
+    initialInvestmentParams.existing_ira_transfer = true
+    initialInvestmentParams.ira_full_or_partial_cash_transfer_1 = transfers[0].full_or_partial_cash_transfer
+    initialInvestmentParams.ira_full_or_partial_cash_transfer_2 = transfers[1]?.full_or_partial_cash_transfer
+    
+    initialInvestmentParams.transfer_type_1 = transfers[0].transfer_type;
+    initialInvestmentParams.transfer_type_2 = transfers[1]?.transfer_type;
+    
+    initialInvestmentParams.ira_cash_amount_1 = transfers[0].cash_amount;
+    initialInvestmentParams.ira_cash_amount_2 = transfers[1]?.cash_amount;
+  }
+
+  if(contributionResult.rowCount > 0)
+  {
+    let contribution : contributionForm = contributionResult.rows[0]
+    initialInvestmentParams.new_ira_contribution = true;
+    initialInvestmentParams.new_contribution_amount = contribution.new_contribution_amount
+  }
+
+  return initialInvestmentParams
 }
