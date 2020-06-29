@@ -98,7 +98,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
   client.query(paymentQuery).then(function(paymentResult: pg.QueryResult){
     if(paymentResult.rowCount > 0){
       let completedPayment = paymentResult.rows[0]
-      res.json({Status: completedPayment.Status, statusdetails: completedPayment.statusdetails, PaymentAmount: completedPayment.paymentamount});
+      res.json({Status: completedPayment.status, statusdetails: completedPayment.status_details, PaymentAmount: completedPayment.payment_amount});
       return
     }
     let sessionQuery = {
@@ -135,7 +135,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
         
         if(data.status === 'Completed')
         {
-          let insertString = 'INSERT INTO salesforce.payment(statusdetails, status, paymentamount, discountamount, session_id) VALUES($1, $2, $3, $4, $5)';
+          let insertString = 'INSERT INTO salesforce.payment(status_details, status, payment_amount, discount_amount, session_id) VALUES($1, $2, $3, $4, $5)';
           let queryInsert = {text: insertString, values: [data.StatusDetails, data.Status, data.PaymentAmount, data.DiscountAmount]}
 
           client.query(queryInsert);
