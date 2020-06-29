@@ -168,14 +168,14 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         <IonCol>
                             <IonLabel>Occupation</IonLabel>
                             <IonItem>
-                            <IonSelect interface='action-sheet' name='occupation' onIonChange={updateForm} value={formData.occupation}>
-                                <IonSelectOption value="Accountant">Accountant
-                                </IonSelectOption>
-                                <IonSelectOption value="Attorney">Attorney</IonSelectOption>
-                                <IonSelectOption value="Financial Advisor">Financial Adviser</IonSelectOption>
-                                <IonSelectOption value="Realtor">Realtor</IonSelectOption>
-                                <IonSelectOption value="Other">Other</IonSelectOption>
-                            </IonSelect>
+                                <IonSelect interface='action-sheet' name='occupation' onIonChange={updateForm} value={formData.occupation}>
+                                    <IonSelectOption value="Accountant">Accountant
+                                    </IonSelectOption>
+                                    <IonSelectOption value="Attorney">Attorney</IonSelectOption>
+                                    <IonSelectOption value="Financial Advisor">Financial Adviser</IonSelectOption>
+                                    <IonSelectOption value="Realtor">Realtor</IonSelectOption>
+                                    <IonSelectOption value="Other">Other</IonSelectOption>
+                                </IonSelect>
                             </IonItem>
                         </IonCol>
                         <IonCol>

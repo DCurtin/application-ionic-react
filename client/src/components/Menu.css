@@ -3,27 +3,23 @@ ion-menu ion-content {
   max-width: 100%;
   border-radius: 10px;
   background-image: url('../images/sideMenuBackground.jpg');
-  background-color: transparent;
   background-size: contain cover;
   background-position: 50% 40%;
 }
 
 
 ion-content {
-  background-color: transparent;
   background-image: url('../images/sideMenuBackground.jpg');
 }
 
 ion-list {
   border: 1px grey solid;
   border-radius: 10px;	
-  background: transparent;
   background: url('../images/sideMenuBackground.jpg');
   width:80%;
 }
 
 ion-item {
-  background: transparent;
   background: url('../images/sideMenuBackground.jpg');
   
 }

@@ -25,7 +25,8 @@ form ion-item {
 
 
 ion-select {
-    width: 100%;
+    min-width: 100%;
+    padding-left: 0;
 }
 
 .well {

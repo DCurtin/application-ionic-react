@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router';
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
+import { IonButtons, IonHeader, IonMenuButton, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
 import { chevronBackCircleOutline, chevronForwardCircleOutline
 } from 'ionicons/icons';
 import midlandLogo from '../images/midlandCrest.jpg';
@@ -58,9 +58,12 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
           </IonButtons>
           {displayRoutingButtons() &&
           (<React.Fragment>
-            <IonButton slot='end' onClick={goToPrevPage} color='secondary'>
+            <IonButton slot='end' onClick={goToPrevPage} color='secondary' disabled={location.pathname.toUpperCase().includes('WELCOME')}>
               <IonIcon icon={chevronBackCircleOutline} slot='start'/>
               Prev
+            </IonButton>
+            <IonButton slot='end'>
+              Save & Return Later
             </IonButton>
               <IonButton slot='end' onClick={goToNextPage} color='secondary'>
                 <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
@@ -73,9 +76,7 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
           <IonTitle>
             {displayTitle()}
           </IonTitle>
-        </IonToolbar>
-            
-           
+        </IonToolbar>    
       </IonHeader>
     )
 }

@@ -6,11 +6,13 @@ import { useParams, useLocation } from 'react-router';
 const DocusignReturn: React.FC = () => {
     const {sessionId} = useParams<{ sessionId: string, event: string}>();
     const [downloadUrl, setDownloadUrl] = useState(''); 
-
+    
     let queryStringParams = new URLSearchParams(useLocation().search);
     let docusignEvent = queryStringParams.get('event');
     
     useEffect(() => {
+        console.log('helllo');
+        console.log(sessionId);
         downloadPenSignDocs(sessionId).then((response : any) => {
             setDownloadUrl(response);
         })    

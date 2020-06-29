@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonSelect, IonLabel, IonSelectOption, IonItem, IonCheckbox, IonInput, IonButton } from '@ionic/react';
 import './Welcome.css';
 import {useForm} from 'react-hook-form';
@@ -227,7 +227,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol size="6">
+                    <IonCol sizeMd="6" sizeSm="12">
                         <IonLabel color="primary">
                             <strong>
                                 What type of account would you like to open?
@@ -256,7 +256,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol size="6">
+                    <IonCol sizeMd="6" sizeSm="12">
                         <IonLabel>
                             <strong>
                                 How would you like to fund your account?
@@ -276,7 +276,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol size="6">
+                    <IonCol sizeMd="6" sizeSm="12">
                         <IonLabel>
                             <strong>
                                 Do you have an initial investment in mind? *
@@ -292,7 +292,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol size="6">
+                    <IonCol sizeMd="6" sizeSm="12">
                         <IonLabel>
                             <strong>
                                 Have you been working with a Midland rep?
@@ -308,7 +308,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol size="6">
+                    <IonCol sizeMd="6" sizeSm="12">
                         <IonLabel>
                             <strong>
                                 How did you hear about us?
@@ -321,7 +321,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                     </IonCol>
                 </IonRow>
                 <IonRow>
-                    <IonCol size="6">
+                    <IonCol sizeMd="6" sizeSm="12">
                         <IonLabel>
                             <strong>
                                 Referral / Group Code
