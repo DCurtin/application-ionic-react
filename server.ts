@@ -201,7 +201,7 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     //************************************************************************************************************************** 
     //TODO: THIS IS HARD CODED TO QA RIGHT NOW!!!!!!!!!!!!!!!!!!!!!!!!!
     //
-    let endpoint = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?eSignResult=' + eSignResult;
+    let endpoint = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
     console.log('getPenSignDoc enpoint: ' + endpoint);
 
     let options = {
