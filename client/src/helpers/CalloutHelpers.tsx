@@ -52,7 +52,6 @@ export function chargeCreditCard(formData: FormData, sessionId: string)
                 return data;
             }
             else {
-                console.log('Status Details ' + data.StatusDetails);
                 throw Error(data.StatusDetails);
             }         
         }).catch(function(error: any) {
