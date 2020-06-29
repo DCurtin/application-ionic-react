@@ -94,8 +94,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
   
   //may want to move this to another end point that triggered when the user lands on payment info 
   //could also call this endpoint and supply a null parameter for creditcard/
-  client.query(paymentQuery).then(function(paymentResult: pg.QueryResult)
-  {
+  client.query(paymentQuery).then(function(paymentResult: pg.QueryResult){
     if(paymentResult.rowCount > 0){
       let completedPayment = paymentResult.rows[0]
       res.json({Status: completedPayment.Status, statusdetails: completedPayment.statusdetails, PaymentAmount: completedPayment.paymentamount});
@@ -107,11 +106,20 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
     }
     
     client.query(sessionQuery).then(function(result:pg.QueryResult){
-      if(result.rowCount == 0)
-      {
-        console.log('no application')
-        res.status(500).send('no application');
-        return;
+    if(result.rowCount == 0)
+    {
+      console.log('no application')
+      res.status(500).send('no application');
+      return;
+    }
+    let application_session : salesforceSchema.application_session = result.rows[0];
+
+    let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString};
+  
+    serverConn.apex.post('/applications/' + application_session.application_id + '/payments', body, function(err : any, data : any) {
+      if (err) { 
+        res.status(500).send(err.message);  
+        return
       }
       let application_session : salesforceSchema.application_session = result.rows[0];
 
@@ -133,9 +141,10 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
         }
 
         res.json({Status: data.Status, StatusDetails: data.StatusDetails, PaymentAmount: data.PaymentAmount});
-        return
-      })
-    }).catch()
+          return
+        })
+      }).catch()
+    })
   })
 })
 
@@ -176,16 +185,42 @@ app.post('/getESignUrl', (req, res) => {
   })
 });
 
+app.post('/handleDocusignReturn', (req : express.Request, res : express.Response) => {
+  console.log('handleDocusignReturn running on server' );
+  
+  let sessionId = req.body.sessionId;
+  validateSessionId(res, sessionId);
+
+  let sessionQuery = {
+    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    values: [sessionId]
+  }
+  
+  client.query(sessionQuery).then(function(result: pg.QueryResult){
+    result = validateApplicationSessionQuery(res, result);
+    let application_session : salesforceSchema.application_session = result.rows[0];
+
+    let body = {'eSignResult': req.body.eSignResult};
+  
+    serverConn.apex.post('/applications/' + application_session.application_id + '/docusign-return', body, function(err : any, data : any) {
+      if (err) { 
+        res.status(500).send(err.message);  
+        return
+      }
+      else {
+        console.log("response: ", data);
+        res.json({docusignAttempts: data.DocusignAttempts, docusignUrl: data.DocusignUrl, accountType: data.AccountType}); 
+        return
+      }
+    })
+  }).catch()
+});
+
 app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   console.log('getPenSignDocs running on server' );
 
   let sessionId = req.query['sessionId'];
-  
-  if(sessionId === '' || sessionId === undefined){
-    console.log('no sesssion id');
-    res.status(500).send('no session id');
-    return
-  }
+  validateSessionId(res, sessionId.toString());
   
   let sessionQuery = {
     text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
@@ -193,15 +228,15 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   }
 
   client.query(sessionQuery).then(function(result:pg.QueryResult) {
-    if(result.rowCount == 0)
-    {
-      console.log('no application')
-      res.status(500).send('no application');
-      return;
-    }
-    
+    result = validateApplicationSessionQuery(res, result);
     let application_session : salesforceSchema.application_session = result.rows[0];
-    let url = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents';
+    
+    let eSignResult = req.query['eSignResult'];
+    //************************************************************************************************************************** 
+    //TODO: THIS IS HARD CODED TO QA RIGHT NOW!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    let endpoint = 'https://entrust--qa.my.salesforce.com'+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
+    console.log('getPenSignDoc enpoint: ' + endpoint);
 
     let options = {
       method: 'GET',
@@ -211,7 +246,7 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
       }
     }
 
-    let request = https.request(url, options, function(response: any) { 
+    let request = https.request(endpoint, options, function(response: any) { 
       if (response.statusCode === 200) {
         response.pipe(res);
       }
@@ -224,6 +259,22 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
   })
 });
 
+function validateSessionId(res : express.Response, sessionId: String) {
+  if(sessionId === '' || sessionId === undefined) {
+    console.log('no sesssion id');
+    res.status(500).send('no session id');
+    return
+  }  
+}
+
+function validateApplicationSessionQuery(res : express.Response, result: pg.QueryResult) {
+  if(result.rowCount == 0) {
+    console.log('no application')
+    res.status(500).send('no application');
+    return;
+  }
+  return result;
+}
 app.get('/loaderio-18abbe8b69ba76fa08ae8d129f865a2f/', (req : express.Request, res : express.Response) => {
   console.log('deliver loader file')
   const file = `${__dirname}/loaderio-18abbe8b69ba76fa08ae8d129f865a2f.txt`;

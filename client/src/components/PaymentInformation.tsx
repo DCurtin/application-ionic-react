@@ -5,7 +5,7 @@ import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton
 import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef}) => {
-    const {handleSubmit, errors} = useForm(); 
+    const {handleSubmit} = useForm(); 
     const [formData, setFormData] = useState<FormData>({
         creditCardNumber: '',
         expirationDateString: '',
