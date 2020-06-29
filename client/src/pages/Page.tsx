@@ -4,14 +4,10 @@ import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import './Page.css';
-import './Page.css';
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
 import {updateValidationTable} from '../helpers/CalloutHelpers'
-import { chevronBackCircleOutline, chevronForwardCircleOutline
-  } from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -37,10 +33,14 @@ export interface session{
   menuSections: MenuSection[],
   setMenuParams: Function,
   setMenuSections: Function,
-  menuParams: MenuParameters
+  menuParams: MenuParameters,
+  hasNextBeenClicked: boolean, 
+  setHasNextBeenClicked: Function,
+  hasPrevBeenClicked: boolean, 
+  setHasPrevBeenClicked: Function
 }
 
-const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams, menuParams}) => {
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuParams, menuParams, hasNextBeenClicked, setHasNextBeenClicked,hasPrevBeenClicked,setHasPrevBeenClicked }) => {
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
@@ -127,6 +127,20 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     setCurrentState(updatedState);
   }, [name,menuSections]);
 
+  useEffect(() => {
+    if (hasNextBeenClicked) {
+      goToNextPage();
+      setHasNextBeenClicked(false);
+    }
+  }, [hasNextBeenClicked])
+
+  useEffect(() => {
+    if (hasPrevBeenClicked) {
+      goToPrevPage();
+      setHasPrevBeenClicked(false);
+    }
+  }, [hasPrevBeenClicked])
+
   const getPageStateFromPage = (currentPageName:string) => {
     const appPagesArr = [...appPages];
     let currentPageIndex = appPagesArr.findIndex(page => page.url.includes(currentPageName));
@@ -193,6 +207,14 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
   }
 
+  const goToPrevPage = () => {
+    //add something for page validation?
+    let path = currentState.prevPage?.url;
+    if (path){
+      history.push(path);
+    }
+  }
+
 
   const updateMenuSections = (page: string, isPageValid:boolean) => {
     let currentPage  = {...currentState.currentPage};
@@ -228,31 +250,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar color="primary">
-          <IonButtons slot="start">
-            <IonMenuButton />
-          </IonButtons>
-            <IonButton slot='end' routerLink={currentState.prevPage?.url} color='secondary'>
-              <IonIcon icon={chevronBackCircleOutline} slot='start'/>
-              Prev
-            </IonButton>
-              <IonButton slot='end' onClick={goToNextPage} color='secondary'>
-                <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
-              Next
-              </IonButton>
-          <IonThumbnail slot="start">
-            <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
-          </IonThumbnail>
-          <IonTitle>
-          {currentState.currentPage.title}
-          </IonTitle>
-        </IonToolbar>
-            
-           
-      </IonHeader>
-
+    <IonPage> 
       <IonContent>
         <IonHeader collapse="condense">
           <IonToolbar>

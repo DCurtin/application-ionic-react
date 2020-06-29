@@ -1,11 +1,12 @@
-:root {
-    --ion-toolbar-color: var(--ion-color-primary-contrast);
-    --ion-toolbar-background: var(--ion-color-primary);
-}
 
 ion-split-pane {
-    --border : hidden;
+    margin-top: 4rem;
 }
+
+ion-thumbnail {
+    --size: 4rem;
+}
+
 
 .ios ion-toolbar {
     background-color: #1A1B3F;
@@ -24,7 +25,8 @@ form ion-item {
 
 
 ion-select {
-    width: 100%;
+    min-width: 100%;
+    padding-left: 0;
 }
 
 .well {

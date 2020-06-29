@@ -95,7 +95,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </strong>
                     </IonItemDivider>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12"> 
                             <IonLabel>
                                 Salutation *
                             </IonLabel>
@@ -108,7 +108,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 </IonSelect>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 First Name *
                             </IonLabel>
@@ -116,7 +116,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 <IonInput name="first_name" value={formData.first_name} placeholder="First Name" onIonInput={updateForm} clearInput ref={register({required: true})}></IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Last Name *
                             </IonLabel>
@@ -126,7 +126,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Social Security Number *
                             </IonLabel>
@@ -134,7 +134,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} clearInput ref={register({required: true})}> </IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Date of Birth *
                             </IonLabel>
@@ -144,7 +144,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Marital Status
                             </IonLabel>
@@ -156,7 +156,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 </IonSelect>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Mother's Maiden Name</IonLabel>
                             <IonItem>
                                 <IonInput name='mothers_maiden_name' value={formData.mothers_maiden_name} onIonInput={updateForm}></IonInput>
@@ -164,20 +164,20 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12">
                             <IonLabel>Occupation</IonLabel>
                             <IonItem>
-                            <IonSelect interface='action-sheet' name='occupation' onIonChange={updateForm} value={formData.occupation}>
-                                <IonSelectOption value="Accountant">Accountant
-                                </IonSelectOption>
-                                <IonSelectOption value="Attorney">Attorney</IonSelectOption>
-                                <IonSelectOption value="Financial Advisor">Financial Adviser</IonSelectOption>
-                                <IonSelectOption value="Realtor">Realtor</IonSelectOption>
-                                <IonSelectOption value="Other">Other</IonSelectOption>
-                            </IonSelect>
+                                <IonSelect interface='action-sheet' name='occupation' onIonChange={updateForm} value={formData.occupation}>
+                                    <IonSelectOption value="Accountant">Accountant
+                                    </IonSelectOption>
+                                    <IonSelectOption value="Attorney">Attorney</IonSelectOption>
+                                    <IonSelectOption value="Financial Advisor">Financial Adviser</IonSelectOption>
+                                    <IonSelectOption value="Realtor">Realtor</IonSelectOption>
+                                    <IonSelectOption value="Other">Other</IonSelectOption>
+                                </IonSelect>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12">
                             <IonLabel>Are you Self-Employed? &nbsp;</IonLabel> 
                             <div className="ion-text-wrap">
                                 <IonRadioGroup name='is_self_employed' onIonChange={updateForm} value={formData.is_self_employed} >
@@ -189,7 +189,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 </IonRadioGroup>
                             </div>               
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12">
                             <IonLabel>Do you have a Health Savings Account?</IonLabel>
                             <div className="ion-text-wrap ion-text-justify">
                                 <IonRadioGroup name='has_hsa' onIonChange={updateForm} value={formData.has_hsa}> 
@@ -207,7 +207,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </strong>
                     </IonItemDivider>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Proof of Identification *</IonLabel>
                             <IonItem className={showError('id_type')}>
                                 <IonSelect interface='action-sheet' value={formData.id_type} onIonChange={updateForm} name='id_type' ref={register({required: true})}>
@@ -217,7 +217,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                             </IonSelect>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel> ID Number * </IonLabel>
                             <IonItem className={showError('id_number')}>
                                 <IonInput value={formData.id_number} name='id_number' onIonInput={updateForm} ref={register({required: true})}></IonInput>
@@ -225,7 +225,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Issued By *
                             </IonLabel>
@@ -233,7 +233,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 <IonInput value={formData.id_issued_by} onIonInput={updateForm} name='id_issued_by' ref={register({required: true})}></IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Issue Date *
                             </IonLabel>
@@ -243,7 +243,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol size='6'>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Expiration Date *</IonLabel>
                             <IonItem className={showError('id_expiration_date')}> 
                                 <IonInput type='date' value={formData.id_expiration_date} onIonInput={updateForm} name='id_expiration_date' ref={register({required: true})}>
@@ -276,7 +276,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Physical Street Address *
                             </IonLabel>
@@ -284,7 +284,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 <IonInput onIonInput={updateForm} value={formData.legal_street} name='legal_street' ref={register({required: true})}></IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 City *
                             </IonLabel>
@@ -294,7 +294,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Physical State * 
                             </IonLabel>
@@ -304,7 +304,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 </IonSelect>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Zip *
                             </IonLabel>
@@ -338,13 +338,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing Street Address *</IonLabel>
                                 <IonItem className={showError('mailing_street')}>
                                     <IonInput value={formData.mailing_street} name='mailing_street' onIonInput={updateForm} ref={register({required: true})}></IonInput>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing City *</IonLabel>
                                 <IonItem className={showError('mailing_city')}>
                                     <IonInput value={formData.mailing_city} name='mailing_city' onIonInput={updateForm} ref={register({required: true})}
@@ -353,7 +353,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing State *</IonLabel>
                                 <IonItem className={showError('mailing_state')}>
                                     <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} ref={register({required: true})} onIonChange={updateForm}>
@@ -361,7 +361,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                     </IonSelect>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Mailing Zip *</IonLabel>
                                 <IonItem className={showError('mailing_zip')}>
                                     <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm} ref={register({
@@ -381,7 +381,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Primary Phone *
                             </IonLabel>
@@ -389,7 +389,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                                 <IonInput value={formData.primary_phone} name='primary_phone' onIonInput={updateForm} ref={register({required: true})}></IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Preferred Contact Method 
                             </IonLabel>
@@ -405,14 +405,14 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Email *</IonLabel>
                             <IonItem className={showError('email')}>
                             <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' onIonInput={updateForm} required={true} clearInput ref={register({required: true})}>
                             </IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Confirm Email *</IonLabel>
                             <IonItem className={showError('confirm_email')}>
                                 <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail} ref={register({validate: validateEmail})}></IonInput>
@@ -425,13 +425,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Alternate Phone</IonLabel>
                             <IonItem>
                                 <IonInput value={formData.alternate_phone} name='alternate_phone' onIonInput={updateForm}></IonInput>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Alternate Phone Type</IonLabel>
                             <IonItem>
                                 <IonSelect value={formData.alternate_phone_type} interface='action-sheet' name='alternate_phone_type' onIonChange={updateForm}>
