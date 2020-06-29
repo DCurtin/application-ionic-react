@@ -19,5 +19,7 @@ DROP TABLE IF EXISTS salesforce.Initial_Investment;
 CREATE TABLE salesforce.Initial_Investment(initial_investment_type text,initial_investment_name text,investment_contact_person text,investment_contact_person_phone text,investment_amount float(2),session_id uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Interested_Party;
 CREATE TABLE salesforce.Interested_Party(first_name text,last_name text,email text,phone text,title text,company_name text,ira_statement_option text,statement_option text,mailing_street text,mailing_city text,mailing_state text,mailing_zip text,online_access boolean,include_interested_party boolean,session_id uuid UNIQUE NOT NULL);
+DROP TABLE IF EXISTS salesforce.payment;
+CREATE TABLE salesforce.payment(payment_amount float(2),status_details text,status text,session_id uuid UNIQUE NOT NULL);
 DROP TABLE IF EXISTS salesforce.Validated_Pages;
 CREATE TABLE salesforce.Validated_Pages(is_welcome_page_valid boolean,is_disclosure_page_valid boolean,is_owner_info_page_valid boolean,is_beneficiaries_page_valid boolean,is_fee_arrangement_page_valid boolean,is_account_notifications_page_valid boolean,is_transfer_ira_page_valid boolean,is_rollover_plan_page_valid boolean,is_investment_details_page_valid boolean,is_new_contribution_page_valid boolean,is_payment_information_page_valid boolean,is_review_and_sign_page_valid boolean,session_id uuid UNIQUE NOT NULL);
