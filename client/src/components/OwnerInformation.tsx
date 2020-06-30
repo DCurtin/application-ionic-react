@@ -159,7 +159,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                     <IonRow>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
-                                Marital Status
+                                Marital Status *
                             </IonLabel>
                             <IonItem className={showError('marital_status')}>
                                 <IonSelect interface='action-sheet' name='marital_status' onIonChange={updateForm} value={formData.marital_status} ref={register({required: true})}>
