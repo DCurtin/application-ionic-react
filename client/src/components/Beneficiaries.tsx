@@ -6,7 +6,7 @@ import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
-const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
+const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
     const {register, handleSubmit, watch, errors} = useForm({
         mode: 'onBlur',
@@ -59,16 +59,29 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
     const validateFields = (e: any) => {
         saveBenePage(sessionId, formData);
         updateMenuSections('is_beneficiaries_page_valid', true);
+        setShowErrorToast(false);
     }
+
+    useEffect(() => {
+        showErrorToast();
+        console.log(errors)
+    }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
-        if (watchAllFields[fieldName]) {
-            className = 'ion=no-padding';
+        let className = errorsArr.includes(fieldName) ? 'danger' : '';
+        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
+            className = '';
         }
         return className;
-};
+    };
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            setShowErrorToast(true);
+        }
+    }
  
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
         if (beneficiaryCount > 0) {
@@ -90,13 +103,13 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                             First Name
                         </IonLabel>
                         <IonItem className={showError(`first_name__${beneficiaryNumber}`)}>
-                            <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
                         </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Last Name</IonLabel>
                         <IonItem className={showError(`last_name__${beneficiaryNumber}`)}>
-                            <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -104,13 +117,13 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol>
                         <IonLabel>Social Security Number</IonLabel>
                         <IonItem className={showError(`ssn__${beneficiaryNumber}`)}>
-                            <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true, pattern: /^[0-9]{9}$/})} type="number"/>
                         </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Date of Birth</IonLabel>
                         <IonItem className={showError(`dob__${beneficiaryNumber}`)}>
-                            <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -143,7 +156,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol>
                         <IonLabel>Share %</IonLabel>
                         <IonItem className={showError(`share_percentage__${beneficiaryNumber}`)}>
-                            <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true, pattern: /^([0-9]|[1-9][0-9]|100)$/})}/>
                         </IonItem>
                     </IonCol>
                     <IonCol className='well'>
@@ -154,13 +167,13 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol>
                         <IonLabel>Beneficiary Street</IonLabel>
                         <IonItem className={showError(`mailing_street__${beneficiaryNumber}`)}>
-                            <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]}onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]}onIonInput={updateForm} ref={register({required: true})}/>
                         </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Beneficiary City</IonLabel>
                         <IonItem className={showError(`mailing_city__${beneficiaryNumber}`)}>
-                            <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -176,7 +189,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol>
                         <IonLabel>Beneficiary Zip</IonLabel>
                         <IonItem className={showError(`mailing_zip__${beneficiaryNumber}`)}>
-                            <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/})}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -186,7 +199,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                             Phone
                         </IonLabel>
                         <IonItem className={showError(`phone__${beneficiaryNumber}`)}>
-                            <IonInput  name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                            <IonInput type='number' name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true,pattern:/^[0-9]{10}$/})}/>
                         </IonItem>
                     </IonCol>
                     <IonCol>
@@ -194,7 +207,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                             Email
                         </IonLabel>
                         <IonItem className={showError(`email__${beneficiaryNumber}`)}>
-                            <IonInput type='email' onIonChange={updateForm}  name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]} ref={register({required: true})}/>
+                            <IonInput type='email' onIonInput={updateForm}  name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]} ref={register({required: true,pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/})}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
