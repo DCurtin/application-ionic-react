@@ -9,7 +9,8 @@ interface InitSessionApp {
     sessionId: string,
     selectedAccountType: string,
     updateMenuSections:Function,
-    formRef: any
+    formRef: any,
+    setShowErrorToast: Function
 }
 
 const Disclosures: React.FC<InitSessionApp> = props => {
