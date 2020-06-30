@@ -18,7 +18,7 @@ export function createAppSession(accountNumber: string, applicationId: string, s
         let appSession: salesforceSchema.application_session = result.rows[0]
         let elapsedTime = (time - appSession.last_active)
         console.log(`elapsed time: ${elapsedTime} sessionId: ${sessionId}`)
-        if(elapsedTime > 30000){
+        if(elapsedTime > 3600000){
           console.log(`delete ${sessionId}`)
           clearInterval(userInstances[sessionId])
           let deleteQuery:{text:string, values:Array<string>} = {
@@ -28,7 +28,7 @@ export function createAppSession(accountNumber: string, applicationId: string, s
           pgClient.query(deleteQuery)
         }
       })
-    },5000,sessionId)
+    },60000,sessionId)
     
     userInstances[sessionId] = intervalRef
   
