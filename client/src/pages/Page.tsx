@@ -1,15 +1,15 @@
-import { IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
+import { IonButtons, IonContent, IonPage, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
 import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
-import {isPlatform } from '@ionic/react';
-import { useParams, useLocation } from 'react-router';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import {isPlatform } from '@ionic/react'
+import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
 import {updateValidationTable} from '../helpers/CalloutHelpers';
-import { chevronBackCircleOutline, chevronForwardCircleOutline, saveOutline
-} from 'ionicons/icons';
+import { chevronBackCircleOutline, chevronForwardCircleOutline} from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -48,7 +48,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     return e.pages
   });
 
-  const formRef = useRef<HTMLFormElement>(null);
+  let formRef = useRef<HTMLFormElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     account_type: '',
@@ -69,6 +69,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   });
 
   const [showErrorToast, setShowErrorToast] = useState(false);
+  const [showPageTransition, setShowPageTransition] = useState(true);
 
   useLayoutEffect(function(){
     let formParams = {...menuParams};
@@ -281,7 +282,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
             </IonToolbar>
         )}
-        {displayPage(name)}
+        <TransitionGroup style={{height: "100%"}}>
+          <CSSTransition appear={true} key={name} timeout={500} classNames="page">
+              {displayPage(name)}
+          </CSSTransition>
+        </TransitionGroup>
       </IonContent>
     </IonPage>
   );

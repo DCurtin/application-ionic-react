@@ -169,7 +169,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Beneficiary State</IonLabel>
                         <IonItem className={showError(`mailing_state__${beneficiaryNumber}`)}>
-                            <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}>
+                            <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
                                 {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                             </IonSelect>
                         </IonItem>

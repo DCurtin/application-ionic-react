@@ -106,7 +106,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                         <IonRow>
                             <IonCol>
                                 <IonLabel> State </IonLabel>
-                                <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm} interfaceOptions={{cssClass: 'states-select'}}>
                                 {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                                 </IonSelect>
                             </IonCol>

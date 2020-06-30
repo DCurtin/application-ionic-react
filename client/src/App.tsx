@@ -7,6 +7,7 @@ import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
 import generateAppPages, { MenuSection, MenuParameters} from './helpers/MenuGenerator';
+import { CSSTransition } from 'react-transition-group';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -68,7 +69,11 @@ const App: React.FC = () => {
         <IonSplitPane contentId="main" className='top-space'>
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>} /> 
+            <Route path="/page/:name" render={(props) => (
+                  <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>
+
+            )
+              } /> 
             <Route path='/docusignReturn/:sessionId'>
               <DocusignReturn/>
             </Route>

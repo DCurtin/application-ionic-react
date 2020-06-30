@@ -111,7 +111,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 <IonLabel>
                                     State
                                 </IonLabel>
-                                <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm} interfaceOptions={{cssClass: 'states-select'}}>
                                     {states.map((state,index) => (
                                         <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                     ))}

@@ -312,7 +312,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Physical State * 
                             </IonLabel>
                             <IonItem className={showError('legal_state')}>
-                                <IonSelect interface='action-sheet' onIonChange={updateForm} value={formData.legal_state} name='legal_state' ref={register({required: true})}>
+                                <IonSelect interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}} onIonChange={updateForm} value={formData.legal_state} name='legal_state' ref={register({required: true})}>
                                 {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
                                 </IonSelect>
                             </IonItem>
@@ -369,7 +369,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing State *</IonLabel>
                                 <IonItem className={showError('mailing_state')}>
-                                    <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} ref={register({required: true})} onIonChange={updateForm}>
+                                    <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} ref={register({required: true})} onIonChange={updateForm} interfaceOptions={{cssClass: 'states-select'}}>
                                 {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
                                     </IonSelect>
                                 </IonItem>

@@ -287,7 +287,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonItem className={showError('initialInvestment')}>
-                            <IonSelect interface='action-sheet' value={props.welcomePageFields.investment_type} onIonChange={handleInitialInvestmentChange} interfaceOptions={{header: 'Initial Investment'}} name='initialInvestment' ref={register({required: true})}>
+                            <IonSelect interface='action-sheet' value={props.welcomePageFields.investment_type} onIonChange={handleInitialInvestmentChange} interfaceOptions={{cssClass: 'initial-investment'}} name='initialInvestment' ref={register({required: true})}>
                                 {initialInvestmentTypes.map((investmentType, index) => (
                                 <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                                 ))}
@@ -303,7 +303,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                             </strong>
                         </IonLabel>
                         <IonItem>
-                            <IonSelect value={props.welcomePageFields.sales_rep} onIonChange={handleSalesRepChange}>
+                            <IonSelect interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}} value={props.welcomePageFields.sales_rep} onIonChange={handleSalesRepChange}>
                                 {midlandReps.map((rep, index) => (
                                     <IonSelectOption value={rep} key={index}>{rep}</IonSelectOption>
                                 ))}

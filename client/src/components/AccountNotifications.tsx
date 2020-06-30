@@ -172,7 +172,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                     <IonLabel>
                                         State
                                     </IonLabel>
-                                    <IonSelect value={formData.mailing_state} name='mailing_state' onIonChange={updateForm} interface='action-sheet'>
+                                    <IonSelect value={formData.mailing_state} name='mailing_state' onIonChange={updateForm} interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}}>
                                         {states.map((state, index) => (
                                             <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
                                             )
