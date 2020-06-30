@@ -83,7 +83,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
     setMenuParams(formParams);
-  },[welcomePageFields]) //setMenuParams is this a required dependency?
+  },[welcomePageFields])
   
   useLayoutEffect(function(){
     let url = '/getPageFields'
@@ -219,7 +219,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const isMobile = () => {
-    return (isPlatform('iphone') || isPlatform('android'));
+    return (isPlatform('iphone') || isPlatform('android') || isPlatform('ipad'));
   }
 
   const updateMenuSections = (page: string, isPageValid:boolean) => {

@@ -51,7 +51,7 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
      }
 
      const isMobile = () => {
-       return (isPlatform('iphone') || isPlatform('android'));
+       return (isPlatform('iphone') || isPlatform('android') || isPlatform('ipad'));
      }
     
     return(
@@ -77,7 +77,7 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
           <IonThumbnail slot='start'>
             <IonImg src={midlandLogo}/>
           </IonThumbnail>
-          <IonTitle>
+          <IonTitle size='small'>
             {displayTitle()}
           </IonTitle>
         </IonToolbar>    
