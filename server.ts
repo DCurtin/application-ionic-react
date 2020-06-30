@@ -74,13 +74,10 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 app.use(router);
 
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
+  console.log('Charge credit card on server');
+  
   let sessionId = req.body.sessionId;
-
-  if(sessionId === '' || sessionId === undefined){
-    console.log('no sesssion id');
-    res.status(500).send('no session id');
-    return;
-  }
+  validateSessionId(res, sessionId);
   
   let sessionQuery = {
     text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
@@ -88,12 +85,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
   }
   
   client.query(sessionQuery).then(function(result:pg.QueryResult){
-    if(result.rowCount == 0)
-    {
-      console.log('no application')
-      res.status(500).send('no application');
-      return;
-    }
+    result = validateApplicationSessionQuery(res, result);
     let application_session : salesforceSchema.application_session = result.rows[0];
 
     let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString};
