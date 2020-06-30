@@ -42,15 +42,18 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
      let location = useLocation();
 
      const displayTitle = () => {
-         return (appPages.filter(page => page.url === location.pathname))[0]?.title;
+         return !isMobile() && (appPages.filter(page => page.url === location.pathname))[0]?.title;
      }
 
      const displayRoutingButtons = () => {
          let pathName = location.pathname.toUpperCase();
-         return (!pathName.includes('DOCUSIGN') && !pathName.includes('RESUME'));
+         return (!pathName.includes('DOCUSIGN') && !pathName.includes('RESUME') && !isMobile());
+     }
+
+     const isMobile = () => {
+       return (isPlatform('iphone') || isPlatform('android'));
      }
     
-
     return(
         <IonHeader>
         <IonToolbar> 

@@ -1,13 +1,15 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
+import { IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
 import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
+import {isPlatform } from '@ionic/react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
-import './Page.css';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
-import {updateValidationTable} from '../helpers/CalloutHelpers'
+import {updateValidationTable} from '../helpers/CalloutHelpers';
+import { chevronBackCircleOutline, chevronForwardCircleOutline, saveOutline
+} from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -65,6 +67,8 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     currentPage: appPages[0],
     nextPage: appPages[1]
   });
+
+  const [showErrorToast, setShowErrorToast] = useState(false);
 
   useLayoutEffect(function(){
     let formParams = {...menuParams};
@@ -172,31 +176,31 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'Disclosures':
-        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} />;
+        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'AccountNotifications':
-        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'TransferIRA':
-        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'RolloverPlan':
-        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'NewContribution':
-        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'PaymentInformation':
-        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       default: 
-        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
     }
   }
 
@@ -208,18 +212,19 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const goToPrevPage = () => {
-    //add something for page validation?
     let path = currentState.prevPage?.url;
     if (path){
       history.push(path);
     }
   }
 
+  const isMobile = () => {
+    return (isPlatform('iphone') || isPlatform('android'));
+  }
 
   const updateMenuSections = (page: string, isPageValid:boolean) => {
     let currentPage  = {...currentState.currentPage};
     let newPage = {...currentPage, isValid: isPageValid};
-    console.log(currentPage);
     setCurrentState(prevState => {
       return {
         ...prevState,
@@ -252,12 +257,19 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   return (
     <IonPage> 
       <IonContent>
+        <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message="Required Fields Missing." buttons={[
+          {
+            icon: 'close',
+            role: 'cancel'
+          }
+        ]}/>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large" color="primary">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
         {displayPage(name)}
+ 
       </IonContent>
     </IonPage>
   );
