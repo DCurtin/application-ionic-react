@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'; 
 import {useForm} from 'react-hook-form';
-import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
+import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
 import {SessionApp, states, FormData, requestBody} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
@@ -11,7 +11,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
     const {register, handleSubmit, watch, errors} = useForm({
         mode: 'onBlur',
         reValidateMode: 'onBlur'
-    }); 
+    });
+    let watchAllFields = watch();
+
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count: 0
     })
@@ -58,6 +60,15 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
         saveBenePage(sessionId, formData);
         updateMenuSections('is_beneficiaries_page_valid', true);
     }
+
+    const showError = (fieldName: string) => {
+        let errorsArr = (Object.keys(errors));
+        let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
+        if (watchAllFields[fieldName]) {
+            className = 'ion=no-padding';
+        }
+        return className;
+};
  
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
         if (beneficiaryCount > 0) {
@@ -78,50 +89,62 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                         <IonLabel>
                             First Name
                         </IonLabel>
-                        <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]} onIonChange={updateForm}>
-                        </IonInput>
+                        <IonItem className={showError(`first_name__${beneficiaryNumber}`)}>
+                            <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Last Name</IonLabel>
-                        <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`last_name__${beneficiaryNumber}`)}>
+                            <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel>Social Security Number</IonLabel>
-                        <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`ssn__${beneficiaryNumber}`)}>
+                            <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Date of Birth</IonLabel>
-                        <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`dob__${beneficiaryNumber}`)}>
+                            <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
-                        <IonLabel> Type </IonLabel>
-                        <IonSelect interface='action-sheet' name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm}>
-                            <IonSelectOption value='Primary'>Primary</IonSelectOption>
-                            <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
-                        </IonSelect>
+                        <IonItem className={showError(`type__${beneficiaryNumber}`)}>
+                            <IonSelect interface='action-sheet' name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}>
+                                <IonSelectOption value='Primary'>Primary</IonSelectOption>
+                                <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Relationship
                         </IonLabel>
-                        <IonSelect interface='action-sheet' name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm}>
-                            <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
-                            <IonSelectOption value='Parent'>Parent</IonSelectOption>
-                            <IonSelectOption value='Child'>Child</IonSelectOption>
-                            <IonSelectOption value='Sibling'>Sibling</IonSelectOption>
-                            <IonSelectOption value='Other Family'>Other Family</IonSelectOption>
-                            <IonSelectOption value='Other'>Other</IonSelectOption>
-                        </IonSelect>
+                        <IonItem className={showError(`relationship__${beneficiaryNumber}`)}>
+                            <IonSelect interface='action-sheet' name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm} ref={register({required: true})}>
+                                <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
+                                <IonSelectOption value='Parent'>Parent</IonSelectOption>
+                                <IonSelectOption value='Child'>Child</IonSelectOption>
+                                <IonSelectOption value='Sibling'>Sibling</IonSelectOption>
+                                <IonSelectOption value='Other Family'>Other Family</IonSelectOption>
+                                <IonSelectOption value='Other'>Other</IonSelectOption>
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel>Share %</IonLabel>
-                        <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`share_percentage__${beneficiaryNumber}`)}>
+                            <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                     <IonCol className='well'>
                        Calculated Share Percentage 
@@ -130,23 +153,31 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                 <IonRow>
                     <IonCol>
                         <IonLabel>Beneficiary Street</IonLabel>
-                        <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]}onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`mailing_street__${beneficiaryNumber}`)}>
+                            <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]}onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Beneficiary City</IonLabel>
-                        <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`mailing_city__${beneficiaryNumber}`)}>
+                            <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol>
                         <IonLabel>Beneficiary State</IonLabel>
-                        <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
-                            {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
-                        </IonSelect>
+                        <IonItem className={showError(`mailing_state__${beneficiaryNumber}`)}>
+                            <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm}>
+                                {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>Beneficiary Zip</IonLabel>
-                        <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`mailing_zip__${beneficiaryNumber}`)}>
+                            <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -154,13 +185,17 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                         <IonLabel>
                             Phone
                         </IonLabel>
-                        <IonInput  name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError(`phone__${beneficiaryNumber}`)}>
+                            <IonInput  name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Email
                         </IonLabel>
-                        <IonInput type='email' onIonChange={updateForm}  name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]}></IonInput>
+                        <IonItem className={showError(`email__${beneficiaryNumber}`)}>
+                            <IonInput type='email' onIonChange={updateForm}  name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
               </React.Fragment>)
