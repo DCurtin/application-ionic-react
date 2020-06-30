@@ -110,7 +110,6 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
       res.status(500).send('no application');
       return;
     }
-
     let application_session : salesforceSchema.application_session = result.rows[0];
 
     let body = {'creditCardNumber': req.body.creditCardNumber, 'expirationDateString': req.body.expirationDateString};
