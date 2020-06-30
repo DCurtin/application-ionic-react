@@ -89,17 +89,6 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
 
     return (
         <IonPage>
-            <IonHeader>
-                <IonToolbar color="primary">
-                    <IonThumbnail slot="start">
-                        <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
-                    </IonThumbnail>
-                    <IonTitle>
-                        Docusign Return
-                    </IonTitle>
-                </IonToolbar>
-            </IonHeader>
-
             <IonContent className='ion-padding'>
                 {errorMsg !== '' &&
                     <IonRow>
@@ -150,7 +139,7 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
                             <IonButton color="primary" routerLink='/page/OwnerInformation'>Go Back To Application
                                 <IonIcon icon={chevronBackCircleOutline} slot='start'/>
                             </IonButton>
-                            <IonButton color="primary" routerLink={formData.docusignUrl}>Proceed to E-Signature
+                            <IonButton color="primary" href={formData.docusignUrl}>Proceed to E-Signature
                                 <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
                             </IonButton>
                         </p>
