@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import { FormData } from '../helpers/Utils';
-import CSS from 'csstype';
 import { IonPage, IonHeader, IonThumbnail, IonImg, IonToolbar, IonTitle, IonContent, IonRow, IonCol, IonButton, IonLoading, IonIcon, IonRouterLink } from '@ionic/react';
 import {handleDocusignReturn, downloadPenSignDocs} from '../helpers/CalloutHelpers'
 import { useParams, useLocation } from 'react-router';
