@@ -1,7 +1,7 @@
 import { IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
 import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
 import {isPlatform } from '@ionic/react';
-import { useParams } from 'react-router';
+import { useParams, useLocation } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
 import Disclosures from '../components/Disclosures';
@@ -263,13 +263,25 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
             role: 'cancel'
           }
         ]}/>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large" color="primary">{name}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        {isMobile() && (
+            <IonToolbar>
+              <IonButtons className="ion-justify-content-center">
+                <IonButton fill='solid' onClick={goToPrevPage} color='secondary' disabled={name.toUpperCase().includes('WELCOME')}>
+                  <IonIcon icon={chevronBackCircleOutline} slot='start'/>
+                  Prev
+                </IonButton>
+                <IonButton fill='solid'>
+                  Save & Return Later
+                </IonButton>
+                  <IonButton fill='solid' onClick={goToNextPage} color='secondary'>
+                    <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
+                  Next
+                  </IonButton>
+              </IonButtons>
+
+            </IonToolbar>
+        )}
         {displayPage(name)}
- 
       </IonContent>
     </IonPage>
   );

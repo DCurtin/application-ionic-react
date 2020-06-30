@@ -200,6 +200,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
         let errorsArr = Object.keys(errors);
         if (errorsArr.length > 0) {
             props.setShowErrorToast(true);
+            props.updateMenuSections('is_welcome_page_valid', false);
         }
     }
 
