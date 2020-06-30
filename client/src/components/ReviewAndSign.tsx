@@ -5,40 +5,54 @@ import {getESignUrl, downloadPenSignDocs} from '../helpers/CalloutHelpers';
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
-    const [docusignUrl, setDocusignUrl] = useState(''); 
+    const [docuSignUrl, setdocuSignUrl] = useState(''); 
     const [downloadUrl, setDownloadUrl] = useState(''); 
-    const [showIdCheckError, setShowIdCheckError] = useState(false);
+    const [idCheckFailed, setIdCheckFailed] = useState(false);
     const [downloadError, setDownloadError] = useState('');
+    const [docuSignError, setDocuSignError] = useState('');
     const [showSpinner, setShowSpinner] = useState(false);
     
     useEffect(() => {
 
         let sessionId = '27a269e4-2ad9-434f-a9d2-e6cb0d1f97c9';
 
-        console.log('spinner on');
         setShowSpinner(true);
         getESignUrl(sessionId).then((data) => {
-            setDocusignUrl(data.eSignUrl);
+            setdocuSignUrl(data.eSignUrl);
             setShowSpinner(false);
-        }).catch(() => {
-            //TODO: ADD A DISTINCTION BETWEEEN OVER 2 DOCUSIGN ATTEMPTS AND A GENERIC ERROR
-            setShowIdCheckError(true);
-            
-            downloadPenSignDocs(sessionId, 'id_check_failed').then((response : any) => {
-                setDownloadUrl(response);
+        }).catch((error : any) => {
+            if (error.message.includes('The ESignUrl')) {
+                callDownloadPenSignDocs(sessionId);    
+            }
+            else {
+                setDocuSignError('Error: Unable to retrieve E Signature Information');
                 setShowSpinner(false);
-            }).catch(function() {
-                setDownloadError('Error: Unable to download the signature document.');               
-                setShowSpinner(false);
-            })
+            }            
         })
     },[])
+
+    const callDownloadPenSignDocs = (sessionId: string) =>{
+        setIdCheckFailed(true);
+        downloadPenSignDocs(sessionId, 'id_check_failed').then((response : any) => {
+            setDownloadUrl(response);
+            setShowSpinner(false);
+        }).catch(function(error: any) {
+            console.log(error);
+            setDownloadError('Error: Unable to download the signature document.');               
+            setShowSpinner(false);
+        })
+    }
 
     return (
         <IonContent className='ion-padding'>
             <IonLoading isOpen={showSpinner} message={'Loading Signing Information...'} spinner="lines"></IonLoading>
             <IonGrid>
-                {showIdCheckError === false && 
+                {docuSignError !== '' &&
+                    <IonCol>
+                        {docuSignError}
+                    </IonCol>
+                }
+                {idCheckFailed === false && docuSignError == '' &&
                     <>
                         <IonRow className='well'>
                             <IonCol>
@@ -46,18 +60,18 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
                                 <b>Congratulations! You have completed the application interview process.</b>
                                 <br/>
                                 <br/>
-                                To begin the e-signature process, click the “Proceed to E-Signature” button below. You will be redirected to Docusign, our electronic signature system partner. Before signing, you will be asked a series of questions to verify your identity.
+                                To begin the e-signature process, click the “Proceed to E-Signature” button below. You will be redirected to docuSign, our electronic signature system partner. Before signing, you will be asked a series of questions to verify your identity.
 
                                 <br/>
                                 <br/>
-                                When you have completed the signing process through DocuSign, keep your browser open as you will be redirected back to this site to download forms that must be pen signed.
+                                When you have completed the signing process through docuSign, keep your browser open as you will be redirected back to this site to download forms that must be pen signed.
                             </span>
                             </IonCol>
                         </IonRow>
-                        {docusignUrl !== '' &&
+                        {docuSignUrl !== '' &&
                             <IonRow>
                                 <IonCol>
-                                    <a className="btn btn-primary" href={docusignUrl}>
+                                    <a className="btn btn-primary" href={docuSignUrl}>
                                         <IonButton>Proceed to E-Signature</IonButton>
                                     </a>
                                 </IonCol>    
@@ -65,7 +79,7 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
                         }
                     </>
                 }
-                {showIdCheckError && 
+                {idCheckFailed && 
                     <>
                         <IonRow className='well'>
                             <IonCol>
@@ -105,8 +119,7 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
                                 <IonCol>
                                     {downloadError}
                                 </IonCol>  
-                            }
-                            
+                            }  
                         </IonRow>
                     </>
                 }

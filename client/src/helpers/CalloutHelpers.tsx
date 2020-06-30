@@ -144,7 +144,7 @@ export function getESignUrl(sessionId: string)
                 return data;
             }
             else {
-                throw Error('Error retrieving ESign URL');
+                throw Error(data.errorMessage);
             } 
         }).catch(function(error: any) {
             throw Error(error.message);
