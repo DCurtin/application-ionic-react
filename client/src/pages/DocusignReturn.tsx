@@ -33,7 +33,7 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
         handleDocusignReturn(sessionId, docusignResult).then((response : any) => {
             setFormData(prevState => {return {...prevState, docusignAttempts: response.docusignAttempts, docusignUrl: response.docusignUrl, accountType: response.accountType}});
             
-            if (shouldDownloadPenSignDocOnPageLoad(docusignResult, response.docusignAttempts)) {
+            if (shouldDownloadPenSignDocOnPageLoad(docusignResult, response.docusignAttempts, response.accountType)) {
                 downloadPenSignDocsAfterEsignSuccess(sessionId, docusignResult);    
             }
             else if (docusignResult === ID_CHECK_FAILED && response.docusignAttempts === 1) {
@@ -74,8 +74,8 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
         })      
     }
 
-    const shouldDownloadPenSignDocOnPageLoad = (docusignResult: string, docusignAttempts: number) => {
-        return docusignResult === SIGNING_COMPLETE || (docusignResult === ID_CHECK_FAILED && docusignAttempts >= 2);
+    const shouldDownloadPenSignDocOnPageLoad = (docusignResult: string, docusignAttempts: number, accountType: string) => {
+        return accountType.includes('401') === false && (docusignResult === SIGNING_COMPLETE || (docusignResult === ID_CHECK_FAILED && docusignAttempts >= 2));
     }
 
     const toggleShowPrintApplication = () => {
@@ -143,33 +143,37 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
                                 <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
                             </IonButton>
                         </p>
-                        <p>
-                            <IonButton fill="outline" onClick={toggleShowPrintApplication}>Print Application</IonButton>
-                        </p>
-                        {formData.accountType.includes('401') === false && showPrintApplication &&
+                        {formData.accountType.includes('401') === false && 
                             <>
-                                You may also skip the verification questions / electronic submission and print your application instead by clicking the download button below:
-                                
                                 <p>
-                                    <IonButton color="primary" onClick={() => downloadFullSigningDoc(formData)}>Download My Signature Document</IonButton>
+                                    <IonButton fill="outline" onClick={toggleShowPrintApplication}>Print Application</IonButton>
                                 </p>
+                                {showPrintApplication &&
+                                    <>
+                                        You may also skip the verification questions / electronic submission and print your application instead by clicking the download button below:
+                                        
+                                        <p>
+                                            <IonButton color="primary" onClick={() => downloadFullSigningDoc(formData)}>Download My Signature Document</IonButton>
+                                        </p>
 
-                                If you decide to skip the verification questions, be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely here: 
-                                <a href="https://www.midlandtrust.com/secure-upload">https://www.midlandtrust.com/secure-upload/</a>
-                                <br/>
-                                <br/>
-                                You may also fax your application to 239-466-5496 or mail it to:                    <br/>
-                                PO Box 07520 <br/> Fort Myers, FL 33919.
-                                <br/>
-                                <br/>
-                                Thank you for your interest in opening an account with Midland.  Once received, Midland's new account team will review your application and a knowledgeable dedicated representative will reach out to you.
-                                We look forward to a lasting relationship. Feel free to contact Midland at 866-839-0429 if you need anything at all.
-                                <br/>
+                                        If you decide to skip the verification questions, be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely here: 
+                                        <a href="https://www.midlandtrust.com/secure-upload">https://www.midlandtrust.com/secure-upload/</a>
+                                        <br/>
+                                        <br/>
+                                        You may also fax your application to 239-466-5496 or mail it to:                    <br/>
+                                        PO Box 07520 <br/> Fort Myers, FL 33919.
+                                        <br/>
+                                        <br/>
+                                        Thank you for your interest in opening an account with Midland.  Once received, Midland's new account team will review your application and a knowledgeable dedicated representative will reach out to you.
+                                        We look forward to a lasting relationship. Feel free to contact Midland at 866-839-0429 if you need anything at all.
+                                        <br/>
+                                    </>
+                                }
                             </>
                         }
                     </>
                 }
-                {formData.docusignResult === ID_CHECK_FAILED && formData.docusignAttempts >= 2 && formData.accountType.includes('401') === false &&
+                {formData.docusignResult === ID_CHECK_FAILED && formData.docusignAttempts >= 2 && 
                     <>
                         <b>Whoops!  Midland was unable to verify your identity.</b>
                         <br/>
@@ -199,7 +203,6 @@ const DocusignReturn: React.FC<{setSessionId: Function}> = ({setSessionId}) => {
                                 <p>
                                     As a financial institution, Midland is required to verify your identity. During the application process, you were unable to answer some (or all) of the identifying verification questions. Please contact our new accounts team for assistance completing your application. 
                                 </p>
-                                <br/><br/>
                                 <p>
                                     Please call 239.333.1032 Option 2.
                                 </p>
