@@ -2,10 +2,11 @@ import React, {useState, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { SessionApp, states, requestBody, applicantIdForm, saveApplicationId} from '../helpers/Utils';
+import { SessionApp, states, applicantIdForm} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
-const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
+
+const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
     const {register, handleSubmit, watch, errors} = useForm({
         mode: 'onBlur',
@@ -57,6 +58,10 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
               saveAppPage(sessionId, formData);
             })
           }, [formData]);
+
+          useEffect(() => {
+              showErrorToast();
+          }, [errors])
     
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
@@ -67,6 +72,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
         const validateFields = () => {
             saveAppPage(sessionId, formData);
             updateMenuSections('is_owner_info_page_valid', true);
+            setShowErrorToast(false);
         }
 
         const showError = (fieldName: string) => {
@@ -79,6 +85,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, setSessionId, update
             }
             return className;
         };
+
+        const showErrorToast = () => {
+            let errorsArr = Object.keys(errors);
+            if (errorsArr.length > 0) {
+                setShowErrorToast(true);
+            }
+        }
 
     return (
         <IonContent className="ion-padding">

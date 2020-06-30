@@ -154,7 +154,11 @@ const Welcome: React.FC<InitSessionApp> = props => {
                   })
             })
         })
-    },[props.welcomePageFields])
+    },[props.welcomePageFields]);
+
+    useEffect(() => {
+        showErrorToast();
+    }, [errors])
 
 
     const validateFields = (e: any) => {
@@ -179,6 +183,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
                 })
             })
             props.updateMenuSections('is_welcome_page_valid', true);
+            props.setShowErrorToast(false);
         
     }
 
@@ -190,6 +195,13 @@ const Welcome: React.FC<InitSessionApp> = props => {
             }
             return className;
     };
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            props.setShowErrorToast(true);
+        }
+    }
 
     return (
         <IonContent className="ion-padding">
