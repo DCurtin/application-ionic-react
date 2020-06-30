@@ -1,24 +1,25 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
-import {welcomePageParameters, SessionApp} from "../helpers/Utils";
+import {welcomePageParameters, saveWelcomeParameters} from "../helpers/Utils";
 import {useForm } from 'react-hook-form';
 
 interface InitSessionApp {
-    initialValues: welcomePageParameters,
-    setInitialValues: Function,
+    welcomePageFields: welcomePageParameters,
+    setWelcomePageFields: Function,
+    sessionId: string,
     selectedAccountType: string,
     updateMenuSections:Function,
-    formRef: any
+    formRef: any,
+    setShowErrorToast: Function
 }
 
 const Disclosures: React.FC<InitSessionApp> = props => {
     let disclosurePDF = props.selectedAccountType.includes('Roth') ? 'https://www.midlandira.com/wp-content/uploads/2015/12/ROTH-IRA-5305-RA.pdf' : 'https://www.midlandira.com/wp-content/uploads/2015/12/Traditional-IRA-5305-A.pdf';
-
     const handleReadDisclosure = (event: any) => {       
-        props.setInitialValues(
+        props.setWelcomePageFields(
             {
-                ...props.initialValues,
-                HasReadDisclosure: event.detail.checked
+                ...props.welcomePageFields,
+                has_read_diclosure: event.detail.checked
             }
         )
     }
@@ -27,11 +28,27 @@ const Disclosures: React.FC<InitSessionApp> = props => {
     const watchAllFields = watch(); 
 
     const onSubmit = () => { 
-        props.updateMenuSections('isDisclosurePageValid',true);
+        props.updateMenuSections('is_disclosure_page_valid',true);
+        props.setShowErrorToast(false);
     }
 
     const validateFields = () => {
-      return (props.initialValues.HasReadDisclosure === true);
+        let body : saveWelcomeParameters ={
+            session: {sessionId: props.sessionId, page: 'welcomePage'},
+            data: props.welcomePageFields
+        }
+        let options = {
+            method : 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        }
+
+        fetch('/saveState', options).then((response)=>{
+            response.json().then(function(data: any){
+                props.setWelcomePageFields(data.sessionId);
+            })
+        })
+      return (props.welcomePageFields.has_read_diclosure === true);
     }
 
     const showError = (fieldName: string) => {
@@ -42,6 +59,17 @@ const Disclosures: React.FC<InitSessionApp> = props => {
             }
             return className;
     };
+
+    useEffect(() => {
+        showErrorToast();
+    }, [errors])
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            props.setShowErrorToast(true);
+        }
+    }
 
     return (
         <IonContent className="ion-padding">
@@ -69,7 +97,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
                                 </a> 
                             </p>
 
-                            <IonCheckbox checked={props.initialValues.HasReadDisclosure} onIonChange={handleReadDisclosure} 
+                            <IonCheckbox checked={props.welcomePageFields.has_read_diclosure} onIonChange={handleReadDisclosure} 
                             name='hasReadDisclosure' className={showError('hasReadDisclosure')} ref={register({validate: validateFields})}></IonCheckbox> &nbsp; I have reviewed these disclosures and agree to all terms and conditions herein 
                         </IonCol>
                     </IonRow>

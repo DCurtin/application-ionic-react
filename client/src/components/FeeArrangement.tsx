@@ -28,7 +28,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                 {
                     return;
                 }
-                console.log(data);
                 ImportForm(data);
             })
         }
@@ -53,7 +52,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
 
     const validateFields = (e:any) => {
         saveFeeArangementPage(sessionId, formData);
-        updateMenuSections('isFeeArrangementPageValid', true)
+        updateMenuSections('is_fee_arrangement_page_valid', true)
 
     }
     return (

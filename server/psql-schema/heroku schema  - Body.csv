@@ -1,8 +1,8 @@
 Identifier,Type,Unique,Required
 account_type,text,,
-offering_id,text,,
+referral_code,text,,
 investment_type,text,,
-owner_id,text,,
+sales_rep,text,,
 referred_by,text,,
 case_management,text,,
 investment_amount,float(2),,
@@ -10,5 +10,6 @@ credit_card,json,,
 bank_account,json,,
 transfer_form,boolean,,
 rollover_form,boolean,,
+has_read_diclosure,boolean,,
 cash_contribution_form,boolean,,
-token,uuid,yes,yes
+session_id,uuid,yes,yes

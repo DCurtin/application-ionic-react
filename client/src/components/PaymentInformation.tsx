@@ -30,7 +30,7 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
     }
 
     const validateFields = () => {
-        updateMenuSections('isPaymentInfoPageValid', true);
+        updateMenuSections('is_payment_information_page_valid', true);
     }
     
     return (

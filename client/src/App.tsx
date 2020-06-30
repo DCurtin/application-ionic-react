@@ -1,5 +1,7 @@
 import {Menu} from './components/Menu';
+import Resume from './pages/Resume'
 import Page from './pages/Page';
+import Header from './components/Header';
 import React, { useState, useEffect } from 'react';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -29,6 +31,8 @@ import DocusignReturn from './pages/DocusignReturn';
 
 const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('');
+  const [hasNextBeenClicked, setHasNextBeenClicked] = useState(false);
+  const [hasPrevBeenClicked, setHasPrevBeenClicked] = useState(false);
   const [menuSections, setMenuSections] = useState<MenuSection[]>([]);
   const[menuParams, setMenuParams] = useState<MenuParameters>({
     planInfo: false,
@@ -37,11 +41,20 @@ const App: React.FC = () => {
     newContribution: false,
     initialInvestment: false,
     is401k: false, 
-    isWelcomePageValid: false, 
-    isDisclosurePageValid: false,
-    isOwnerInfoPageValid: false
+    is_welcome_page_valid: false,
+    is_disclosure_page_valid: false,
+    is_owner_info_page_valid: false,
+    is_beneficiaries_page_valid: false,
+    is_fee_arrangement_page_valid: false,
+    is_account_notifications_page_valid: false,
+    is_transfer_ira_page_valid: false,
+    is_rollover_plan_page_valid: false,
+    is_investment_details_page_valid: false,
+    is_new_contribution_page_valid: false,
+    is_payment_information_page_valid: false,
+    is_review_and_sign_page_valid: false,
+    is_plan_information_page_valid: false
   });
-
 
   useEffect(()=>{
     let menuSections:MenuSection[] = generateAppPages(menuParams);
@@ -51,11 +64,13 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonSplitPane contentId="main">
+        <Header sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections} setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>
+        <IonSplitPane contentId="main" className='top-space'>
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections} setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams}/>} /> 
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>} /> 
             <Route path='/docusignReturn/:sessionId' render={(props) => <DocusignReturn {...props} setSessionId={setSessionId}/>}/> 
+            <Route path="/resume/:herokuToken" render={(props) => <Resume {...props} setSessionId={setSessionId}/>}/>
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
         </IonSplitPane>
