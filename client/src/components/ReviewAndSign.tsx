@@ -5,7 +5,7 @@ import {getESignUrl, downloadPenSignDocs} from '../helpers/CalloutHelpers';
 
 
 const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
-    const [docuSignUrl, setdocuSignUrl] = useState(''); 
+    const [docuSignUrl, setDocuSignUrl] = useState(''); 
     const [downloadUrl, setDownloadUrl] = useState(''); 
     const [idCheckFailed, setIdCheckFailed] = useState(false);
     const [downloadError, setDownloadError] = useState('');
@@ -15,7 +15,7 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
     useEffect(() => {
         setShowSpinner(true);
         getESignUrl(sessionId).then((data) => {
-            setdocuSignUrl(data.eSignUrl);
+            setDocuSignUrl(data.eSignUrl);
             setShowSpinner(false);
         }).catch((error : any) => {
             if (error.message.includes('The ESignUrl')) {
