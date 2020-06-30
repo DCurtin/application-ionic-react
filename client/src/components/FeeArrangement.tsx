@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers'
 import { fingerPrint } from 'ionicons/icons';
 
-const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef}) => {
+const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
     const {register, handleSubmit, watch, errors} = useForm({
         mode: 'onBlur',
@@ -49,23 +49,43 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
-        setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
+        console.log(`${e.target.name} is ${e.target.value}`)
+        //console.log(e.target.className);
+        //let originalClass = e.target.className;
+        //e.target.className = originalClass.replace('danger', '');
+        setFormData(previousState =>({
+            ...previousState,
+              [e.target.name]: newValue
+            }));
     }
 
     const validateFields = (e:any) => {
         saveFeeArangementPage(sessionId, formData);
-        updateMenuSections('is_fee_arrangement_page_valid', true)
-
+        updateMenuSections('is_fee_arrangement_page_valid', true);
+        setShowErrorToast(false);   
     }
+
+    useEffect(() => {
+        showErrorToast();
+    }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
-        if (watchAllFields[fieldName]) {
-            className = 'ion=no-padding';
-        }
-        return className;
+            //console.log(errors);
+            let className = errorsArr.includes(fieldName) ? 'danger' : '';
+            //console.log(watchAllFields);
+            if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
+                className = '';
+            }
+            return className;
     };
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            setShowErrorToast(true);
+        }
+    }
     return (
         <IonContent className='ion-padding'>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
@@ -103,7 +123,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                             Select fee agreement
                         </IonLabel>
                         <IonItem className={showError('fee_schedule')}>
-                            <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm}>
+                            <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm} ref={register({required: true})}>
                                 <IonSelectOption value='Asset Based ($295)'>
                                 Option 1 - Asset Based
                                 </IonSelectOption>
@@ -121,7 +141,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                     <IonCol>
                         <IonLabel>
                             <IonItem className={showError('payment_method')}>
-                                <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method' onIonChange={updateForm}>
+                                <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method' onIonChange={updateForm} ref={register({required: true})}>
                                     <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
                                     <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
                                 </IonSelect>
@@ -129,24 +149,24 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                         </IonLabel>
                     </IonCol>
                 </IonRow>
-                {formData.payment_method == 'Credit Card' && (
+                {formData.payment_method == 'Credit Card' &&  <React.Fragment>
                     <IonRow>
                         <IonCol>
                             <IonLabel>
                                 Credit Card Number
                             </IonLabel>
                             <IonItem className={showError('cc_number')}>
-                                <IonInput name='cc_number' value={formData.cc_number} onIonChange={updateForm}/>
+                                <IonInput type='number' name='cc_number' value={formData.cc_number} onIonInput={updateForm} clearInput ref={register({required: true})}/>
                             </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel> Expiration Date</IonLabel>
                             <IonItem className={showError('cc_exp_date')}>
-                                <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonChange={updateForm}/>
+                                <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonInput={updateForm} ref={register({required: true})}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
-                )}
+                    </React.Fragment>}
             </IonGrid>
             </form>
         </IonContent>
