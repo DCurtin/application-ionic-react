@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {SessionApp, feeArrangementForm} from '../helpers/Utils';
-import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
+import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput, IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers'
 import { fingerPrint } from 'ionicons/icons';
@@ -11,7 +11,9 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
     const {register, handleSubmit, watch, errors} = useForm({
         mode: 'onBlur',
         reValidateMode: 'onBlur'
-    }); 
+    });
+    let watchAllFields = watch();
+
     const [formData, setFormData] = useState<feeArrangementForm>({
         initial_investment_type: '',
         fee_schedule: '',
@@ -55,6 +57,15 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
         updateMenuSections('is_fee_arrangement_page_valid', true)
 
     }
+
+    const showError = (fieldName: string) => {
+        let errorsArr = (Object.keys(errors));
+        let className = errorsArr.includes(fieldName) ? 'danger ion-no-padding' : 'ion-no-padding';
+        if (watchAllFields[fieldName]) {
+            className = 'ion=no-padding';
+        }
+        return className;
+    };
     return (
         <IonContent className='ion-padding'>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
@@ -91,12 +102,14 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                         <IonLabel>
                             Select fee agreement
                         </IonLabel>
-                        <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm}>
-                            <IonSelectOption value='Asset Based ($295)'>
-                            Option 1 - Asset Based
-                            </IonSelectOption>
-                            <IonSelectOption value='Value Based'>Option 2 - Value Based</IonSelectOption>
-                        </IonSelect>
+                        <IonItem className={showError('fee_schedule')}>
+                            <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm}>
+                                <IonSelectOption value='Asset Based ($295)'>
+                                Option 1 - Asset Based
+                                </IonSelectOption>
+                                <IonSelectOption value='Value Based'>Option 2 - Value Based</IonSelectOption>
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonItemDivider>
@@ -107,10 +120,12 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                 <IonRow>
                     <IonCol>
                         <IonLabel>
-                            <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method' onIonChange={updateForm}>
-                                <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
-                                <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
-                            </IonSelect>
+                            <IonItem className={showError('payment_method')}>
+                                <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method' onIonChange={updateForm}>
+                                    <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
+                                    <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
                         </IonLabel>
                     </IonCol>
                 </IonRow>
@@ -120,11 +135,15 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                             <IonLabel>
                                 Credit Card Number
                             </IonLabel>
-                            <IonInput name='cc_number' value={formData.cc_number} onIonChange={updateForm}></IonInput>
+                            <IonItem className={showError('cc_number')}>
+                                <IonInput name='cc_number' value={formData.cc_number} onIonChange={updateForm}/>
+                            </IonItem>
                         </IonCol>
                         <IonCol>
                             <IonLabel> Expiration Date</IonLabel>
-                            <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonChange={updateForm}></IonInput>
+                            <IonItem className={showError('cc_exp_date')}>
+                                <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonChange={updateForm}/>
+                            </IonItem>
                         </IonCol>
                     </IonRow>
                 )}
