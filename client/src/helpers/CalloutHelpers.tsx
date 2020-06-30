@@ -139,10 +139,15 @@ export function getESignUrl(sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            console.log('eSignUrl from server ' + data.eSignUrl);
-            return data;
+            console.log(response.status);
+            if (response.status == 200) {
+                return data;
+            }
+            else {
+                throw Error('Error retrieving ESign URL');
+            } 
         }).catch(function(error: any) {
-            console.log('error: ' + error);
+            throw Error(error.message);
         })
     })
 }

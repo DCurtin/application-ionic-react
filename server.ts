@@ -113,13 +113,9 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
 
 app.post('/getESignUrl', (req, res) => {
   console.log('Get ESignUrl on server');
+  
   let sessionId = req.body.sessionId;
-
-  if(sessionId === '' || sessionId === undefined){
-    console.log('no sesssion id');
-    res.status(500).send('no session id');
-    return
-  }
+  validateSessionId(res, sessionId);
   
   let sessionQuery = {
     text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
@@ -127,21 +123,19 @@ app.post('/getESignUrl', (req, res) => {
   }
 
   client.query(sessionQuery).then(function(result:pg.QueryResult){
-    if(result.rowCount == 0)
-    {
-      console.log('no application')
-      res.status(500).send('no application');
-      return;
-    }
-    
+    result = validateApplicationSessionQuery(res, result);
     let application_session : salesforceSchema.application_session = result.rows[0];
+    
     let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
     let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
     console.log('getESignUrl sessionId: ' + sessionId);
     console.log('getESignUrl enpoint: ' + endpoint);
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
-      if (err) { return console.error(err); }
+      if (err) { 
+        res.status(500).send(err.message);  
+        return
+      }
       else {
         console.log("eSignUrl: ", data.eSignUrl);
         res.json({eSignUrl: data.eSignUrl}); 

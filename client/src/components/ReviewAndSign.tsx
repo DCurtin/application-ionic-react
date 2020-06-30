@@ -1,44 +1,52 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp } from '../helpers/Utils';
 import { IonContent, IonGrid, IonCol, IonRow, IonButton, IonLoading } from '@ionic/react';
-import {getESignUrl} from '../helpers/CalloutHelpers';
-import axios from 'axios'; 
+import {getESignUrl, downloadPenSignDocs} from '../helpers/CalloutHelpers';
 
 
-const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
-    const [docusignSignAttempts, setDocusignSignAttempts] = useState(0);
+const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
     const [docusignUrl, setDocusignUrl] = useState(''); 
+    const [downloadUrl, setDownloadUrl] = useState(''); 
+    const [showIdCheckError, setShowIdCheckError] = useState(false);
+    const [downloadError, setDownloadError] = useState('');
+    const [showSpinner, setShowSpinner] = useState(false);
+    
     useEffect(() => {
-        getESignUrl(sessionId).then((data) =>
-        {
-            let url = data.eSignUrl;
-            console.log('done here');
-            setDocusignUrl(url);
-        }
-        ).catch(() =>
-        {
-            setDocusignUrl('/docusignReturn')
-        })
-    },[sessionId])
 
-    useEffect(() => {
-        axios.get('/getPenSignDoc').then((res) => {
+        let sessionId = '27a269e4-2ad9-434f-a9d2-e6cb0d1f97c9';
 
+        console.log('spinner on');
+        setShowSpinner(true);
+        getESignUrl(sessionId).then((data) => {
+            setDocusignUrl(data.eSignUrl);
+            setShowSpinner(false);
+        }).catch(() => {
+            //TODO: ADD A DISTINCTION BETWEEEN OVER 2 DOCUSIGN ATTEMPTS AND A GENERIC ERROR
+            setShowIdCheckError(true);
+            
+            downloadPenSignDocs(sessionId, 'id_check_failed').then((response : any) => {
+                setDownloadUrl(response);
+                setShowSpinner(false);
+            }).catch(function() {
+                setDownloadError('Error: Unable to download the signature document.');               
+                setShowSpinner(false);
+            })
         })
     },[])
 
     return (
         <IonContent className='ion-padding'>
+            <IonLoading isOpen={showSpinner} message={'Loading Signing Information...'} spinner="lines"></IonLoading>
             <IonGrid>
-                {docusignSignAttempts < 2 && (
-                    <React.Fragment>
+                {showIdCheckError === false && 
+                    <>
                         <IonRow className='well'>
                             <IonCol>
                             <span>
                                 <b>Congratulations! You have completed the application interview process.</b>
                                 <br/>
                                 <br/>
-                                To begin the e-signature process, click the “Proceed to E-Signature” button below. You will be redirected to Docusign, our electronic signature system partner.Before signing, you will be asked a series of questions to verify your identity.
+                                To begin the e-signature process, click the “Proceed to E-Signature” button below. You will be redirected to Docusign, our electronic signature system partner. Before signing, you will be asked a series of questions to verify your identity.
 
                                 <br/>
                                 <br/>
@@ -46,7 +54,6 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             </span>
                             </IonCol>
                         </IonRow>
-                        <IonLoading isOpen={docusignUrl === ''} message={'Loading Signing Information...'} spinner="lines"></IonLoading>
                         {docusignUrl !== '' &&
                             <IonRow>
                                 <IonCol>
@@ -56,10 +63,10 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                                 </IonCol>    
                             </IonRow>
                         }
-                    </React.Fragment>
-                )}
-                {docusignSignAttempts >= 2 && (
-                    <React.Fragment>
+                    </>
+                }
+                {showIdCheckError && 
+                    <>
                         <IonRow className='well'>
                             <IonCol>
                                 <span>
@@ -69,14 +76,15 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
                                 As a financial institution, Midland is required to verify your identity.  During the application process, you were unable to answer some (or all) of the identity verification questions.
 
-                                Because you were unable to answer the identity verification questions, you will need to print your application by <a href="">clicking here</a>.
+                                Because you were unable to answer the identity verification questions, you will need to print your application by clicking the download button below.
+                                <br/>
                                 <br/>
                                 Be sure to physically sign your application where needed and return to Midland with a copy of a valid government issued photo ID as well.  The application, ID, and IRA statement (if transferring funds from another custodian) can all be uploaded securely at
                                 <br/>
-                                <a href="https://www.midlandira.com/secure-upload/">https://www.midlandira.com/secure-upload/</a>
+                                <a href="https://www.midlandtrust.com/secure-upload/">https://www.midlandtrust.com/secure-upload/</a>
                                 <br/>
                                 <br/>
-                                You may also fax your application to 239-466-5496 or mail it to:
+                                You may also fax your application to 239-333-1032 or mail it to:
                                 <br/>PO Box 07520
                                 <br/>  Fort Myers, FL 33919.
                                 <br/><br/>
@@ -86,14 +94,22 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
-                                <a className="btn btn-primary" href={docusignUrl}>
-                                    <IonButton>Download My Signature Document</IonButton>
-                                </a>
-                            </IonCol>
+                            {downloadUrl !== '' &&
+                                <IonCol>
+                                    <a className="btn btn-primary" href={downloadUrl} download = 'Midland_Application_Documents.pdf'>
+                                        <IonButton>Download My Signature Document</IonButton>
+                                    </a>
+                               </IonCol>  
+                            }
+                            {downloadError &&
+                                <IonCol>
+                                    {downloadError}
+                                </IonCol>  
+                            }
+                            
                         </IonRow>
-                    </React.Fragment>
-                )}
+                    </>
+                }
             </IonGrid>
         </IonContent>
     )
