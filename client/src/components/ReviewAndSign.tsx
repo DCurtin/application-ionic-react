@@ -13,9 +13,6 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
     const [showSpinner, setShowSpinner] = useState(false);
     
     useEffect(() => {
-
-        let sessionId = '27a269e4-2ad9-434f-a9d2-e6cb0d1f97c9';
-
         setShowSpinner(true);
         getESignUrl(sessionId).then((data) => {
             setdocuSignUrl(data.eSignUrl);
