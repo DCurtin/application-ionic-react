@@ -95,11 +95,11 @@ const ReviewAndSign : React.FC<SessionApp> = ({sessionId}) => {
                                 <a href="https://www.midlandtrust.com/secure-upload/">https://www.midlandtrust.com/secure-upload/</a>
                                 <br/>
                                 <br/>
-                                You may also fax your application to 239-333-1032 or mail it to:
+                                You may also fax your application to 239-466-5496 or mail it to:
                                 <br/>PO Box 07520
                                 <br/>  Fort Myers, FL 33919.
                                 <br/><br/>
-                                Thank you for your interest in opening an account with Midland.  Once received, Midland's new account team will review your application and a knowledgeable dedicated representative will reach out to you.  We look forward to a lasting relationship. Feel free to contact Midland at 866-839-0429 if you need anything at all.
+                                Thank you for your interest in opening an account with Midland.  Once received, Midland's new account team will review your application and a knowledgeable dedicated representative will reach out to you.  We look forward to a lasting relationship. Feel free to contact Midland at 239-333-1032 if you need anything at all.
                                 <br/>
                             </span>
                             </IonCol>
