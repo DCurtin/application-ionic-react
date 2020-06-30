@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
 import {welcomePageParameters, saveWelcomeParameters} from "../helpers/Utils";
 import {useForm } from 'react-hook-form';
@@ -15,7 +15,6 @@ interface InitSessionApp {
 
 const Disclosures: React.FC<InitSessionApp> = props => {
     let disclosurePDF = props.selectedAccountType.includes('Roth') ? 'https://www.midlandira.com/wp-content/uploads/2015/12/ROTH-IRA-5305-RA.pdf' : 'https://www.midlandira.com/wp-content/uploads/2015/12/Traditional-IRA-5305-A.pdf';
-
     const handleReadDisclosure = (event: any) => {       
         props.setWelcomePageFields(
             {
@@ -30,6 +29,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
 
     const onSubmit = () => { 
         props.updateMenuSections('is_disclosure_page_valid',true);
+        props.setShowErrorToast(false);
     }
 
     const validateFields = () => {
@@ -59,6 +59,17 @@ const Disclosures: React.FC<InitSessionApp> = props => {
             }
             return className;
     };
+
+    useEffect(() => {
+        showErrorToast();
+    }, [errors])
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            props.setShowErrorToast(true);
+        }
+    }
 
     return (
         <IonContent className="ion-padding">
