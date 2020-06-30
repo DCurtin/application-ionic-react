@@ -23,14 +23,14 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
     const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
-            console.log(e.target.className);
-            let originalClass = e.target.className;
-            e.target.className = originalClass.replace('danger', '');
+            //console.log(e.target.className);
+            //let originalClass = e.target.className;
+            //e.target.className = originalClass.replace('danger', '');
             setFormData(previousState =>({
             ...previousState,
               [e.target.name]: newValue
             }));
-        }
+    }
 
         const updateConfEmail = (e : any)=>{
             setConfirmEmail(e.target.value);
@@ -57,11 +57,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             return history.listen(()=>{
               saveAppPage(sessionId, formData);
             })
-          }, [formData]);
+        }, [formData]);
 
-          useEffect(() => {
-              showErrorToast();
-          }, [errors])
+        useEffect(() => {
+            showErrorToast();
+        }, [errors])
     
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
@@ -80,7 +80,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             console.log(errors);
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
             console.log(watchAllFields);
-            if (watchAllFields[fieldName]) {
+            if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
                 className = '';
             }
             return className;
@@ -323,6 +323,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             </IonLabel>
                             <IonItem className={showError('legal_zip')}>
                                 <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({
+                                        required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
                                 })} type='number'></IonInput>
                                 {errors.legal_zip ? (
@@ -378,6 +379,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 <IonLabel> Mailing Zip *</IonLabel>
                                 <IonItem className={showError('mailing_zip')}>
                                     <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm} ref={register({
+                                        required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
                                     })}></IonInput>
                                     {errors.mailing_zip ? (<IonText color='danger'>
