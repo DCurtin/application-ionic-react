@@ -32,14 +32,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
     useEffect(()=>{
       return history.listen(()=>{
-        console.log('saving bene');
         saveTransferPage(sessionId, formData);
       })
     },[formData])
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
-        console.log(e.target.name + ' ' + newValue);
         setFormData(prevState => ({...prevState, [e.target.name]:newValue}));
     }
 

@@ -31,4 +31,5 @@ has_hsa,boolean,,
 is_self_employed,boolean,,
 application_id,text,,
 account_number,text,,
-token,uuid,yes,yes
+heroku_token,uuid,,yes
+session_id,uuid,yes,yes

@@ -1,13 +1,16 @@
 ion-menu ion-content {
-  /* --background: var(--ion-item-background, var(--ion-background-color, #1A1B3F)); */
+  --background: transparent;
   max-width: 100%;
   border-radius: 10px;
-  /* width: 75%; */
+  background-image: url('../images/sideMenuBackground.jpg');
+  background-size: contain cover;
+  background-position: 50% 35%;
 }
 
 ion-list {
   border: 1px grey solid;
-  border-radius: 10px;
+  border-radius: 10px;	
+  width:80%;
 }
 
 ion-menu.md ion-content {
@@ -118,4 +121,5 @@ ion-note {
 
 ion-item.selected {
   --color: var(--ion-color-primary);
+  --background: var(--ion-color-medium-shade);
 } 

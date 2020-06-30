@@ -7,16 +7,16 @@ import {
   IonListHeader,
   IonMenu,
   IonMenuToggle,
-  IonImg,
   IonToolbar,
-  IonTitle,
+  IonFooter,
+  IonText,
 } from '@ionic/react';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import './Menu.css';
 import { AppPage } from '../helpers/MenuGenerator';
-import { checkmarkCircleSharp, checkmarkCircle, alertCircleOutline, alertCircleSharp } from 'ionicons/icons';
+import {  checkmarkCircle, alertCircleOutline } from 'ionicons/icons';
 
 interface AppSection {
   header: string;
@@ -29,11 +29,12 @@ interface session{
   menuSections: AppSection[]
 }
 
+
 const Menu: React.FC<session> = ({sessionId, menuSections}) => {
   const location = useLocation();
   let appPages = menuSections.flatMap(menuSection => menuSection.pages);
   return (
-    <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN')}>
+    <IonMenu contentId="main" type="overlay" hidden={location.pathname.toUpperCase().includes('DOCUSIGN') || location.pathname.toUpperCase().includes('RESUME')}>
       <IonContent forceOverscroll={false}>
         <IonList id="inbox-list">
           {menuSections.map((menuSection, index) => {
@@ -54,14 +55,25 @@ const Menu: React.FC<session> = ({sessionId, menuSections}) => {
             )
           })}
         </IonList>
-        {/* <IonImg src="../../assets/icon/midlandSideBar.PNG"></IonImg> */}
-        {/* <IonToolbar color="primary">
-            <IonTitle>FAQs</IonTitle>
-        </IonToolbar>
-        <IonToolbar color="primary">
-          <IonTitle> Contact Us </IonTitle>
-        </IonToolbar> */}
       </IonContent>
+      <IonFooter>
+        <IonToolbar color="primary">
+            <IonText color='light' className='ion-padding-start ion-text-center'>
+              <strong>
+                Contact Us <br/>
+              </strong>
+            </IonText>
+              <IonText color='light' className='ion-padding-start'>
+                  (239) 333-1032 
+              </IonText> <br/>
+              <IonText color='light' className='ion-padding-start'>
+                  newaccounts@midlandira.com <br/>
+              </IonText>
+              <IonText color='light' className='ion-padding-start'>
+                www.midlandtrust.com
+              </IonText>
+        </IonToolbar>
+      </IonFooter>
     </IonMenu>
   );
 };

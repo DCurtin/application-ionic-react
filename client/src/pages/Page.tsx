@@ -1,16 +1,15 @@
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonImg, IonThumbnail, IonButton, IonIcon } from '@ionic/react';
-import React, {useState, useEffect, useRef} from 'react';
+import { IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
+import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
+import {isPlatform } from '@ionic/react';
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
-import './Page.css';
-import './Page.css';
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
-import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator';
-import { chevronBackCircleOutline, chevronForwardCircleOutline
-  } from 'ionicons/icons';
+import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
+import {updateValidationTable} from '../helpers/CalloutHelpers';
+import { chevronBackCircleOutline, chevronForwardCircleOutline, saveOutline
+} from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -36,10 +35,14 @@ export interface session{
   menuSections: MenuSection[],
   setMenuParams: Function,
   setMenuSections: Function,
-  menuParams: MenuParameters
+  menuParams: MenuParameters,
+  hasNextBeenClicked: boolean, 
+  setHasNextBeenClicked: Function,
+  hasPrevBeenClicked: boolean, 
+  setHasPrevBeenClicked: Function
 }
 
-const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuSections, setMenuParams, menuParams}) => {
+const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenuParams, menuParams, hasNextBeenClicked, setHasNextBeenClicked,hasPrevBeenClicked,setHasPrevBeenClicked }) => {
   const history = useHistory();
   let appPages = menuSections.flatMap(e=>{
     return e.pages
@@ -48,15 +51,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const formRef = useRef<HTMLFormElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
-    AccountType: '',
-    InitialInvestment: '',
-    ReferralCode: '',
-    SalesRep: '',
-    SpecifiedSource: '',
-    CashContribution: false,
-    RolloverEmployer: false,
-    TransferIra: false,
-    HasReadDisclosure: false
+    account_type: '',
+    investment_type: '',
+    referral_code: '',
+    sales_rep: '',
+    referred_by: '',
+    cash_contribution_form: false,
+    rollover_form: false,
+    transfer_form: false,
+    has_read_diclosure: false
   });
 
   const [currentState, setCurrentState] = useState<userState>({
@@ -65,21 +68,24 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     nextPage: appPages[1]
   });
 
-  useEffect(function(){
-    let formParams = {...menuParams};
-    
-    formParams.transferForm = welcomePageFields.TransferIra;
-    formParams.rolloverForm = welcomePageFields.RolloverEmployer;
-    formParams.newContribution = welcomePageFields.CashContribution;
-    formParams.planInfo = welcomePageFields.AccountType.includes('SEP');
-    formParams.is401k = welcomePageFields.AccountType.includes('401k');
+  const [showErrorToast, setShowErrorToast] = useState(false);
 
-    formParams.initialInvestment = (welcomePageFields.InitialInvestment !== "I'm Not Sure" && welcomePageFields.InitialInvestment !== '')
+  useLayoutEffect(function(){
+    let formParams = {...menuParams};
+
+    
+    formParams.transferForm = welcomePageFields.transfer_form;
+    formParams.rolloverForm = welcomePageFields.rollover_form;
+    formParams.newContribution = welcomePageFields.cash_contribution_form;
+    formParams.planInfo = welcomePageFields.account_type.includes('SEP');
+    formParams.is401k = welcomePageFields.account_type.includes('401k');
+
+    formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
     setMenuParams(formParams);
-  },[welcomePageFields])
+  },[welcomePageFields]) //setMenuParams is this a required dependency?
   
-  useEffect(function(){
+  useLayoutEffect(function(){
     let url = '/getPageFields'
     let body : requestBody ={
         session: {sessionId: sessionId, page: 'rootPage'},
@@ -92,18 +98,52 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
     fetch(url, options).then((response)=>{
       response.json().then((data:any)=>{
-        console.log(data)
-        setWelcomePageFields(data.welcomePageFields);
+        setWelcomePageFields(data.data);
       })
     })
-    
-  },[])
+
+    let urlValidation = '/getValidatedPages'
+    let bodyValidation : requestBody ={
+        session: {sessionId: sessionId, page: 'rootPage'},
+        data: undefined
+    }
+    let optionsValidation = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(bodyValidation)
+    }
+    fetch(urlValidation, optionsValidation).then((response)=>{
+      response.json().then((data:any)=>{
+        console.log(data);
+        let validationParamters : PageValidationParamters = data.data;
+        let menuParamsUpdate :MenuParameters = {...menuParams, ...validationParamters
+        }
+        console.log(menuParamsUpdate);
+        setMenuParams(menuParamsUpdate)
+      })
+    })
+  },[sessionId])
+
   const { name } = useParams<{ name: string; }>();
 
   useEffect(() => {    
     let updatedState = getPageStateFromPage(name);
     setCurrentState(updatedState);
   }, [name,menuSections]);
+
+  useEffect(() => {
+    if (hasNextBeenClicked) {
+      goToNextPage();
+      setHasNextBeenClicked(false);
+    }
+  }, [hasNextBeenClicked])
+
+  useEffect(() => {
+    if (hasPrevBeenClicked) {
+      goToPrevPage();
+      setHasPrevBeenClicked(false);
+    }
+  }, [hasPrevBeenClicked])
 
   const getPageStateFromPage = (currentPageName:string) => {
     const appPagesArr = [...appPages];
@@ -136,31 +176,31 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'Disclosures':
-        return <Disclosures initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} selectedAccountType={welcomePageFields.AccountType} updateMenuSections={updateMenuSections} formRef={formRef} />;
+        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'AccountNotifications':
-        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'TransferIRA':
-        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'RolloverPlan':
-        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'NewContribution':
-        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'PaymentInformation':
-        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       default: 
-        return <Welcome initialValues={welcomePageFields} setInitialValues={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
     }
   }
 
@@ -171,11 +211,20 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
   }
 
+  const goToPrevPage = () => {
+    let path = currentState.prevPage?.url;
+    if (path){
+      history.push(path);
+    }
+  }
+
+  const isMobile = () => {
+    return (isPlatform('iphone') || isPlatform('android'));
+  }
 
   const updateMenuSections = (page: string, isPageValid:boolean) => {
     let currentPage  = {...currentState.currentPage};
     let newPage = {...currentPage, isValid: isPageValid};
-    console.log(currentPage);
     setCurrentState(prevState => {
       return {
         ...prevState,
@@ -185,6 +234,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     
     updateMenuParams(page, isPageValid);
     
+    if(page !== 'is_welcome_page_valid')
+    {
+      updateValidationTable(page, isPageValid, sessionId);
+    }
+
     if (isPageValid){
       let path = currentState.nextPage?.url;
       if (path){
@@ -193,45 +247,29 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     }
   }
 
+
   const updateMenuParams = (page: string, isValid: boolean) => {
-    let currentMenuParams = {...menuParams};
+    let currentMenuParams : any = {...menuParams};
     currentMenuParams[page] = isValid; 
     setMenuParams(currentMenuParams);
   }
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar color="primary">
-          <IonButtons slot="start">
-            <IonMenuButton />
-          </IonButtons>
-            <IonButton slot='end' routerLink={currentState.prevPage?.url} color='secondary'>
-              <IonIcon icon={chevronBackCircleOutline} slot='start'/>
-              Prev
-            </IonButton>
-              <IonButton slot='end' onClick={goToNextPage} color='secondary'>
-                <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
-              Next
-              </IonButton>
-          <IonThumbnail slot="start">
-            <IonImg src="../../assets/icon/midlandCrestForDarkBg.png"/>
-          </IonThumbnail>
-          <IonTitle>
-          {currentState.currentPage.title}
-          </IonTitle>
-        </IonToolbar>
-            
-           
-      </IonHeader>
-
+    <IonPage> 
       <IonContent>
+        <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message="Required Fields Missing." buttons={[
+          {
+            icon: 'close',
+            role: 'cancel'
+          }
+        ]}/>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large" color="primary">{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
         {displayPage(name)}
+ 
       </IonContent>
     </IonPage>
   );

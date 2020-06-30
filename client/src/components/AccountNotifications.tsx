@@ -48,7 +48,6 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
 
     useEffect(()=>{
       return history.listen(()=>{
-        console.log('saving bene');
         saveAccountNotificationsPage(sessionId, formData);
       })
     },[formData])
@@ -61,7 +60,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
     }
 
     const validateFields = (data: any, e: any) => {
-        updateMenuSections('isAccountNotificationsPageValid', true);
+        updateMenuSections('is_account_notifications_page_valid', true);
 
     }
 

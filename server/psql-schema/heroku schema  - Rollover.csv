@@ -12,4 +12,4 @@ mailing_state,text,"",""
 mailing_zip,text,"",""
 index,integer,"",""
 key,text,yes,yes
-token,uuid,,yes
+session_id,uuid,,yes
