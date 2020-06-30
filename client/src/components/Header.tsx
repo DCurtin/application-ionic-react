@@ -27,7 +27,7 @@ export interface userState {
   }
 
 const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasPrevBeenClicked}) => {
-    let appPages = menuSections.flatMap(e=>{
+      let appPages = menuSections.flatMap(e=>{
         return e.pages
       });
 
@@ -41,9 +41,17 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
 
      let location = useLocation();
 
-     const displayTitle = () => {
-         return !isMobile() && (appPages.filter(page => page.url === location.pathname))[0]?.title;
-     }
+    const displayTitle = () => {
+      let pathName = location.pathname.toUpperCase(); 
+      if (!isMobile()) {
+        if (pathName.includes('DOCUSIGN')) {
+          return 'Finishing Up';
+        }
+        else {
+          return !isMobile() && (appPages.filter(page => page.url === location.pathname))[0]?.title;
+        }
+      } 
+    }
 
      const displayRoutingButtons = () => {
          let pathName = location.pathname.toUpperCase();
