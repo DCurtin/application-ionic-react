@@ -131,7 +131,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 Contact Phone Number
                                 </IonLabel>
                                 <IonItem className={showError(`contact_phone_number__${i}`)}>
-                                    <IonInput value={formData[`contact_phone_number__${i}`]} name={`contact_phone_number__${i}`} onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{10}$/})}/>
+                                    <IonInput type='number' value={formData[`contact_phone_number__${i}`]} name={`contact_phone_number__${i}`} onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{10}$/})}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
