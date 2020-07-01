@@ -80,14 +80,11 @@ app.use(function(req : express.Request, res : express.Response, next : express.N
 app.use(router);
 
 app.post('/chargeCreditCard', (req : express.Request, res : express.Response) => {
+  console.log('Charge credit card on server');
+  
   let sessionId = req.body.sessionId;
-
-  if(sessionId === '' || sessionId === undefined){
-    console.log('no sesssion id');
-    res.status(500).send('no session id');
-    return;
-  }
-
+  validateSessionId(res, sessionId);
+  
   let paymentQuery = {
     text: 'SELECT * FROM salesforce.payment WHERE session_id = $1 AND status= $2',
     values: [sessionId, 'Completed']
@@ -151,33 +148,27 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
 
 app.post('/getESignUrl', (req, res) => {
   console.log('Get ESignUrl on server');
+  
   let sessionId = req.body.sessionId;
-
-  if(sessionId === '' || sessionId === undefined){
-    console.log('no sesssion id');
-    res.status(500).send('no session id');
-    return
-  }
+  validateSessionId(res, sessionId);
   
   let sessionQuery = {
     text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
     values: [sessionId]
   }
 
-  client.query(sessionQuery).then(function(result:pg.QueryResult<salesforceSchema.application_session>){
-    if(result.rowCount == 0)
-    {
-      console.log('no application')
-      res.status(500).send('no application');
-      return;
-    }
+  client.query(sessionQuery).then(function(result:pg.QueryResult){
+    result = validateApplicationSessionQuery(res, result);
+    let application_session : salesforceSchema.application_session = result.rows[0];
     
-    let application_session = result.rows[0];
     let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
     let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
-      if (err) { return console.error(err); }
+      if (err) { 
+        res.status(500).send(err.message);  
+        return
+      }
       else {
         res.json({eSignUrl: data.eSignUrl}); 
         return
@@ -193,7 +184,7 @@ app.post('/handleDocusignReturn', (req : express.Request, res : express.Response
   validateSessionId(res, sessionId);
 
   let sessionQuery = {
-    text: 'SELECT * FROM salesforce.application_session WHERE token = $1',
+    text: 'SELECT * FROM salesforce.application_session WHERE session_id = $1',
     values: [sessionId]
   }
   
@@ -233,12 +224,9 @@ app.get('/getPenSignDocs', (req : express.Request, res : express.Response) => {
     let application_session : salesforceSchema.application_session = result.rows[0];
     
     let eSignResult = req.query['eSignResult'];
-    //************************************************************************************************************************** 
-    //TODO: THIS IS HARD CODED TO QA RIGHT NOW!!!!!!!!!!!!!!!!!!!!!!!!!
-    //
     let instanceUrl = serverConn.instanceUrl || 'https://entrust--qa.my.salesforce.com'
 
-    let endpoint = instanceUrl+'/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
+    let endpoint = instanceUrl + '/services/apexrest/v1/accounts/' + application_session.account_number + '/pen-sign-documents?esign-result=' + eSignResult;
     console.log('getPenSignDoc enpoint: ' + endpoint);
 
     let options = {

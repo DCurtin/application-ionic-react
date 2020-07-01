@@ -140,9 +140,15 @@ export function getESignUrl(sessionId: string)
     }
     return fetch(url, options).then(function(response: any){
         return response.json().then(function(data: any){
-            return data;
+            console.log(response.status);
+            if (response.status == 200) {
+                return data;
+            }
+            else {
+                throw Error(data.errorMessage);
+            } 
         }).catch(function(error: any) {
-            console.log('error: ' + error);
+            throw Error(error.message);
         })
     })
 }

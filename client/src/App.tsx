@@ -69,14 +69,8 @@ const App: React.FC = () => {
         <IonSplitPane contentId="main" className='top-space'>
           <Menu sessionId={sessionId} menuSections={menuSections}/>
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" render={(props) => (
-                  <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>
-
-            )
-              } /> 
-            <Route path='/docusignReturn/:sessionId'>
-              <DocusignReturn/>
-            </Route>
+            <Route path="/page/:name" render={(props) => <Page {...props} sessionId={sessionId} setSessionId={setSessionId} menuSections={menuSections}  setMenuSections={setMenuSections} setMenuParams={setMenuParams} menuParams={menuParams} hasNextBeenClicked={hasNextBeenClicked} setHasNextBeenClicked={setHasNextBeenClicked} hasPrevBeenClicked={hasPrevBeenClicked} setHasPrevBeenClicked={setHasPrevBeenClicked}/>} /> 
+            <Route path='/docusignReturn/:sessionId' render={(props) => <DocusignReturn {...props} setSessionId={setSessionId}/>}/> 
             <Route path="/resume/:herokuToken" render={(props) => <Resume {...props} setSessionId={setSessionId}/>}/>
             <Redirect from="/" to="/page/Welcome" exact />
           </IonRouterOutlet>
