@@ -161,7 +161,7 @@ app.post('/getESignUrl', (req, res) => {
     result = validateApplicationSessionQuery(res, result);
     let application_session : salesforceSchema.application_session = result.rows[0];
     
-    let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.com` : 'localhost:3000'
+    let returnurl = process.env.HEROKU_APP_NAME ? `${process.env.HEROKU_APP_NAME}.herokuapp.com` : 'localhost:3000'
     let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=http://${returnurl}/DocusignReturn/${sessionId}`;
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
