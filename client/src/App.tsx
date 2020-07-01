@@ -7,6 +7,7 @@ import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
 import generateAppPages, { MenuSection, MenuParameters} from './helpers/MenuGenerator';
+import { CSSTransition } from 'react-transition-group';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';

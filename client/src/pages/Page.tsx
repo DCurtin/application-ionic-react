@@ -1,6 +1,7 @@
-import { IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
+import { IonButtons, IonContent, IonPage, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
 import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
-import {isPlatform } from '@ionic/react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import {isPlatform } from '@ionic/react'
 import { useParams } from 'react-router';
 import Welcome from '../components/Welcome';
 import {welcomePageParameters, requestBody} from '../helpers/Utils'
@@ -8,8 +9,7 @@ import Disclosures from '../components/Disclosures';
 import OwnerInformation from '../components/OwnerInformation';
 import {MenuSection, MenuParameters, PageValidationParamters, AppPage} from '../helpers/MenuGenerator';
 import {updateValidationTable} from '../helpers/CalloutHelpers';
-import { chevronBackCircleOutline, chevronForwardCircleOutline, saveOutline
-} from 'ionicons/icons';
+import { chevronBackCircleOutline, chevronForwardCircleOutline} from 'ionicons/icons';
 
 import {useHistory} from 'react-router-dom';
 import Beneficiaries from '../components/Beneficiaries';
@@ -48,7 +48,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     return e.pages
   });
 
-  const formRef = useRef<HTMLFormElement>(null);
+  let formRef = useRef<HTMLFormElement>(null);
   
   const [welcomePageFields, setWelcomePageFields] = useState<welcomePageParameters>({
     account_type: '',
@@ -69,6 +69,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   });
 
   const [showErrorToast, setShowErrorToast] = useState(false);
+  const [showPageTransition, setShowPageTransition] = useState(true);
 
   useLayoutEffect(function(){
     let formParams = {...menuParams};
@@ -83,7 +84,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
     formParams.initialInvestment = (welcomePageFields.investment_type !== "I'm Not Sure" && welcomePageFields.investment_type !== '')
     
     setMenuParams(formParams);
-  },[welcomePageFields]) //setMenuParams is this a required dependency?
+  },[welcomePageFields])
   
   useLayoutEffect(function(){
     let url = '/getPageFields'
@@ -219,7 +220,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   const isMobile = () => {
-    return (isPlatform('iphone') || isPlatform('android'));
+    return (isPlatform('iphone') || isPlatform('android') || isPlatform('ipad'));
   }
 
   const updateMenuSections = (page: string, isPageValid:boolean) => {
@@ -255,7 +256,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   return (
-    <IonPage> 
+    <IonPage className={isPlatform('android') ? 'android-fit-content' : ''}> 
       <IonContent>
         <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message="Required Fields Missing." buttons={[
           {
@@ -263,13 +264,29 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
             role: 'cancel'
           }
         ]}/>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large" color="primary">{name}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        {displayPage(name)}
- 
+        {isMobile() && (
+            <IonToolbar>
+              <IonButtons className="ion-justify-content-center">
+                <IonButton fill='solid' onClick={goToPrevPage} color='secondary' disabled={name.toUpperCase().includes('WELCOME')}>
+                  <IonIcon icon={chevronBackCircleOutline} slot='start'/>
+                  Prev
+                </IonButton>
+                <IonButton fill='solid'>
+                  Save & Return Later
+                </IonButton>
+                  <IonButton fill='solid' onClick={goToNextPage} color='secondary'>
+                    <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
+                  Next
+                  </IonButton>
+              </IonButtons>
+
+            </IonToolbar>
+        )}
+        {/* <TransitionGroup style={{height: "100%"}}>
+          <CSSTransition appear={true} key={name} timeout={500} classNames="page"> */}
+              {displayPage(name)}
+          {/* </CSSTransition>
+        </TransitionGroup> */}
       </IonContent>
     </IonPage>
   );

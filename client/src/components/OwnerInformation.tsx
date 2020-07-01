@@ -23,14 +23,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
     const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
-            console.log(e.target.className);
-            let originalClass = e.target.className;
-            e.target.className = originalClass.replace('danger', '');
             setFormData(previousState =>({
             ...previousState,
               [e.target.name]: newValue
             }));
-        }
+    }
 
         const updateConfEmail = (e : any)=>{
             setConfirmEmail(e.target.value);
@@ -57,11 +54,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             return history.listen(()=>{
               saveAppPage(sessionId, formData);
             })
-          }, [formData]);
+        }, [formData]);
 
-          useEffect(() => {
-              showErrorToast();
-          }, [errors])
+        useEffect(() => {
+            showErrorToast();
+        }, [errors])
     
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
@@ -80,7 +77,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             console.log(errors);
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
             console.log(watchAllFields);
-            if (watchAllFields[fieldName]) {
+            if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
                 className = '';
             }
             return className;
@@ -159,7 +156,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                     <IonRow>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
-                                Marital Status
+                                Marital Status *
                             </IonLabel>
                             <IonItem className={showError('marital_status')}>
                                 <IonSelect interface='action-sheet' name='marital_status' onIonChange={updateForm} value={formData.marital_status} ref={register({required: true})}>
@@ -312,7 +309,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Physical State * 
                             </IonLabel>
                             <IonItem className={showError('legal_state')}>
-                                <IonSelect interface='action-sheet' onIonChange={updateForm} value={formData.legal_state} name='legal_state' ref={register({required: true})}>
+                                <IonSelect interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}} onIonChange={updateForm} value={formData.legal_state} name='legal_state' ref={register({required: true})}>
                                 {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
                                 </IonSelect>
                             </IonItem>
@@ -323,6 +320,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             </IonLabel>
                             <IonItem className={showError('legal_zip')}>
                                 <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({
+                                        required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
                                 })} type='number'></IonInput>
                                 {errors.legal_zip ? (
@@ -369,7 +367,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing State *</IonLabel>
                                 <IonItem className={showError('mailing_state')}>
-                                    <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} ref={register({required: true})} onIonChange={updateForm}>
+                                    <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} ref={register({required: true})} onIonChange={updateForm} interfaceOptions={{cssClass: 'states-select'}}>
                                 {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
                                     </IonSelect>
                                 </IonItem>
@@ -378,6 +376,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 <IonLabel> Mailing Zip *</IonLabel>
                                 <IonItem className={showError('mailing_zip')}>
                                     <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm} ref={register({
+                                        required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
                                     })}></IonInput>
                                     {errors.mailing_zip ? (<IonText color='danger'>
@@ -429,6 +428,9 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             <IonLabel>Confirm Email *</IonLabel>
                             <IonItem className={showError('confirm_email')}>
                                 <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail} ref={register({validate: validateEmail})}></IonInput>
+                                {errors.confirm_email ? (
+                                    <IonText color='danger'>E-mails Must Match</IonText>
+                                ) : null}
                             </IonItem>
                         </IonCol>
                     </IonRow>
