@@ -282,11 +282,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
 
             </IonToolbar>
         )}
-        <TransitionGroup style={{height: "100%"}}>
-          <CSSTransition appear={true} key={name} timeout={500} classNames="page">
+        {/* <TransitionGroup style={{height: "100%"}}>
+          <CSSTransition appear={true} key={name} timeout={500} classNames="page"> */}
               {displayPage(name)}
-          </CSSTransition>
-        </TransitionGroup>
+          {/* </CSSTransition>
+        </TransitionGroup> */}
       </IonContent>
     </IonPage>
   );
