@@ -256,7 +256,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   return (
-    <IonPage> 
+    <IonPage className={isPlatform('android') ? 'android-fit-content' : ''}> 
       <IonContent>
         <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message="Required Fields Missing." buttons={[
           {

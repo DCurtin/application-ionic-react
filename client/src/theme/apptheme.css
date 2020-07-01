@@ -23,6 +23,11 @@ form ion-item {
     background-color: rgba(255, 0, 7, 0.16);
 }
 
+.android-fit-content {
+    height: fit-content(130%);
+    font-size: 88%;
+}
+
 
 ion-select {
     min-width: 100%;

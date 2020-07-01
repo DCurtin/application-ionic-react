@@ -75,7 +75,7 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
 
     const validateFields = (e: any) => {
         saveContributionPage(sessionId, formData);
-        updateMenuSections('is_rollover_plan_page_valid', true);
+        updateMenuSections('is_new_contribution_page_valid', true);
         setShowErrorToast(false);
     }
 

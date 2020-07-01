@@ -58,7 +58,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
             return {...prevState, [e.target.name]: newValue}
         });
     }
-    //validation
+
     const validateFields = (data: any, e: any) => {
         updateMenuSections('is_account_notifications_page_valid', true);
         setShowErrorToast(false);
@@ -85,7 +85,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
     useEffect(() => {
         showErrorToast();
     }, [errors])
-    //validation
+  
 
     return(
         <IonContent className='ion-padding'>
@@ -137,7 +137,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                         </IonCol>
                     </IonRow>
                     <IonRow>
-                        <IonCol size='6'>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                             Do you want to provide someone else access to your account? *
                             </IonLabel>
@@ -155,7 +155,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                     (
                         <React.Fragment>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         First Name
                                     </IonLabel>
@@ -163,7 +163,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         <IonInput value={formData.first_name} name='first_name' onIonInput={updateForm} ref={register({required: true})}/>
                                     </IonItem>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Last Name
                                     </IonLabel>
@@ -173,7 +173,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 </IonCol>
                             </IonRow>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Email
                                     </IonLabel>
@@ -181,7 +181,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         <IonInput value={formData.email} name='email' onIonInput={updateForm} ref={register({required: true, pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/})}/>
                                     </IonItem>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Phone</IonLabel>
                                     <IonItem className={showError('phone')}>
                                         <IonInput value={formData.phone} type='number' name='phone' onIonInput={updateForm} ref={register({required: true,pattern:/^[0-9]{10}$/})}/>
@@ -189,13 +189,13 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 </IonCol>
                             </IonRow>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Street</IonLabel>
                                     <IonItem className={showError('mailing_street')}>
                                         <IonInput value={formData.mailing_street} name='mailing_street' onIonInput={updateForm} ref={register({required: true})}/>
                                     </IonItem>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         City
                                     </IonLabel>
@@ -205,7 +205,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 </IonCol>
                             </IonRow>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         State
                                     </IonLabel>
@@ -218,7 +218,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         </IonSelect>
                                     </IonItem>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel> Zip</IonLabel>
                                     <IonItem className={showError('mailing_zip')}>
                                         <IonInput value={formData.mailing_zip} type='number' name='mailing_zip' onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/})}/>
@@ -226,7 +226,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 </IonCol>
                             </IonRow>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Company Name
                                     </IonLabel>
@@ -234,7 +234,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         <IonInput value={formData.company_name} name='company_name' onIonInput={updateForm}  ref={register({required: true})}/>
                                     </IonItem>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Title
                                     </IonLabel>
@@ -244,7 +244,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 </IonCol>
                             </IonRow>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Online Access</IonLabel>
                                     <IonItem className={showError('online_access')}>
                                         <IonSelect value={formData.online_access} name='online_access' onIonChange={updateForm} interface='action-sheet'  ref={register({required: false})}>
@@ -253,7 +253,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         </IonSelect>
                                     </IonItem>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Paper Statement Options
                                     </IonLabel>

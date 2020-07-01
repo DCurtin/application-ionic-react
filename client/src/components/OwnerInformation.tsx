@@ -23,9 +23,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
     const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
-            //console.log(e.target.className);
-            //let originalClass = e.target.className;
-            //e.target.className = originalClass.replace('danger', '');
             setFormData(previousState =>({
             ...previousState,
               [e.target.name]: newValue
@@ -431,6 +428,9 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             <IonLabel>Confirm Email *</IonLabel>
                             <IonItem className={showError('confirm_email')}>
                                 <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail} ref={register({validate: validateEmail})}></IonInput>
+                                {errors.confirm_email ? (
+                                    <IonText color='danger'>E-mails Must Match</IonText>
+                                ) : null}
                             </IonItem>
                         </IonCol>
                     </IonRow>

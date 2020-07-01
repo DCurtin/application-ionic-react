@@ -100,13 +100,13 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             </strong>
                         </IonItemDivider>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Institution Name</IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
                                     <IonInput name={`institution_name__${i}`} value={formData[`institution_name__${i}`]} placeholder='Institution Name' onIonInput={updateForm} ref={register({required: true})}/>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Cash Amount (approximate value allowed)</IonLabel>
                                 <IonItem className={showError(`cash_amount__${i}`)}>
                                     <IonInput name={`cash_amount__${i}`} value={formData[`cash_amount__${i}`]} onIonInput={updateForm} ref={register({required: true, pattern:/^([0-9]+\.[0-9]+|[0-9]+)$/})}/>
@@ -114,7 +114,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12"> 
                                 <IonLabel>
                                     Contact Name
                                 </IonLabel>
@@ -122,7 +122,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     <IonInput name={`name__${i}`} value={formData[`name__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Contact Phone Number
                                 </IonLabel>
@@ -132,7 +132,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Street
                                 </IonLabel>
@@ -140,7 +140,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     <IonInput name={`mailing_street__${i}`} value={formData[`mailing_street__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     City
                                 </IonLabel>
@@ -150,7 +150,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     State
                                 </IonLabel>
@@ -162,7 +162,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     </IonSelect>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Zip
                                 </IonLabel>
@@ -172,12 +172,12 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Account Type
                                 </IonLabel>
                                 <IonItem className={showError(`account_type__${i}`)}>
-                                    <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
+                                    <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
                                         {formData.account_type.includes('Roth') ? (
                                             <React.Fragment>
                                                 <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
@@ -205,7 +205,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     </IonSelect>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Account Number</IonLabel>
                                 <IonItem className={showError(`account_number__${i}`)}>
                                     <IonInput name={`account_number__${i}`} value={formData[`account_number__${i}`]} onIonInput={updateForm}  ref={register({required: true})}/>
@@ -213,7 +213,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol size='6'>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Rollover Type
                                 </IonLabel>
@@ -237,7 +237,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
     }
 
     return (
-        <IonContent className='ion-padding'>
+        <IonContent className='ion-padding' style={{height: '110%'}}>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
             <IonGrid>
                 <IonRow className='well'>

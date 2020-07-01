@@ -151,7 +151,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                 </IonRow>
                 {formData.payment_method == 'Credit Card' &&  <React.Fragment>
                     <IonRow>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>
                                 Credit Card Number
                             </IonLabel>
@@ -159,7 +159,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                                 <IonInput type='number' name='cc_number' value={formData.cc_number} onIonInput={updateForm} clearInput ref={register({required: true})}/>
                             </IonItem>
                         </IonCol>
-                        <IonCol>
+                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel> Expiration Date</IonLabel>
                             <IonItem className={showError('cc_exp_date')}>
                                 <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonInput={updateForm} ref={register({required: true})}/>

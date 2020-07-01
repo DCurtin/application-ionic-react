@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import { SessionApp, states, FormData } from '../helpers/Utils';
-import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio } from '@ionic/react';
+import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
@@ -100,7 +100,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </strong>
                         </IonItemDivider>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                    Account Number 
                                 </IonLabel>
@@ -108,7 +108,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     <IonInput value={formData[`account_number__${i}`]} name={`account_number__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Institution Name
                                 </IonLabel>
@@ -118,7 +118,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Contact Name
                                 </IonLabel>
@@ -126,7 +126,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     <IonInput value={formData[`contact_name__${i}`]} name={`contact_name__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                 Contact Phone Number
                                 </IonLabel>
@@ -136,13 +136,13 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Street</IonLabel>
                                 <IonItem className={showError(`mailing_street__${i}`)}>
                                     <IonInput value={formData[`mailing_street__${i}`]} name={`mailing_street__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> City</IonLabel>
                                 <IonItem className={showError(`mailing_city__${i}`)}>
                                     <IonInput value={formData[`mailing_city__${i}`]} name={`mailing_city__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
@@ -150,7 +150,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> State </IonLabel>
                                 <IonItem className={showError(`mailing_state__${i}`)}>
                                     <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm} ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
@@ -158,7 +158,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     </IonSelect>
                                 </IonItem>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Zip
                                 </IonLabel>
@@ -168,7 +168,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </IonCol>
                         </IonRow>
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                     Transfer Type 
                                 </IonLabel>
@@ -180,7 +180,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 </IonItem>
                             </IonCol>
                             {formData[`transfer_type__${i}`] === 'Cash Transfer' && (
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Account Type</IonLabel>
                                     <IonItem className={showError(`account_type__${i}`)}>
                                         <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
@@ -198,7 +198,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 </IonCol>
                             )}
                             {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Holding Name
                                     </IonLabel>
@@ -211,7 +211,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                         {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
                             <React.Fragment>
                                 <IonRow>
-                                    <IonCol>
+                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel> Account Type</IonLabel>
                                         <IonItem className={showError(`account_type__${i}`)}>
                                             <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
@@ -227,7 +227,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             </IonSelect>
                                         </IonItem>
                                     </IonCol>
-                                    <IonCol>
+                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel>
                                             Holding 2 Name (if applicable)
                                         </IonLabel>
@@ -237,9 +237,9 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     </IonCol>
                                 </IonRow>
                                 <IonRow>
-                                    <IonCol>
+                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel>
-                                            Complete or Partial Transfer
+                                            Complete or Partial Transfer *
                                         </IonLabel>
                                         <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
                                             <IonSelect interface='action-sheet' value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm} ref={register({required: true})}>
@@ -248,7 +248,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             </IonSelect>
                                         </IonItem>
                                     </IonCol>
-                                    <IonCol>
+                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel>
                                             Holding 3 Name (if applicable)
                                         </IonLabel>
@@ -263,16 +263,17 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                         (
                             <React.Fragment>
                                 <IonRow>
-                                    <IonCol size='6'>
-                                    <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
-                                        <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm} ref={register({required: true})}>
-                                            <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
-                                            <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
-                                        </IonSelect>
-                                    </IonItem>
+                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
+                                        <IonLabel> Transfer Amount * </IonLabel>
+                                        <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
+                                            <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm} ref={register({required: true})}>
+                                                <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
+                                                <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
+                                            </IonSelect>
+                                        </IonItem>
                                     </IonCol>
                                     {formData[`full_or_partial_cash_transfer__${i}`] == 'Partial Cash Transfer' && (
-                                        <IonCol>
+                                        <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                             <IonLabel>Cash Amount</IonLabel>
                                             <IonItem className={showError(`cash_amount__${i}`)}>
                                                 <IonInput value={formData[`cash_amount__${i}`]} name={`cash_amount__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
@@ -283,28 +284,32 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </React.Fragment>
                         )}
                         <IonRow>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                 To expedite this transfer request, Midland will send your signed request via fax or scan if acceptable by your current IRA custodian. If your current IRA custodian requires original documents, how do you want this transfer to be delivered?
                                 </IonLabel>
                                 <div className="ion-text-wrap">
-                                    <IonItem className={showError(`delivery_method__${i}`)}>
+                                    <IonList className={showError(`delivery_method__${i}`)}>
                                         <IonRadioGroup name={`delivery_method__${i}`} value={formData[`delivery_method__${i}`]} onIonChange={updateForm} ref={register({required: true})}>
-                                            <IonLabel>Mail (No charge)</IonLabel>
-                                            <IonRadio value='Certified Mail' className='ion-margin-horizontal'>
-                                            </IonRadio>
-                                            <IonLabel>Overnight ($30 Fee Applies)</IonLabel>
-                                            <IonRadio value='FedEx Overnight' className='ion-margin-horizontal'></IonRadio>
+                                            <IonItem>
+                                                <IonLabel>Mail (No charge)</IonLabel>
+                                                <IonRadio value='Certified Mail'>
+                                                </IonRadio>
+                                            </IonItem>
+                                            <IonItem>
+                                                <IonLabel>Overnight ($30 Fee Applies)</IonLabel>
+                                                <IonRadio value='FedEx Overnight'></IonRadio>
+                                            </IonItem>
                                         </IonRadioGroup>
-                                    </IonItem>
+                                    </IonList>
                                 </div>
                             </IonCol>
-                            <IonCol>
+                            <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>
                                 Upload Current Institution's Statement
                                 </IonLabel>
-                                <IonItem className={showError(`file__${i}`)}>
-                                    <input type='file' name={`file__${i}`} ref={register({required: true})}/>
+                                <IonItem>
+                                    <input type='file' name={`file__${i}`}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -341,10 +346,9 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                     </ul>
                     </IonCol>
                 </IonRow>
-                    {displayTransferForm(formData.existing_transfers)}
-                
+                    {displayTransferForm(formData.existing_transfers)}            
                 <IonRow>
-                    <IonCol>
+                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         {formData.existing_transfers < 2 && (
                             <IonButton onClick={addTransfer}>
                                 <IonIcon icon={addOutline} slot='start'></IonIcon>
@@ -353,6 +357,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                         )}
                     </IonCol>
                 </IonRow>
+                
             </IonGrid> 
             </form>           
         </IonContent>

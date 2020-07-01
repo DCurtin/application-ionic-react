@@ -112,7 +112,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
 
     const validateFields = (e: any) => {
         saveInitialInvestmentPage(sessionId, formData);
-        updateMenuSections('is_rollover_plan_page_valid', true);
+        updateMenuSections('is_investment_details_page_valid', true);
         setShowErrorToast(false);
     }
 
