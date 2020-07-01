@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, applicantIdForm} from '../helpers/Utils';
@@ -8,9 +8,8 @@ import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+    const {control, register, handleSubmit, watch, errors} = useForm({
+        mode: "onChange"
     }); 
     const [formData, setFormData] = useState<applicantIdForm>({
             is_self_employed: false,
@@ -52,7 +51,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
         useEffect(()=>{
             return history.listen(()=>{
-              saveAppPage(sessionId, formData);
+              saveAppPage(sessionId, formData, () => {return;});
             })
         }, [formData]);
 
@@ -65,12 +64,16 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             setFormData(importedForm);
         }
 
-
-        const validateFields = () => {
-            saveAppPage(sessionId, formData);
+        const updateMenus = () =>  {
             updateMenuSections('is_owner_info_page_valid', true);
             setShowErrorToast(false);
+
         }
+
+        const validateFields = () => {
+            saveAppPage(sessionId, formData, updateMenus());
+        }
+
 
         const showError = (fieldName: string) => {
             let errorsArr = (Object.keys(errors));
@@ -319,10 +322,20 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Zip *
                             </IonLabel>
                             <IonItem className={showError('legal_zip')}>
-                                <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({
+                                {/* <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({
                                         required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
-                                })} type='number'></IonInput>
+                                })} type='number'></IonInput> */}
+                                <Controller as={
+                                     <IonInput value={formData.legal_zip} name='legal_zip' type='number'></IonInput>
+                                } control={control} onChangeName="onIonChange" onChange={([selected]) => {
+                                    console.log("fullName", selected);
+                                    console.log('mdy114' + selected);
+                                    return selected.detail.value;
+                                  }}name='legal_zip' rules={{
+                                    required: true,
+                                    pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
+                                }} />
                                 {errors.legal_zip ? (
                                     <IonText color='danger'>Invalid Zip</IonText>
                                 ) : null}

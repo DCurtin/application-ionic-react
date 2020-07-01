@@ -54,13 +54,13 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
                     {formData.paymentStatus !== 'Success' &&
                         <>
                             <IonRow>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Credit Card Number
                                     </IonLabel>
                                     <IonInput class='item-input' name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
                                 </IonCol>
-                                <IonCol>
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Expiration Date
                                     </IonLabel>
