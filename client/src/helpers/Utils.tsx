@@ -183,6 +183,7 @@ export interface initialInvestmentForm{
     investment_contact_person?: string, //##
     investment_contact_person_phone?: string, //##
     investment_amount?: number, //##
+    min_cash_balance_checkbox: boolean
 }
 
 export interface initialInvestmentConditionalParameters{
