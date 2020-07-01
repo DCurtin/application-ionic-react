@@ -1,7 +1,6 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
-import { FromTo } from 'moment';
 
-export function saveAppPage(sessionId: string, formData: applicantIdForm, callback: any){
+export function saveAppPage(sessionId: string, formData: applicantIdForm, callback: Function){
     return makeSaveStateCalloutWithCallback(sessionId, 'appId', formData, callback)
 }
 
@@ -60,7 +59,7 @@ export function getRolloverPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'rollover')
 }
 
-function makeSaveStateCalloutWithCallback(sessionId: string, page: string, formData: FormData, callback: any){
+function makeSaveStateCalloutWithCallback(sessionId: string, page: string, formData: FormData, callback: Function){
     let url = '/saveState'
     let body : requestBody= {
     session: {sessionId: sessionId, page: page},
@@ -72,9 +71,10 @@ function makeSaveStateCalloutWithCallback(sessionId: string, page: string, formD
     body: JSON.stringify(body)
     }
     return fetch(url, options).then(function(response: any){
-        return response.json().then(function(data: any){
-            callback();
-        })
+        // return response.json().then(function(data: any){
+            
+        // })
+        callback();
     });
 }
 

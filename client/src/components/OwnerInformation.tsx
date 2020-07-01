@@ -71,7 +71,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         }
 
         const validateFields = () => {
-            saveAppPage(sessionId, formData, updateMenus());
+            saveAppPage(sessionId, formData, updateMenus);
         }
 
 
