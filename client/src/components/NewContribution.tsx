@@ -1,12 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, contributionForm } from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
+import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
 import moment from 'moment'; 
 import { useHistory } from 'react-router-dom';
+import {useForm} from 'react-hook-form';
 import {getContributionPage, saveContributionPage} from '../helpers/CalloutHelpers'
 
-const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowErrorToast, updateMenuSections}) => {
     const history = useHistory();
+    const {register, handleSubmit, watch, errors} = useForm({
+        mode: 'onBlur',
+        reValidateMode: 'onBlur'
+    });
+    let watchAllFields = watch();
     const [formData, setFormData] = useState<contributionForm>({
         new_contribution_amount: 0, 
         tax_year: '',
@@ -25,6 +31,7 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
 
     const validateRoutingNumber = (e:CustomEvent) => {
         let routingNumberInput = e.detail.value;
+        updateForm(e);
     }
 
     const showTaxYearInput = (accountType:string) => {
@@ -66,89 +73,132 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, setSessionId}) => {
       })
     },[formData])
 
+    const validateFields = (e: any) => {
+        saveContributionPage(sessionId, formData);
+        updateMenuSections('is_rollover_plan_page_valid', true);
+        setShowErrorToast(false);
+    }
+
+    useEffect(() => {
+        showErrorToast();
+        console.log(errors)
+    }, [errors])
+
+    const showError = (fieldName: string) => {
+        let errorsArr = (Object.keys(errors));
+        let className = errorsArr.includes(fieldName) ? 'danger' : '';
+        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
+            className = '';
+        }
+        return className;
+    };
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            setShowErrorToast(true);
+        }
+    }
+
     return (
         <IonContent className='ion-padding'>
-            <IonGrid>
-                <IonRow className='well'>
-                    <IonCol>
-                        <b>Using this page, you can make a new contribution to your account.</b> Please complete the information below including the amount of your contribution and what bank account you would like the contribution debited from. Your request will be reviewed and processed within 1-2 business days of the account being opened. Please keep in mind that there will be a five business day hold on the funds before they can be released into your account. This contribution will be considered for the tax year in which it was received.
-                    </IonCol>
-                </IonRow>
-                <IonItemDivider>
-                    <IonText color='primary'>
-                        <b>
-                          New Contribution  
-                        </b>
-                    </IonText>
-                </IonItemDivider>
-                <IonRow>
-                    <IonCol size='6'>
-                        <IonLabel>
-                            Amount
-                        </IonLabel>
-                        <IonInput name='new_contribution_amount' value={formData.new_contribution_amount} onIonChange={updateForm}></IonInput>
-                    </IonCol>
-                    {showTaxYearInput(formData.account_type) && (
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
+                <IonGrid>
+                    <IonRow className='well'>
+                        <IonCol>
+                            <b>Using this page, you can make a new contribution to your account.</b> Please complete the information below including the amount of your contribution and what bank account you would like the contribution debited from. Your request will be reviewed and processed within 1-2 business days of the account being opened. Please keep in mind that there will be a five business day hold on the funds before they can be released into your account. This contribution will be considered for the tax year in which it was received.
+                        </IonCol>
+                    </IonRow>
+                    <IonItemDivider>
+                        <IonText color='primary'>
+                            <b>
+                            New Contribution  
+                            </b>
+                        </IonText>
+                    </IonItemDivider>
+                    <IonRow>
+                        <IonCol size='6'>
+                            <IonLabel>
+                                Amount
+                            </IonLabel>
+                            <IonItem className={showError('new_contribution_amount')}>
+                                <IonInput type='number' name='new_contribution_amount' value={formData.new_contribution_amount} onIonInput={updateForm} ref={register({required: true})}/>
+                            </IonItem>
+                        </IonCol>
+                        {showTaxYearInput(formData.account_type) && (
+                            <IonCol>
+                                <IonLabel>
+                                    Tax Year
+                                </IonLabel>
+                                <IonItem className={showError('tax_year')}>
+                                    <IonSelect interface='action-sheet' value={formData.tax_year} name='tax_year' onIonChange={updateForm} ref={register({required: true})}>
+                                        <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
+                                        <IonSelectOption value='Last Year'>
+                                            Last Year
+                                        </IonSelectOption>
+                                    </IonSelect>
+                                </IonItem>
+                            </IonCol>
+                        )}
+                    </IonRow>
+                    <IonRow>
                         <IonCol>
                             <IonLabel>
-                                Tax Year
+                                Name on Account
                             </IonLabel>
-                            <IonSelect interface='action-sheet' value={formData.tax_year} name='tax_year' onIonChange={updateForm}>
-                                <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
-                                <IonSelectOption value='Last Year'>
-                                    Last Year
-                                </IonSelectOption>
-                            </IonSelect>
+                            <IonItem className={showError('name_on_account')}>
+                                <IonInput value={formData.name_on_account} name='name_on_account' onIonInput={updateForm} ref={register({required: true})}/>
+                            </IonItem>
                         </IonCol>
-                    )}
-                </IonRow>
-                <IonRow>
-                    <IonCol>
-                        <IonLabel>
-                            Name on Account
-                        </IonLabel>
-                        <IonInput value={formData.name_on_account} name='name_on_account' onIonChange={updateForm}></IonInput>
-                    </IonCol>
-                    <IonCol>
-                        <IonLabel>
-                            Bank Account Type
-                        </IonLabel>
-                        <IonSelect interface='action-sheet' value={formData.bank_account_type} name='bank_account_type' onIonChange={updateForm}>
-                            <IonSelectOption value='Checkings'>Checkings</IonSelectOption>
-                            <IonSelectOption value='Savings'>Savings </IonSelectOption>
-                        </IonSelect>
-                    </IonCol>
-                </IonRow>
-                <IonRow>
-                    <IonCol>
-                        <IonLabel>
-                            Bank ABA/Routing Number
-                        </IonLabel>
-                        <IonInput name='routing_number' value={formData.routing_number} onIonChange={validateRoutingNumber}></IonInput>
-                    </IonCol>
-                    <IonCol>
-                        <IonLabel>
-                            Account Number
-                        </IonLabel>
-                        <IonInput value={formData.account_number} onIonChange={updateForm} name='account_number'></IonInput>
-                    </IonCol>
-                </IonRow>
-                <IonRow>
-                    <IonCol size='6'>
-                        <IonLabel>Bank Name</IonLabel>
-                        <IonInput value={formData.bank_name} onIonChange={updateForm} name='bank_name'></IonInput>
-                    </IonCol>
-                </IonRow>
-                <IonRow className='well ion-margin-top'>
-                    <IonCol>
-                    <p>Providing Midland with your account information is optional.</p>
-                    <p>If you prefer to mail a check for your contribution, please send to the address below, mark the year in which you wish the contribution to be applied to, and make the check payable to Midland Trust Company FBO your name as it appears on your application.</p>
-                    <p>Midland IRA, Inc. 
-                    <br/>P.O. Box 07520
-                    <br/>Fort Myers, FL 33919</p>
-                    </IonCol>
-                </IonRow>
-            </IonGrid>
+                        <IonCol>
+                            <IonLabel>
+                                Bank Account Type
+                            </IonLabel>
+                            <IonItem className={showError('bank_account_type')}>
+                                <IonSelect interface='action-sheet' value={formData.bank_account_type} name='bank_account_type' onIonChange={updateForm}  ref={register({required: true})}>
+                                    <IonSelectOption value='Checkings'>Checkings</IonSelectOption>
+                                    <IonSelectOption value='Savings'>Savings </IonSelectOption>
+                                </IonSelect>
+                            </IonItem>
+                        </IonCol>
+                    </IonRow>
+                    <IonRow>
+                        <IonCol>
+                            <IonLabel>
+                                Bank ABA/Routing Number
+                            </IonLabel>
+                            <IonItem className={showError('routing_number')}>
+                                <IonInput type='number' name='routing_number' value={formData.routing_number} onIonInput={validateRoutingNumber} ref={register({required: true})}/>
+                            </IonItem>
+                        </IonCol>
+                        <IonCol>
+                            <IonLabel>
+                                Account Number
+                            </IonLabel>
+                            <IonItem className={showError('account_number')}>
+                                <IonInput value={formData.account_number} onIonInput={updateForm} name='account_number' ref={register({required: true})}/>
+                            </IonItem>
+                        </IonCol>
+                    </IonRow>
+                    <IonRow>
+                        <IonCol size='6'>
+                            <IonLabel>Bank Name</IonLabel>
+                            <IonItem className={showError('bank_name')}>
+                                <IonInput value={formData.bank_name} onIonInput={updateForm} name='bank_name'  ref={register({required: true})}/>
+                            </IonItem>
+                        </IonCol>
+                    </IonRow>
+                    <IonRow className='well ion-margin-top'>
+                        <IonCol>
+                        <p>Providing Midland with your account information is optional.</p>
+                        <p>If you prefer to mail a check for your contribution, please send to the address below, mark the year in which you wish the contribution to be applied to, and make the check payable to Midland Trust Company FBO your name as it appears on your application.</p>
+                        <p>Midland IRA, Inc. 
+                        <br/>P.O. Box 07520
+                        <br/>Fort Myers, FL 33919</p>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
+            </form>
         </IonContent>
     );
 }
