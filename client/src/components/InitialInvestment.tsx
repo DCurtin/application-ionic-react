@@ -1,15 +1,23 @@
 import React, {useState, useEffect} from 'react';
 import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters} from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
+import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import {useForm} from 'react-hook-form';
 import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers'
 
-const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => {
+const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef}) => {
     const history = useHistory();
+    const {register, handleSubmit, watch, errors} = useForm({
+        mode: 'onBlur',
+        reValidateMode: 'onBlur'
+    });
+    let watchAllFields = watch();
+
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
 
     const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({
-        initial_investment_type : 'Futures/Forex'
+        initial_investment_type : 'Futures/Forex',
+        min_cash_balance_checkbox: false
     });
     const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
 
@@ -101,10 +109,39 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
         
         return showNotEnoughProjectedCashWarning;
     }
+
+    const validateFields = (e: any) => {
+        saveInitialInvestmentPage(sessionId, formData);
+        updateMenuSections('is_investment_details_page_valid', true);
+        setShowErrorToast(false);
+    }
+
+    useEffect(() => {
+        showErrorToast();
+        console.log(errors)
+    }, [errors])
+
+    const showError = (fieldName: string) => {
+        let errorsArr = (Object.keys(errors));
+        let className = errorsArr.includes(fieldName) ? 'danger' : '';
+        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
+            className = '';
+        }
+        return className;
+    };
+
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            setShowErrorToast(true);
+        }
+    }
+
     
 
     return (
         <IonContent className='ion-padding'>
+            <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
             <IonGrid>
                 <IonRow className='well'>
                     <IonCol>
@@ -123,15 +160,19 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         <IonLabel>
                             What type of asset?
                         </IonLabel>
-                        <IonSelect value={formData.initial_investment_type} name='initial_investment_type' onIonChange={updateForm}>
-                            {investmentTypesArr.map((investmentType, index) => (
-                                <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
-                            ))}
-                        </IonSelect>
+                        <IonItem className={showError('initial_investment_type')}>
+                            <IonSelect value={formData.initial_investment_type} name='initial_investment_type' onIonChange={updateForm} ref={register({required: true})}>
+                                {investmentTypesArr.map((investmentType, index) => (
+                                    <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                                ))}
+                            </IonSelect>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                             <IonLabel>{displayEntityNameLabel(formData.initial_investment_type)}</IonLabel>
-                            <IonInput name='initial_investment_name' value={formData.initial_investment_name} onIonChange={updateForm}></IonInput>
+                            <IonItem className={showError('initial_investment_name')}>
+                                <IonInput name='initial_investment_name' value={formData.initial_investment_name} onIonInput={updateForm} ref={register({required: true})}/>
+                            </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -139,25 +180,31 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                         <IonLabel>
                             Contact Person
                         </IonLabel>
-                        <IonInput name='investment_contact_person' value={formData.investment_contact_person} onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError('investment_contact_person')}>
+                            <IonInput name='investment_contact_person' value={formData.investment_contact_person} onIonInput={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                     <IonCol>
                         <IonLabel>
                             Contact Phone
                         </IonLabel>
-                        <IonInput name='investment_contact_person_phone' value={formData.investment_contact_person_phone} onIonChange={updateForm} placeholder='(555)555-5555'></IonInput>
+                        <IonItem className={showError('investment_contact_person_phone')}>
+                            <IonInput type='number' name='investment_contact_person_phone' value={formData.investment_contact_person_phone} onIonInput={updateForm} placeholder='(555)555-5555'  ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol size='6'>
                         <IonLabel>Investment Amount</IonLabel>
-                        <IonInput value={formData.investment_amount} name='investment_amount' onIonChange={updateForm}></IonInput>
+                        <IonItem className={showError('investment_amount')}>
+                            <IonInput type='number' value={formData.investment_amount} name='investment_amount' onIonInput={updateForm} ref={register({required: true})}/>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 {showMinCashBalanceCheckbox(formData) && (
                     <IonRow>
                         <IonCol>
-                            <IonCheckbox></IonCheckbox> &nbsp; 
+                                <IonCheckbox onIonChange={updateForm} className={showError('min_cash_balance_checkbox')} name='min_cash_balance_checkbox' ref={register({required: true})}></IonCheckbox> &nbsp; 
                             <IonText className='ion-padding-left'>
                                 Midland has a minimum cash balance requirement of $250 which cannot be included in the investment amount. *   
                             </IonText>
@@ -173,6 +220,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setSessionId}) => 
                     </IonRow>
                 )}
             </IonGrid>
+            </form>
         </IonContent>
     )
 }

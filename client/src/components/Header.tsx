@@ -59,13 +59,13 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
      }
 
      const isMobile = () => {
-       return (isPlatform('iphone') || isPlatform('android'));
+       return (isPlatform('iphone') || isPlatform('android') || isPlatform('ipad'));
      }
     
     return(
         <IonHeader>
         <IonToolbar> 
-          <IonButtons slot="start">
+          <IonButtons slot="end">
             <IonMenuButton />
           </IonButtons>
           {displayRoutingButtons() &&
@@ -82,10 +82,10 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
               Next
               </IonButton>
           </React.Fragment>)}
-          <IonThumbnail slot="start">
+          <IonThumbnail slot='start'>
             <IonImg src={midlandLogo}/>
           </IonThumbnail>
-          <IonTitle>
+          <IonTitle size='small'>
             {displayTitle()}
           </IonTitle>
         </IonToolbar>    

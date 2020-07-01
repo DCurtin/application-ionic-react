@@ -2,14 +2,7 @@ ion-item-divider {
     border-radius: 5px;
 }
 
-.alert-radio-label.sc-ion-alert-md {
-    padding-left: 52px;
-    padding-right: 26px;
-    padding-top: 13px;
-    padding-bottom: 13px;
-    flex: 1;
-    color: var(--ion-color-step-850, #262626);
-    font-size: 14px;
-    text-overflow: ellipsis;
-    white-space: pre-line;
-  }
+.initial-investment .action-sheet-group {
+    position: relative;
+    top:1rem;
+}
