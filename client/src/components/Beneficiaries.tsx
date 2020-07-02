@@ -1,17 +1,16 @@
 import React, {useState, useEffect} from 'react'; 
 import {useForm, Controller} from 'react-hook-form';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
-import {SessionApp, states, FormData, requestBody} from '../helpers/Utils';
+import {SessionApp, states, FormData} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
-const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast}) => {
+const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
+    const {control, register, handleSubmit, watch, errors, setValue, getValues, formState } = useForm({
         mode: 'onChange'
     });
-    let watchAllFields = watch();
 
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count: 0
@@ -34,6 +33,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
     function ImportForm(data : any){
         let importedForm : FormData = data
         setFormData(importedForm);
+        for (var fieldName in data) {
+            setValue(fieldName, data[fieldName]);
+        }
     }
 
     useEffect(()=>{
@@ -63,14 +65,18 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
 
     useEffect(() => {
         showErrorToast();
-        console.log(errors)
+        return function onUnmount() {
+            if (Object.keys(errors).length > 0) {
+                updateMenuSections('is_beneficiaries_page_valid', false);
+            }
+        }
     }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
@@ -80,6 +86,22 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
         if (errorsArr.length > 0) {
             setShowErrorToast(true);
         }
+    }
+
+    const calcShare = (beneficiaryType : string) => {
+        let totalShare = 0; 
+        if (formData.beneficiary_count > 0) {
+            for (let i=1; i <= formData.beneficiary_count; i++) {
+                if (getValues(`type__${i}`) == beneficiaryType) {
+                    let beneficiaryShare = getValues(`share_percentage__${i}`);
+                    if (beneficiaryShare != null) {
+                        totalShare += Number(beneficiaryShare);
+                    }
+                }
+            }
+        }
+        
+        return totalShare; 
     }
  
     const displayBeneficiaryForm = (beneficiaryCount: number) => {
@@ -102,13 +124,23 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                             First Name
                         </IonLabel>
                         <IonItem className={showError(`first_name__${beneficiaryNumber}`)}>
-                            <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                        <Controller name={`first_name__${beneficiaryNumber}`} control={control} as={
+                                <IonInput name={`first_name__${beneficiaryNumber}`} value={formData[`first_name__${beneficiaryNumber}`]}/>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value;
+                            }} rules={{required: true}} />
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Last Name</IonLabel>
                         <IonItem className={showError(`last_name__${beneficiaryNumber}`)}>
-                            <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                            <Controller name={`last_name__${beneficiaryNumber}`} control={control} as={
+                                <IonInput name={`last_name__${beneficiaryNumber}`} value={formData[`last_name__${beneficiaryNumber}`]}/>
+                            }  onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}} />
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -116,13 +148,24 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Social Security Number</IonLabel>
                         <IonItem className={showError(`ssn__${beneficiaryNumber}`)}>
-                            <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true, pattern: /^[0-9]{9}$/})} type="number"/>
+                            <Controller name={`ssn__${beneficiaryNumber}`} control={control} as={
+                                <IonInput name={`ssn__${beneficiaryNumber}`} value={formData[`ssn__${beneficiaryNumber}`]} />
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}} /> 
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Date of Birth</IonLabel>
                         <IonItem className={showError(`dob__${beneficiaryNumber}`)}>
-                            <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                            <Controller name={`dob__${beneficiaryNumber}`} control={control}  as={
+                                <IonInput type='date' name={`dob__${beneficiaryNumber}`} value={formData[`dob__${beneficiaryNumber}`]} />
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}}
+                            />
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -130,10 +173,15 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel> Beneficiary Type</IonLabel>
                         <IonItem className={showError(`type__${beneficiaryNumber}`)}>
-                            <IonSelect interface='action-sheet' name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})}>
-                                <IonSelectOption value='Primary'>Primary</IonSelectOption>
-                                <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
-                            </IonSelect>
+                            <Controller name={`type__${beneficiaryNumber}`}  control={control} as={
+                                <IonSelect interface='action-sheet' name={`type__${beneficiaryNumber}`} value={formData[`type__${beneficiaryNumber}`]}>
+                                    <IonSelectOption value='Primary'>Primary</IonSelectOption>
+                                    <IonSelectOption value='Contingent'>Contingent</IonSelectOption>
+                                </IonSelect>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}}/>
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -141,14 +189,19 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMen
                             Relationship
                         </IonLabel>
                         <IonItem className={showError(`relationship__${beneficiaryNumber}`)}>
-                            <IonSelect interface='action-sheet' name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}   onIonChange={updateForm} ref={register({required: true})}>
-                                <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
-                                <IonSelectOption value='Parent'>Parent</IonSelectOption>
-                                <IonSelectOption value='Child'>Child</IonSelectOption>
-                                <IonSelectOption value='Sibling'>Sibling</IonSelectOption>
-                                <IonSelectOption value='Other Family'>Other Family</IonSelectOption>
-                                <IonSelectOption value='Other'>Other</IonSelectOption>
-                            </IonSelect>
+                            <Controller control={control} name={`relationship__${beneficiaryNumber}`} as={
+                                <IonSelect interface='action-sheet' name={`relationship__${beneficiaryNumber}`} value={formData[`relationship__${beneficiaryNumber}`]}>
+                                    <IonSelectOption value='Spouse'>Spouse</IonSelectOption>
+                                    <IonSelectOption value='Parent'>Parent</IonSelectOption>
+                                    <IonSelectOption value='Child'>Child</IonSelectOption>
+                                    <IonSelectOption value='Sibling'>Sibling</IonSelectOption>
+                                    <IonSelectOption value='Other Family'>Other Family</IonSelectOption>
+                                    <IonSelectOption value='Other'>Other</IonSelectOption>
+                                </IonSelect>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
