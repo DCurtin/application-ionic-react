@@ -8,7 +8,7 @@ import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
-    const {control, register, handleSubmit, errors, setValue, getValues, formState } = useForm({
+    const {control, handleSubmit, errors, setValue, getValues, formState } = useForm({
         mode: 'onChange'
     });
 
@@ -58,6 +58,10 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     }
 
     const validateFields = (e: any) => {
+        if (formData.beneficiary_count > 0 && (calcShare('Primary') < 100 || calcShare('Contingent') < 100)){
+            setShowErrorToast(true); 
+            return;
+        }
         saveBenePage(sessionId, formData);
         updateMenuSections('is_beneficiaries_page_valid', true);
         setShowErrorToast(false);
@@ -260,15 +264,25 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Beneficiary State</IonLabel>
                         <IonItem className={showError(`mailing_state__${beneficiaryNumber}`)}>
-                            <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} onIonChange={updateForm} ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
+                            <Controller control={control} name={`mailing_state__${beneficiaryNumber}`}  as={ 
+                                <IonSelect interface='action-sheet' name={`mailing_state__${beneficiaryNumber}`} value={formData[`mailing_state__${beneficiaryNumber}`]} interfaceOptions={{cssClass: 'states-select'}}>
                                 {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                             </IonSelect>
+                            }  onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}}/>
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Beneficiary Zip</IonLabel>
                         <IonItem className={showError(`mailing_zip__${beneficiaryNumber}`)}>
-                            <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/})}/>
+                            <Controller control={control} name={`mailing_zip__${beneficiaryNumber}`}  as={ 
+                                <IonInput  name={`mailing_zip__${beneficiaryNumber}`} value={formData[`mailing_zip__${beneficiaryNumber}`]} />
+                            }  onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/}}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -278,7 +292,12 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                             Phone
                         </IonLabel>
                         <IonItem className={showError(`phone__${beneficiaryNumber}`)}>
-                            <IonInput type='number' name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true,pattern:/^[0-9]{10}$/})}/>
+                            <Controller control={control} name={`phone__${beneficiaryNumber}`} as={
+                                <IonInput type='number' name={`phone__${beneficiaryNumber}`} value={formData[`phone__${beneficiaryNumber}`]}/>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}}/>
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -286,7 +305,15 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                             Email
                         </IonLabel>
                         <IonItem className={showError(`email__${beneficiaryNumber}`)}>
-                            <IonInput type='email' onIonInput={updateForm}  name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]} ref={register({required: true,pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/})}/>
+                        <Controller  name={`email__${beneficiaryNumber}`} control={control} as={
+                                 <IonInput type='email'   name={`email__${beneficiaryNumber}`} value={formData[`email__${beneficiaryNumber}`]}/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{
+                                      required:true, 
+                                      pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,63}/
+                                      }}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
