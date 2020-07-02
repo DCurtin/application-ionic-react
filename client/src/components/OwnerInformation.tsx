@@ -8,14 +8,17 @@ import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
-    const {control, register, handleSubmit, watch, errors} = useForm({
+    const [formData, setFormData] = useState<applicantIdForm>({
+        is_self_employed: false,
+        has_hsa: false,
+        home_and_mailing_address_different: false
+    });
+    const {control, register, handleSubmit, watch, errors, setValue, getValues} = useForm({
         mode: "onChange"
     }); 
-    const [formData, setFormData] = useState<applicantIdForm>({
-            is_self_employed: false,
-            has_hsa: false,
-            home_and_mailing_address_different: false
-        });
+
+    const allValues = getValues();
+    console.log(allValues);
 
     const watchAllFields = watch();
 
@@ -33,7 +36,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         }
 
         const validateEmail = () => {
-            return (confirmEmail === formData.email);
+            return (getValues('confirm_email') === getValues('email'));
         }
     
         useEffect(()=>{
@@ -62,6 +65,9 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         function ImportForm(data : any){
             let importedForm : applicantIdForm = data;
             setFormData(importedForm);
+            for (var fieldName in data) {
+                setValue(fieldName, data[fieldName])
+            }
         }
 
         const updateMenus = () =>  {
@@ -79,8 +85,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             let errorsArr = (Object.keys(errors));
             console.log(errors);
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
-            console.log(watchAllFields);
-            if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
+            if (!errorsArr.includes(fieldName)) {
                 className = '';
             }
             return className;
@@ -322,20 +327,15 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Zip *
                             </IonLabel>
                             <IonItem className={showError('legal_zip')}>
-                                {/* <IonInput value={formData.legal_zip} name='legal_zip' onIonInput={updateForm} ref={register({
-                                        required: true,
-                                        pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
-                                })} type='number'></IonInput> */}
                                 <Controller as={
                                      <IonInput value={formData.legal_zip} name='legal_zip' type='number'></IonInput>
                                 } control={control} onChangeName="onIonChange" onChange={([selected]) => {
-                                    console.log("fullName", selected);
-                                    console.log('mdy114' + selected);
+                                    updateForm(selected);
                                     return selected.detail.value;
                                   }}name='legal_zip' rules={{
                                     required: true,
                                     pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
-                                }} />
+                                }}/>
                                 {errors.legal_zip ? (
                                     <IonText color='danger'>Invalid Zip</IonText>
                                 ) : null}
@@ -439,8 +439,19 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Confirm Email *</IonLabel>
+                            
+                            {/* <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail} ref={register({validate: validateEmail})}></IonInput> */}
+
                             <IonItem className={showError('confirm_email')}>
-                                <IonInput value={confirmEmail} name='confirm_email' onIonInput={updateConfEmail} ref={register({validate: validateEmail})}></IonInput>
+                                <Controller name='confirm_email' control={control} as={
+                                    <IonInput value={confirmEmail} name='confirm_email'></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateConfEmail(selected);
+                                    return selected.detail.value;
+                                }} rules={{
+                                    required: true,
+                                    validate: validateEmail
+                                }}/>
                                 {errors.confirm_email ? (
                                     <IonText color='danger'>E-mails Must Match</IonText>
                                 ) : null}
