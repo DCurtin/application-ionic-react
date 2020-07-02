@@ -161,8 +161,8 @@ app.post('/getESignUrl', (req, res) => {
     result = validateApplicationSessionQuery(res, result);
     let application_session : salesforceSchema.application_session = result.rows[0];
     
-    let returnurl = process.env.HEROKU_APP_NAME ? `https://${process.env.HEROKU_APP_NAME}.herokuapp.com` : 'http://localhost:3000'
-    let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=${returnurl}/DocusignReturn/${sessionId}`;
+    let returnBaseUrl = process.env.HEROKU_APP_NAME ? `https://${process.env.HEROKU_APP_NAME}.herokuapp.com` : 'http://localhost:3000'
+    let endpoint = '/v1/accounts/' + application_session.account_number + `/esign-url?return-url=${returnBaseUrl}/DocusignReturn/${sessionId}`;
 
     serverConn.apex.get(endpoint, function(err: any, data: any) {
       if (err) { 
@@ -192,8 +192,9 @@ app.post('/handleDocusignReturn', (req : express.Request, res : express.Response
     result = validateApplicationSessionQuery(res, result);
     let application_session : salesforceSchema.application_session = result.rows[0];
 
-    let body = {'eSignResult': req.body.eSignResult};
-  
+    let returnBaseUrl = process.env.HEROKU_APP_NAME ? `https://${process.env.HEROKU_APP_NAME}.herokuapp.com` : 'http://localhost:3000'    
+    let body = {'eSignResult': req.body.eSignResult, 'eSignReturnUrl': `${returnBaseUrl}/DocusignReturn/${sessionId}`};
+
     serverConn.apex.post('/applications/' + application_session.application_id + '/docusign-return', body, function(err : any, data : any) {
       if (err) { 
         res.status(500).send(err.message);  
