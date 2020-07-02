@@ -13,10 +13,9 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         has_hsa: false,
         home_and_mailing_address_different: false
     });
-    const {control, register, handleSubmit, watch, errors, setValue, getValues} = useForm({
+    const {control, register, handleSubmit, errors, setValue, getValues, formState} = useForm({
         mode: "onChange"
     }); 
-    const watchAllFields = watch();
 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
     const [showSpinner, setShowSpinner]  = useState(false); 
@@ -28,17 +27,17 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
             }));
     }
 
-        const updateConfEmail = (e : any)=>{
-            setConfirmEmail(e.target.value);
-        }
+    const updateConfEmail = (e : any)=>{
+        setConfirmEmail(e.target.value);
+    }
 
-        const validateEmail = () => {
-            return (getValues('confirm_email') === getValues('email'));
-        }
+    const validateEmail = () => {
+        return (getValues('confirm_email') === getValues('email'));
+    }
     
-        useEffect(()=>{
-            if(sessionId !== '')
-            {
+    useEffect(()=>{
+        if(sessionId !== '')
+        {
                 setShowSpinner(true);
                 getAppPage(sessionId).then(data =>{
                     if(data === undefined)
@@ -49,54 +48,59 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                     ImportForm(data);
                     setShowSpinner(false);
                 })
-            }
-        },[sessionId]);
+        }
+    },[sessionId]);
 
-        useEffect(()=>{
-            return history.listen(()=>{
-              saveAppPage(sessionId, formData, () => {return;});
-            })
-        }, [formData]);
+    useEffect(()=>{
+        return history.listen(()=>{
+            saveAppPage(sessionId, formData, () => {return;});
+        })
+    }, [formData]);
 
-        useEffect(() => {
-            showErrorToast();
-        }, [errors])
+    useEffect(() => {
+        showErrorToast();
+    }, [errors]);
+
+    useEffect(() => {
+        if (formState.isSubmitting && (!formState.isValid)) {
+            updateMenuSections('is_owner_info_page_valid', false);
+        }
+    }, [formState])
     
-        function ImportForm(data : any){
-            let importedForm : applicantIdForm = data;
-            setFormData(importedForm);
-            for (var fieldName in data) {
-                setValue(fieldName, data[fieldName])
-            }
+    function ImportForm(data : any){
+        let importedForm : applicantIdForm = data;
+        setFormData(importedForm);
+        for (var fieldName in data) {
+        setValue(fieldName, data[fieldName])
         }
+    }
 
-        const updateMenus = () =>  {
-            updateMenuSections('is_owner_info_page_valid', true);
-            setShowErrorToast(false);
+    const updateMenus = () =>  {
+        updateMenuSections('is_owner_info_page_valid', true);
+        setShowErrorToast(false);
+    }
 
+    const validateFields = () => {
+        saveAppPage(sessionId, formData, updateMenus);
+    }
+
+
+    const showError = (fieldName: string) => {
+        let errorsArr = (Object.keys(errors));
+        console.log(errors);
+        let className = errorsArr.includes(fieldName) ? 'danger' : '';
+        if (!errorsArr.includes(fieldName)) {
+            className = '';
         }
+        return className;
+    };
 
-        const validateFields = () => {
-            saveAppPage(sessionId, formData, updateMenus);
+    const showErrorToast = () => {
+        let errorsArr = Object.keys(errors);
+        if (errorsArr.length > 0) {
+            setShowErrorToast(true);
         }
-
-
-        const showError = (fieldName: string) => {
-            let errorsArr = (Object.keys(errors));
-            console.log(errors);
-            let className = errorsArr.includes(fieldName) ? 'danger' : '';
-            if (!errorsArr.includes(fieldName)) {
-                className = '';
-            }
-            return className;
-        };
-
-        const showErrorToast = () => {
-            let errorsArr = Object.keys(errors);
-            if (errorsArr.length > 0) {
-                setShowErrorToast(true);
-            }
-        }
+    }
 
     return (
         <IonContent className="ion-padding">
@@ -382,9 +386,14 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Physical State * 
                             </IonLabel>
                             <IonItem className={showError('legal_state')}>
-                                <IonSelect interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}} onIonChange={updateForm} value={formData.legal_state} name='legal_state' ref={register({required: true})}>
-                                {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
-                                </IonSelect>
+                                <Controller name='legal_state' control={control} as={
+                                    <IonSelect interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}}  value={formData.legal_state} name='legal_state'>
+                                    {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
+                                    </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -430,14 +439,23 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing Street Address *</IonLabel>
                                 <IonItem className={showError('mailing_street')}>
-                                    <IonInput value={formData.mailing_street} name='mailing_street' onIonInput={updateForm} ref={register({required: true})}></IonInput>
+                                    <Controller name='mailing_street' control={control} as={
+                                        <IonInput value={formData.mailing_street} name='mailing_street'></IonInput>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                      }} rules={{required:true}}/>
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing City *</IonLabel>
                                 <IonItem className={showError('mailing_city')}>
-                                    <IonInput value={formData.mailing_city} name='mailing_city' onIonInput={updateForm} ref={register({required: true})}
-                                    ></IonInput>
+                                    <Controller name='mailing_city' control={control} as={
+                                        <IonInput value={formData.mailing_city} name='mailing_city'></IonInput>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                      }} rules={{required:true}} />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -445,20 +463,30 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Mailing State *</IonLabel>
                                 <IonItem className={showError('mailing_state')}>
-                                    <IonSelect interface='action-sheet' name='mailing_state' value={formData.mailing_state} ref={register({required: true})} onIonChange={updateForm} interfaceOptions={{cssClass: 'states-select'}}>
-                                {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
-                                    </IonSelect>
+                                    <Controller name='mailing_state' control={control} as={
+                                        <IonSelect interface='action-sheet' interfaceOptions={{cssClass: 'states-select'}}  value={formData.mailing_state} name='mailing_state'>
+                                        {states.map((state, index) => <IonSelectOption value={state} key={index}>{state}</IonSelectOption>)}
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required:true}}/>
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Mailing Zip *</IonLabel>
                                 <IonItem className={showError('mailing_zip')}>
-                                    <IonInput value={formData.mailing_zip} name='mailing_zip' onIonInput={updateForm} ref={register({
+                                    <Controller as={
+                                        <IonInput value={formData.mailing_zip} name='mailing_zip' type='number'></IonInput>
+                                    } control={control} onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }}name='mailing_zip' rules={{
                                         required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
-                                    })}></IonInput>
+                                    }}/>
                                     {errors.mailing_zip ? (<IonText color='danger'>
-                                        Error Message
+                                       Invalid Zip
                                     </IonText>
                                     ): ''}
                                 </IonItem>
@@ -476,7 +504,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Primary Phone *
                             </IonLabel>
                             <IonItem className={showError('primary_phone')}>
-                                <IonInput value={formData.primary_phone} name='primary_phone' onIonInput={updateForm} ref={register({required: true})}></IonInput>
+                                <Controller name='primary_phone' control={control} as={
+                                    <IonInput value={formData.primary_phone} name='primary_phone'></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -498,8 +531,16 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Email *</IonLabel>
                             <IonItem className={showError('email')}>
-                            <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' onIonInput={updateForm} required={true} clearInput ref={register({required: true})}>
-                            </IonInput>
+                                <Controller name='email' control={control} as={
+                                <IonInput class='item-input' name='email' value={formData.email} placeholder='Email' required={true} clearInput>
+                                </IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{
+                                      required:true, 
+                                      pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,63}/
+                                      }}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
