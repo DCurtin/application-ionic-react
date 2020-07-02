@@ -4,9 +4,13 @@ import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonIt
 import {SessionApp, states, FormData} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
+import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers';
 
-const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
+interface BeneficiariesPage extends SessionApp {
+    setErrorMessage: Function
+}
+
+const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setErrorMessage}) => {
     const history = useHistory();
     const {control, handleSubmit, errors, setValue, getValues, formState } = useForm({
         mode: 'onChange'
@@ -58,13 +62,22 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     }
 
     const validateFields = (e: any) => {
-        if (formData.beneficiary_count > 0 && (calcShare('Primary') < 100 || calcShare('Contingent') < 100)){
+         if (!isSharePercentageValid()) {
+            setErrorMessage('Share percentage for each beneficiary type must add up to 100.');
             setShowErrorToast(true); 
             return;
         }
         saveBenePage(sessionId, formData);
         updateMenuSections('is_beneficiaries_page_valid', true);
+        setErrorMessage(''); 
         setShowErrorToast(false);
+    }
+
+    const isSharePercentageValid = () => {
+        if (calcShare('Primary') !== null) {
+
+        }
+        return false; 
     }
 
     useEffect(() => {
@@ -93,8 +106,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     }
 
     const calcShare = (beneficiaryType : string) => {
-        let totalShare = 0; 
+        let totalShare = null; 
         if (formData.beneficiary_count > 0) {
+            totalShare = 0; 
             for (let i=1; i <= formData.beneficiary_count; i++) {
                 if (getValues(`type__${i}`) == beneficiaryType) {
                     let beneficiaryShare = getValues(`share_percentage__${i}`);

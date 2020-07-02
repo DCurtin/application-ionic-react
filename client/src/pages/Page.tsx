@@ -69,12 +69,11 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   });
 
   const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [showPageTransition, setShowPageTransition] = useState(true);
 
   useLayoutEffect(function(){
     let formParams = {...menuParams};
-
-    
     formParams.transferForm = welcomePageFields.transfer_form;
     formParams.rolloverForm = welcomePageFields.rollover_form;
     formParams.newContribution = welcomePageFields.cash_contribution_form;
@@ -183,7 +182,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'OwnerInformation':
         return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage}/>;
       case 'FeeArrangement':
         return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
       case 'AccountNotifications':
@@ -258,7 +257,7 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   return (
     <IonPage className={isPlatform('android') ? 'android-fit-content ion-justify-content-around' : ''}> 
       <IonContent>
-        <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message="Required Fields Missing." buttons={[
+        <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message={errorMessage === '' ? 'Required Fields Missing' : errorMessage} buttons={[
           {
             icon: 'close',
             role: 'cancel'
