@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
+import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem,IonLoading } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, applicantIdForm} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
@@ -16,13 +16,10 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     const {control, register, handleSubmit, watch, errors, setValue, getValues} = useForm({
         mode: "onChange"
     }); 
-
-    const allValues = getValues();
-    console.log(allValues);
-
     const watchAllFields = watch();
 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
+    const [showSpinner, setShowSpinner]  = useState(false); 
     const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
             setFormData(previousState =>({
@@ -42,12 +39,15 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         useEffect(()=>{
             if(sessionId !== '')
             {
+                setShowSpinner(true);
                 getAppPage(sessionId).then(data =>{
                     if(data === undefined)
                     {
+                        setShowSpinner(false);
                         return;
                     }
                     ImportForm(data);
+                    setShowSpinner(false);
                 })
             }
         },[sessionId]);
@@ -100,6 +100,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
     return (
         <IonContent className="ion-padding">
+            <IonLoading isOpen={showSpinner} message={'Loading..'} spinner="lines"></IonLoading>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
                 <IonGrid>
                     <IonRow className="well">
@@ -163,7 +164,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Social Security Number *
                             </IonLabel>
                             <IonItem className={showError('ssn')}>
-                                <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" onIonInput={updateForm} clearInput ref={register({required: true})}> </IonInput>
+                                <Controller name='ssn' control={control} as={
+                                    <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" clearInput> </IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} />
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -171,7 +177,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Date of Birth *
                             </IonLabel>
                             <IonItem className={showError('dob')}>
-                                <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" onIonInput={e => updateForm(e!)} clearInput ref={register({required: true})}></IonInput>
+                                <Controller name='dob' control={control} as={
+                                    <IonInput type='date' class='item-input' name="dob" value={formData.dob} placeholder="Date of Birth" clearInput></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} />
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -181,11 +192,16 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Marital Status *
                             </IonLabel>
                             <IonItem className={showError('marital_status')}>
-                                <IonSelect interface='action-sheet' name='marital_status' onIonChange={updateForm} value={formData.marital_status} ref={register({required: true})}>
-                                    <IonSelectOption value="Single">Single</IonSelectOption>
-                                    <IonSelectOption value="Married">Married</IonSelectOption>
-                                    <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
-                                </IonSelect>
+                                <Controller name='marital_status' control={control} as={
+                                    <IonSelect interface='action-sheet' name='marital_status' value={formData.marital_status}>
+                                        <IonSelectOption value="Single">Single</IonSelectOption>
+                                        <IonSelectOption value="Married">Married</IonSelectOption>
+                                        <IonSelectOption value="Widowed/Divorced">Widowed/Divorced</IonSelectOption>
+                                    </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -242,17 +258,27 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Proof of Identification *</IonLabel>
                             <IonItem className={showError('id_type')}>
-                                <IonSelect interface='action-sheet' value={formData.id_type} onIonChange={updateForm} name='id_type' ref={register({required: true})}>
-                                <IonSelectOption value={`Driver's License`}>Driver's License</IonSelectOption>
-                                <IonSelectOption value='Passport'>Passport</IonSelectOption>
-                                <IonSelectOption value='Other'>Other</IonSelectOption>
-                            </IonSelect>
+                                <Controller name='id_type' control={control} as={
+                                    <IonSelect interface='action-sheet' value={formData.id_type} name='id_type'>
+                                    <IonSelectOption value={`Driver's License`}>Driver's License</IonSelectOption>
+                                    <IonSelectOption value='Passport'>Passport</IonSelectOption>
+                                    <IonSelectOption value='Other'>Other</IonSelectOption>
+                                </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel> ID Number * </IonLabel>
                             <IonItem className={showError('id_number')}>
-                                <IonInput value={formData.id_number} name='id_number' onIonInput={updateForm} ref={register({required: true})}></IonInput>
+                                <Controller name='id_number' control={control} as={
+                                    <IonInput value={formData.id_number} name='id_number'></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -262,7 +288,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Issued By *
                             </IonLabel>
                             <IonItem className={showError('id_issued_by')}>
-                                <IonInput value={formData.id_issued_by} onIonInput={updateForm} name='id_issued_by' ref={register({required: true})}></IonInput>
+                                <Controller name='id_issued_by' control={control} as={
+                                    <IonInput value={formData.id_issued_by} name='id_issued_by'></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -270,7 +301,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Issue Date *
                             </IonLabel>
                             <IonItem className={showError('id_issued_date')}>
-                                <IonInput type='date' value={formData.id_issued_date} onIonInput={updateForm} name='id_issued_date' ref={register({required: true})}></IonInput>
+                                <Controller name='id_issued_date' control={control} as={
+                                    <IonInput type='date' value={formData.id_issued_date} name='id_issued_date'></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} />
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -278,8 +314,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel>Expiration Date *</IonLabel>
                             <IonItem className={showError('id_expiration_date')}> 
-                                <IonInput type='date' value={formData.id_expiration_date} onIonInput={updateForm} name='id_expiration_date' ref={register({required: true})}>
-                                </IonInput>
+                                <Controller name='id_expiration_date' control={control} as={
+                                    <IonInput type='date' value={formData.id_expiration_date} name='id_expiration_date'>
+                                    </IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -313,7 +354,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 Physical Street Address *
                             </IonLabel>
                             <IonItem className={showError('legal_street')}> 
-                                <IonInput onIonInput={updateForm} value={formData.legal_street} name='legal_street' ref={register({required: true})}></IonInput>
+                                  <Controller name='legal_street' control={control} as={
+                                      <IonInput value={formData.legal_street} name='legal_street'></IonInput>
+                                  } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} />
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -321,7 +367,12 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 City *
                             </IonLabel>
                             <IonItem className={showError('legal_city')}>
-                                <IonInput onIonInput={updateForm} value={formData.legal_city} name='legal_city' ref={register({required: true})}></IonInput>
+                                <Controller name='legal_city' control={control} as={
+                                    <IonInput  value={formData.legal_city} name='legal_city'></IonInput>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} />
                             </IonItem>
                         </IonCol>
                     </IonRow>
