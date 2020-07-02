@@ -13,7 +13,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         has_hsa: false,
         home_and_mailing_address_different: false
     });
-    const {control, register, handleSubmit, errors, setValue, getValues, formState} = useForm({
+    const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
         mode: "onChange"
     }); 
 
@@ -62,10 +62,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     }, [errors]);
 
     useEffect(() => {
-        if (formState.isSubmitting && (!formState.isValid)) {
+        if ((!formState.isValid)) {
             updateMenuSections('is_owner_info_page_valid', false);
         }
-    }, [formState])
+    }, [])
+
     
     function ImportForm(data : any){
         let importedForm : applicantIdForm = data;
@@ -88,9 +89,9 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
         console.log(errors);
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        if (!errorsArr.includes(fieldName)) {
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
