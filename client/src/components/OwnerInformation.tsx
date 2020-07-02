@@ -59,13 +59,13 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
     useEffect(() => {
         showErrorToast();
+        return function onUnmount() {
+            if (Object.keys(errors).length > 0) {
+                updateMenuSections('is_owner_info_page_valid', false);
+            }
+        }
     }, [errors]);
 
-    useEffect(() => {
-        if ((!formState.isValid)) {
-            updateMenuSections('is_owner_info_page_valid', false);
-        }
-    }, [])
 
     
     function ImportForm(data : any){
@@ -88,7 +88,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        console.log(errors);
         let className = '';
         if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
             className = 'danger';

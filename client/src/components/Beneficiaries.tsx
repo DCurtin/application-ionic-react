@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'; 
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
 import {SessionApp, states, FormData, requestBody} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
@@ -9,8 +9,7 @@ import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
     const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+        mode: 'onChange'
     });
     let watchAllFields = watch();
 
