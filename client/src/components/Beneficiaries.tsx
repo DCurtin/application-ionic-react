@@ -8,7 +8,7 @@ import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers'
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
-    const {control, register, handleSubmit, watch, errors, setValue, getValues, formState } = useForm({
+    const {control, register, handleSubmit, errors, setValue, getValues, formState } = useForm({
         mode: 'onChange'
     });
 
@@ -100,7 +100,6 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                 }
             }
         }
-        
         return totalShare; 
     }
  
@@ -209,24 +208,51 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Share %</IonLabel>
                         <IonItem className={showError(`share_percentage__${beneficiaryNumber}`)}>
-                            <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true, pattern: /^([0-9]|[1-9][0-9]|100)$/})}/>
+                            <Controller control={control}  name={`share_percentage__${beneficiaryNumber}`} as={
+                                <IonInput type='number' name={`share_percentage__${beneficiaryNumber}`} value={formData[`share_percentage__${beneficiaryNumber}`]}/>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{
+                                required: true, 
+                                pattern: /^([0-9]|[1-9][0-9]|100)$/
+                            }}/>
                         </IonItem>
                     </IonCol>
                     <IonCol className='well' size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                        Calculated Share Percentage 
+                       {
+                           !!formData[`type__${beneficiaryNumber}`] ? (
+                                <p>
+                                        <strong>
+                                        {formData[`type__${beneficiaryNumber}`]} Share Percentage : {calcShare(formData[`type__${beneficiaryNumber}`])} %
+                                        </strong>
+                                </p>
+                           ) : ''
+                       }
                     </IonCol>
                 </IonRow>
                 <IonRow>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Beneficiary Street</IonLabel>
                         <IonItem className={showError(`mailing_street__${beneficiaryNumber}`)}>
-                            <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]}onIonInput={updateForm} ref={register({required: true})}/>
+                        <Controller control={control} name={`mailing_street__${beneficiaryNumber}`} as={
+                            <IonInput name={`mailing_street__${beneficiaryNumber}`} value={formData[`mailing_street__${beneficiaryNumber}`]} />
+                        }  onChangeName="onIonChange" onChange={([selected]) => {
+                            updateForm(selected);
+                            return selected.detail.value
+                        }} rules={{required: true}} />
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                         <IonLabel>Beneficiary City</IonLabel>
                         <IonItem className={showError(`mailing_city__${beneficiaryNumber}`)}>
-                            <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                            <Controller control={control} name={`mailing_city__${beneficiaryNumber}`} as={ 
+                                <IonInput name={`mailing_city__${beneficiaryNumber}`} value={formData[`mailing_city__${beneficiaryNumber}`]}/>
+                            }  onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value
+                            }} rules={{required: true}}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>
