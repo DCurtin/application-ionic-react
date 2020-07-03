@@ -71,10 +71,7 @@ function makeSaveStateCallout(sessionId: string, page: string, formData: FormDat
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(body)
     }
-    return fetch(url, options).then(function(response: any){
-        return response.json().then(function(data: any){
-        })
-    });
+    return fetch(url, options);
 }
 
 function makeGetPageInfoCallout(sessionId: string, page: string)

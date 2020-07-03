@@ -67,8 +67,10 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
 
         const validateFields = () => {
-            saveAppPage(sessionId, formData);
-            updateMenuSections('is_owner_info_page_valid', true);
+            saveAppPage(sessionId, formData).then(()=>{
+                //could do error handling here
+                updateMenuSections('is_owner_info_page_valid', true);
+            })
             setShowErrorToast(false);
         }
 
