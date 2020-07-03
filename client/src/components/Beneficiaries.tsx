@@ -44,7 +44,7 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
 
     useEffect(()=>{
       return history.listen(()=>{
-        saveBenePage(sessionId, formData);
+        saveBenePage(sessionId, formData, () => {return;});
       })
     },[formData]);
 
@@ -67,7 +67,10 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
             setShowErrorToast(true); 
             return;
         }
-        saveBenePage(sessionId, formData);
+        saveBenePage(sessionId, formData, updateMenus);
+    }
+
+    const updateMenus = () => {
         updateMenuSections('is_beneficiaries_page_valid', true);
         setErrorMessage(''); 
         setShowErrorToast(false);
@@ -81,7 +84,7 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
         if (calcShare('Contingent') !== null) {
             isValid = (calcShare('Contingent') === 100)
         }
-        return false; 
+        return isValid; 
     }
 
     useEffect(() => {
@@ -112,11 +115,13 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
     const calcShare = (beneficiaryType : string) => {
         let totalShare = null; 
         if (formData.beneficiary_count > 0) {
-            totalShare = 0; 
             for (let i=1; i <= formData.beneficiary_count; i++) {
                 if (getValues(`type__${i}`) == beneficiaryType) {
+                    if (totalShare == null) {
+                        totalShare = 0;
+                    }
                     let beneficiaryShare = getValues(`share_percentage__${i}`);
-                    if (beneficiaryShare != null) {
+                    if (beneficiaryShare !== null && totalShare !== null) {
                         totalShare += Number(beneficiaryShare);
                     }
                 }

@@ -1,16 +1,16 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm, callback: Function){
-    return makeSaveStateCalloutWithCallback(sessionId, 'appId', formData, callback)
+    return makeSaveStateCalloutWithCallback(sessionId, 'appId',formData, callback);
 }
 
 export function getAppPage(sessionId: string) {
     return makeGetPageInfoCallout(sessionId, 'appId');
 }
 
-export function saveBenePage(sessionId: string, formData: FormData)
+export function saveBenePage(sessionId: string, formData: FormData, callback:Function)
 {
-    return makeSaveStateCallout(sessionId, 'beneficiary', formData)
+    return makeSaveStateCalloutWithCallback(sessionId, 'beneficiary', formData, callback)
 }
 
 export function getBenePage(sessionId: string){
@@ -70,10 +70,7 @@ function makeSaveStateCalloutWithCallback(sessionId: string, page: string, formD
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(body)
     }
-    return fetch(url, options).then(function(response: any){
-        // return response.json().then(function(data: any){
-            
-        // })
+    return fetch(url, options).then(function(response: any){ 
         callback();
     });
 }
