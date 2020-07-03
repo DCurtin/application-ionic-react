@@ -1,1 +1,1 @@
-schemats generate -c 'postgres://postgres:welcome@localhost/postgres' -s salesforce -o '.\server\utils\salesforce.ts'
+schemats generate -c 'postgres://postgres:welcome@localhost/postgres' -s salesforce -o '.\server\utils\postgresSchema.ts'
