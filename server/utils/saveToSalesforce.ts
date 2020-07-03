@@ -1,11 +1,14 @@
 import pg from 'pg'
 import jsforce from 'jsforce'
 import express from 'express'
-import * as salesforceSchema from './salesforce'
+import * as salesforceSchema from './postgresSchema'
 import * as applicationInterfaces from '../../client/src/helpers/Utils'
 import {runQueryReturnPromise, insertApplicant} from './saveStateHandlers'
 import {queryParameters} from './helperSchemas';
 import { createAppSession } from './appSessionHandler';
+
+import {Online_Application__c} from './onlineAppSchema'
+
 const { v4: uuidv4 } = require('uuid');
 
 export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response){
@@ -39,7 +42,7 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
         let herokuToken = uuidv4();
         console.log('found no app')
         
-        let insertValues = {'HerokuToken__c':herokuToken, 
+        let insertValues : Partial<Online_Application__c> = {'HerokuToken__c':herokuToken, 
         'IntegrationOwner__c':'0052i000000Mz0CAAS',
         'Salutation__c':applicantForm.salutation,//applicant fields start here
         'First_Name__c': applicantForm.first_name,

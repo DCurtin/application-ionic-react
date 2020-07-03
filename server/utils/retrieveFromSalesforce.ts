@@ -1,9 +1,10 @@
 import pg from 'pg'
 import express from 'express'
 import jsforce from 'jsforce'
-import * as salesforceSchema from './salesforce'
+import * as salesforceSchema from './postgresSchema'
 import * as saveStateHandlers from './saveStateHandlers'
 import {createAppSession} from './appSessionHandler';
+import {Online_Application__c} from './onlineAppSchema'
 const { v4: uuidv4 } = require('uuid');
 
 interface resume{
@@ -51,7 +52,7 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
   
       if(dateOfBirthsMatch && emailsMatch && lastNamesMatch && lastFourSocialMatch)
       {
-        serverConn.sobject("Online_Application__c").retrieve(record.Id).then((onlineAppresult:any)=>{
+        serverConn.sobject("Online_Application__c").retrieve(record.Id).then((onlineAppresult:Online_Application__c)=>{
         let sessionId : string = uuidv4();
         let bodyInfo : Partial<salesforceSchema.body> ={
           has_read_diclosure: onlineAppresult.Disclosures_Viewed__c,
