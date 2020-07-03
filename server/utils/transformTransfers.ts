@@ -1,5 +1,5 @@
 import {transferForm, transfer} from '../../client/src/helpers/Utils'
-import * as salesforceSchema from '../utils/salesforce'
+import * as postgresSchema from './postgresSchema'
 
 export function transformTransferClientToServer(transferFlattened: any): transferForm{
     let transferForm : transferForm ={
@@ -36,7 +36,7 @@ export function transformTransferClientToServer(transferFlattened: any): transfe
 }
 
 
-export function transformTransferServerToClient(transferForm: Array<salesforceSchema.transfer>, accountType: string):any{
+export function transformTransferServerToClient(transferForm: Array<postgresSchema.transfer>, accountType: string):any{
     let returnData : any = {};
     returnData['account_type'] = accountType; //query from applicant or body
     returnData['existing_transfers'] =transferForm.length;

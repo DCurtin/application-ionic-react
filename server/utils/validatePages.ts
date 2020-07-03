@@ -1,6 +1,6 @@
 import pg from 'pg'
 import express from 'express'
-import {validated_pages} from './salesforce'
+import {validated_pages} from './postgresSchema'
 import {requestBody} from '../../client/src/helpers/Utils'
 import {generateQueryString, runQueryReturnPromise} from './saveStateHandlers'
 import { queryParameters } from './helperSchemas';

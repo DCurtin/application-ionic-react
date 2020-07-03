@@ -1,5 +1,5 @@
 import {beneficiaryForm, beneficiary} from '../../client/src/helpers/Utils'
-import * as salesforceSchema from '../utils/salesforce'
+import * as postgresSchema from './postgresSchema'
 import {addressSchema} from '../utils/helperSchemas'
 
 export function transformBeneClientToServer(flattenedBenes: any): beneficiaryForm{
@@ -37,7 +37,7 @@ function getBeneficiaryByIndex(index:number, flattenedBenes: any) : beneficiary{
         return castedBene;
 }
 
-export function transformBeneficiariesServerToClient(beneficiaryList : Array<salesforceSchema.beneficiary>) : any{
+export function transformBeneficiariesServerToClient(beneficiaryList : Array<postgresSchema.beneficiary>) : any{
     let returnData : any = {};
     let count = 0;
     returnData[`beneficiary_count`] = beneficiaryList.length,

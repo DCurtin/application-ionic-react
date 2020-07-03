@@ -1,7 +1,7 @@
 import pg from 'pg'
 import express from 'express';
 const { v4: uuidv4 } = require('uuid');
-import * as salesforceSchema from './salesforce'
+import * as postgresSchema from './postgresSchema'
 import {queryParameters} from './helperSchemas';
 import { ExecException } from 'child_process';
 
@@ -15,7 +15,7 @@ export function createAppSession(accountNumber: string, applicationId: string, s
       }
       pgClient.query(query).then((result:pg.QueryResult)=>{
         let time = Date.now()
-        let appSession: salesforceSchema.application_session = result.rows[0]
+        let appSession: postgresSchema.application_session = result.rows[0]
         let elapsedTime = (time - appSession.last_active)
         console.log(`elapsed time: ${elapsedTime} sessionId: ${sessionId}`)
         if(elapsedTime > 3600000){

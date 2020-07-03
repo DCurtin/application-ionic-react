@@ -1,5 +1,5 @@
 import {rolloverForm, rollover} from '../../client/src/helpers/Utils'
-import * as salesforceSchema from '../utils/salesforce'
+import * as postgresSchema from './postgresSchema'
 
 export function transformRolloverClientToServer(rolloverFlattened: any): rolloverForm{
     let rolloverForm : rolloverForm ={
@@ -32,7 +32,7 @@ export function transformRolloverClientToServer(rolloverFlattened: any): rollove
     return rolloverForm;
 }
 
-export function transformRolloverServerToClient(rolloverInfoList: Array<salesforceSchema.rollover>, account_type:string){
+export function transformRolloverServerToClient(rolloverInfoList: Array<postgresSchema.rollover>, account_type:string){
     let rolloverFlattened : any = {
         account_type: account_type,
         existing_employer_plan_roll_overs: rolloverInfoList.length
