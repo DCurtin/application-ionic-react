@@ -5,6 +5,7 @@ import {SessionApp, states, FormData} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers';
+import {DevTool} from '@hookform/devtools';
 
 interface BeneficiariesPage extends SessionApp {
     setErrorMessage: Function
@@ -12,13 +13,14 @@ interface BeneficiariesPage extends SessionApp {
 
 const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setErrorMessage}) => {
     const history = useHistory();
+    const [formData, setFormData] = useState<FormData>({
+        beneficiary_count: 0
+    });
+    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
+
     const {control, handleSubmit, errors, setValue, getValues, formState } = useForm({
         mode: 'onChange'
     });
-
-    const [formData, setFormData] = useState<FormData>({
-        beneficiary_count: 0
-    })
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -33,20 +35,19 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
         }
     },[sessionId])
 
+    useEffect(() => {
+        if (isAfterGettingData) {
+            for (var fieldName in formData) {
+                setValue(fieldName, formData[fieldName]);
+            }
+        }
+    }, [isAfterGettingData])
+
     
     function ImportForm(data : any){
-        let importedForm : FormData = data
-        // setFormData(prevState => {
-        //     return {...prevState, beneficiary_count: importedForm.beneficiary_count}
-        // });
-        for (var fieldName in importedForm) {
-            setValue(fieldName, importedForm[fieldName]);
-            setFormData(prevState => {
-                return {
-                    ...prevState, fieldName: importedForm[fieldName]
-                }
-            })
-        }
+        let importedForm : FormData = data;
+        setFormData(importedForm);
+        setIsAfterGettingData(true);
     }
 
     useEffect(()=>{
@@ -96,6 +97,7 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
 
     useEffect(() => {
         showErrorToast();
+
         return function onUnmount() {
             if (Object.keys(errors).length > 0) {
                 updateMenuSections('is_beneficiaries_page_valid', false);
@@ -162,7 +164,7 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
                             } onChangeName="onIonChange" onChange={([selected]) => {
                                 updateForm(selected);
                                 return selected.detail.value;
-                            }} rules={{required: true}} />
+                            }} rules={{required: true}} value={formData[`first_name__${beneficiaryNumber}`]} />
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -379,7 +381,7 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
                         </IonCol>
                     </IonRow>
                 </IonGrid>
-
+                <DevTool control={control} />
             </form>
         </IonContent>
     )
