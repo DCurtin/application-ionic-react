@@ -11,18 +11,18 @@ import {Online_Application__c} from './onlineAppSchema'
 
 const { v4: uuidv4 } = require('uuid');
 
-export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response){
+export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string, res: express.Response){
+    herokuToken === undefined ? uuidv4() : herokuToken;
+    console.log('found no app')
+
     let welcomeParamsQuery = {
         text:'SELECT * FROM salesforce.body,salesforce.validated_pages WHERE body.session_id=validated_pages.session_id AND body.session_id = $1',
         values:[sessionId]
     }
 
-    /*let validatedPages = {
-        text: 'SELECT * FROM salesforce.validated_pages WHERE session_id = $1',
-        values:[sessionId]
-    }*/
     type joinedInterface = salesforceSchema.body & salesforceSchema.validated_pages
     pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<joinedInterface>)=>{
+
         let appBody = appBodyResult.rows[0];
         let validatedPages : Partial<salesforceSchema.validated_pages> = {
             is_welcome_page_valid : appBody.is_welcome_page_valid,
@@ -39,8 +39,7 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
             is_review_and_sign_page_valid: appBody.is_review_and_sign_page_valid
         }
 
-        let herokuToken = uuidv4();
-        console.log('found no app')
+       
         
         let insertValues : Partial<Online_Application__c> = {'HerokuToken__c':herokuToken, 
         'IntegrationOwner__c':'0052i000000Mz0CAAS',
@@ -86,7 +85,7 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
 
         let appQueryUpsert:queryParameters = insertApplicant(sessionId, herokuToken, applicantForm)
 
-        serverConn.sobject("Online_Application__c").create(insertValues).then((result:any)=>{
+        serverConn.sobject("Online_Application__c").upsert(insertValues, 'HerokuToken__c').then((result:any)=>{
             serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
             runQueryReturnPromise(appQueryUpsert,pgClient).then((queryUpsertResult:pg.QueryResult)=>{
                 createAppSession(queryResult['AccountNew__c'], result.id, sessionId,pgClient, {},res)
