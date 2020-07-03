@@ -36,9 +36,16 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
     
     function ImportForm(data : any){
         let importedForm : FormData = data
-        setFormData(importedForm);
-        for (var fieldName in data) {
-            setValue(fieldName, data[fieldName]);
+        // setFormData(prevState => {
+        //     return {...prevState, beneficiary_count: importedForm.beneficiary_count}
+        // });
+        for (var fieldName in importedForm) {
+            setValue(fieldName, importedForm[fieldName]);
+            setFormData(prevState => {
+                return {
+                    ...prevState, fieldName: importedForm[fieldName]
+                }
+            })
         }
     }
 
