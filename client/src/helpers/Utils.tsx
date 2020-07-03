@@ -3,7 +3,9 @@ export interface SessionApp {
     setSessionId : Function, 
     updateMenuSections:Function,
     formRef: any, 
-    setShowErrorToast: Function
+    setShowErrorToast: Function,
+    setErrorMessage: Function,
+    setShowSpinner: Function
 }
 
 export interface welcomePageParameters {

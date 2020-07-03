@@ -7,11 +7,7 @@ import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers';
 import {DevTool} from '@hookform/devtools';
 
-interface BeneficiariesPage extends SessionApp {
-    setErrorMessage: Function
-}
-
-const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setErrorMessage}) => {
+const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setErrorMessage, setShowSpinner}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<FormData>({
         beneficiary_count: 0
@@ -25,12 +21,14 @@ const Beneficiaries: React.FC<BeneficiariesPage> = ({sessionId, updateMenuSectio
     useEffect(()=>{
         if(sessionId !== '')
         {
+            setShowSpinner(true);
             getBenePage(sessionId).then(data =>{
                 if(data === undefined)
                 {
                     return;
                 }
                 ImportForm(data);
+                setShowSpinner(false);
             })
         }
     },[sessionId])

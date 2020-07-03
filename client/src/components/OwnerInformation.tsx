@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem,IonLoading } from '@ionic/react';
+import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { SessionApp, states, applicantIdForm} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
 
-const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
+const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<applicantIdForm>({
         is_self_employed: false,
@@ -18,7 +18,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     }); 
 
     const [confirmEmail, setConfirmEmail] = useState<string>('')
-    const [showSpinner, setShowSpinner]  = useState(false); 
     const updateForm = (e : any) => {
             let newValue = e.target.name === 'home_and_mailing_address_different' ? e.target.checked : e.target.value;
             setFormData(previousState =>({
@@ -104,7 +103,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
     return (
         <IonContent className="ion-padding">
-            <IonLoading isOpen={showSpinner} message={'Loading..'} spinner="lines"></IonLoading>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
                 <IonGrid>
                     <IonRow className="well">

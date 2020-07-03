@@ -10,7 +10,8 @@ interface InitSessionApp {
     selectedAccountType: string,
     updateMenuSections:Function,
     formRef: any,
-    setShowErrorToast: Function
+    setShowErrorToast: Function,
+    setShowSpinner: Function
 }
 
 const Disclosures: React.FC<InitSessionApp> = props => {

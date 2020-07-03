@@ -50,9 +50,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
     const updateForm = (e:any) => {
         let newValue = e.target.value;
         console.log(`${e.target.name} is ${e.target.value}`)
-        //console.log(e.target.className);
-        //let originalClass = e.target.className;
-        //e.target.className = originalClass.replace('danger', '');
         setFormData(previousState =>({
             ...previousState,
               [e.target.name]: newValue
@@ -71,9 +68,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-            //console.log(errors);
             let className = errorsArr.includes(fieldName) ? 'danger' : '';
-            //console.log(watchAllFields);
             if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
                 className = '';
             }
