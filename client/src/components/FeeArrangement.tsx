@@ -1,16 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import {SessionApp, feeArrangementForm} from '../helpers/Utils';
 import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput, IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers'
-import { fingerPrint } from 'ionicons/icons';
+import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers';
 
-const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast}) => {
+const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+    const {control, register, handleSubmit, watch, errors, setValue} = useForm({
+        mode: 'onChange'
     });
     let watchAllFields = watch();
 
@@ -25,12 +23,14 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
     useEffect(()=>{
         if(sessionId !== '')
         {
+            setShowSpinner(true);
             getFeeArrangementPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
                     return;
                 }
                 ImportForm(data);
+                setShowSpinner(false);
             })
         }
     },[sessionId])
@@ -39,6 +39,9 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
     function ImportForm(data : any){
         let importedForm : feeArrangementForm = data
         setFormData(importedForm);
+        for (var fieldName in data) {
+            setValue(fieldName, data[fieldName])
+        }
     }
 
     useEffect(()=>{
@@ -118,12 +121,17 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, setSessionId, updateMe
                             Select fee agreement
                         </IonLabel>
                         <IonItem className={showError('fee_schedule')}>
-                            <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule' onIonChange={updateForm} ref={register({required: true})}>
-                                <IonSelectOption value='Asset Based ($295)'>
-                                Option 1 - Asset Based
-                                </IonSelectOption>
-                                <IonSelectOption value='Value Based'>Option 2 - Value Based</IonSelectOption>
-                            </IonSelect>
+                            <Controller name='fee_schedule' as={
+                                <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule'>
+                                    <IonSelectOption value='Asset Based ($295)'>
+                                    Option 1 - Asset Based
+                                    </IonSelectOption>
+                                    <IonSelectOption value='Value Based'>Option 2 - Value Based</IonSelectOption>
+                                </IonSelect>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value;
+                              }} rules={{required: true}}  /> 
                         </IonItem>
                     </IonCol>
                 </IonRow>

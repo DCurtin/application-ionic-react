@@ -408,7 +408,10 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                     required: true,
                                     pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
                                 }}/>
-                                {errors.legal_zip ? (
+                                {((formState.submitCount > 0)&&
+                                errors.legal_zip 
+                                )
+                                ? (
                                     <IonText color='danger'>Invalid Zip</IonText>
                                 ) : null}
                             </IonItem>
@@ -483,7 +486,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                         required: true,
                                         pattern:  /^[0-9]{5}(?:-[0-9]{4})?$/
                                     }}/>
-                                    {errors.mailing_zip ? (<IonText color='danger'>
+                                    {((formState.submitCount > 0)&& errors.mailing_zip) ? (<IonText color='danger'>
                                        Invalid Zip
                                     </IonText>
                                     ): ''}
@@ -554,7 +557,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                     required: true,
                                     validate: validateEmail
                                 }}/>
-                                {errors.confirm_email ? (
+                                {((formState.submitCount > 0)
+                                && 
+                                errors.confirm_email 
+                                )
+                                ? (
                                     <IonText color='danger'>E-mails Must Match</IonText>
                                 ) : null}
                             </IonItem>
