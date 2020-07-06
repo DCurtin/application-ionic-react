@@ -84,43 +84,6 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
 
         
         return upsertSFOnlineApp(sessionId, serverConn, insertValues, herokuToken);
-
-        /*
-        if(appSessionParams === null){
-                return null
-            }
-            let appQueryUpsert:queryParameters = insertApplicant(sessionId, herokuToken, applicantForm)
-            return runQueryReturnPromise(appQueryUpsert,pgClient).then(()=>{
-                return appSessionParams;
-            })
-         */
-
-
-        /*return serverConn.sobject("Online_Application__c").upsert(insertValues, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
-            console.log('asset result: ')
-            console.log(onlineAppUpsertResult)
-            let options :jsforce.ExecuteOptions ={}
-            type FoundOnlineApp = {Id?:string}[] & Online_Application__c
-            return serverConn.sobject("Online_Application__c").findOne({HerokuToken__c:herokuToken}, ['Id','AccountNew__c','HerokuToken__c']).execute(options,(err, onlineAppQueryResult:FoundOnlineApp)=>{
-                return runQueryReturnPromise(appQueryUpsert,pgClient).then(()=>{
-                    let appSessionParams : Partial<postgresSchema.application_session> = {
-                        account_number: onlineAppQueryResult.AccountNew__c,
-                        application_id: onlineAppQueryResult.Id,
-                        heroku_token: onlineAppQueryResult.HerokuToken__c,
-                        session_id: sessionId
-                    } 
-                    return appSessionParams
-                    }).catch((err)=>{
-                        console.log(err);
-                        console.log('could not upsert app')
-                        return null;
-                    });  
-                })
-        }).catch((err)=>{
-            console.log(err)
-            console.log('failed to upser to salesforce');
-            return null;
-        });*/
     })
 }
 
