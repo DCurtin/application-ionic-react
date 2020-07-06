@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { SessionApp, states, applicantIdForm} from '../helpers/Utils';
+import { SessionApp, states, applicantIdForm, showErrorToast} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
 
@@ -57,7 +57,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
     }, [formData]);
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
         return function onUnmount() {
             if (Object.keys(errors).length > 0) {
                 updateMenuSections('is_owner_info_page_valid', false);
@@ -95,13 +95,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         }
         return className;
     };
-
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
 
     return (
         <IonContent className="ion-padding">

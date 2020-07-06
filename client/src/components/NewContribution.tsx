@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, contributionForm } from '../helpers/Utils';
+import { SessionApp, contributionForm, showErrorToast } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
 import moment from 'moment'; 
 import { useHistory } from 'react-router-dom';
@@ -82,7 +82,7 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
     }
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
         return function onUnmount() {
             if (Object.keys(errors).length > 0) {
                 updateMenuSections('is_new_contribution_page_valid', false);
@@ -98,13 +98,6 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
         }
         return className;
     };
-
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
 
     return (
         <IonContent className='ion-padding'>

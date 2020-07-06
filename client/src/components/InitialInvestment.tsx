@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters} from '../helpers/Utils';
+import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters, showErrorToast} from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {useForm, Controller} from 'react-hook-form';
-import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers'
+import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers';
 
-const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef, setShowSpinner}) => {
+const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef}) => {
     const history = useHistory();
-    const {control, handleSubmit, errors, setValue, getValues, formState}  = useForm({
+    const {control, handleSubmit, errors, setValue, formState}  = useForm({
         mode: 'onChange'
     });
 
@@ -129,7 +129,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
     }
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
     }, [errors])
 
     const showError = (fieldName: string) => {
@@ -140,13 +140,6 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
         }
         return className;
     };
-
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
 
     return (
         <IonContent className='ion-padding'>

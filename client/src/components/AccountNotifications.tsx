@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { SessionApp, states, accountNotificationsForm } from '../helpers/Utils';
+import { SessionApp, states, accountNotificationsForm, showErrorToast } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers'
@@ -85,15 +85,8 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
         return className;
     };
 
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
-
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
     }, [errors])
   
 

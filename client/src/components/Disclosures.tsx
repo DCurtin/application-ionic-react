@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
-import {welcomePageParameters, saveWelcomeParameters} from "../helpers/Utils";
+import {welcomePageParameters, saveWelcomeParameters, showErrorToast} from "../helpers/Utils";
 import {useForm } from 'react-hook-form';
 
 interface InitSessionApp {
@@ -62,15 +62,9 @@ const Disclosures: React.FC<InitSessionApp> = props => {
     };
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, props.setShowErrorToast);
     }, [errors])
 
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            props.setShowErrorToast(true);
-        }
-    }
 
     return (
         <IonContent className="ion-padding">

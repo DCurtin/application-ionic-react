@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'; 
 import {useForm, Controller} from 'react-hook-form';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
-import {SessionApp, states, FormData} from '../helpers/Utils';
+import {SessionApp, states, FormData, showErrorToast} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers';
@@ -43,7 +43,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     
     function ImportForm(data : any){
         let importedForm : FormData = data;
-        setFormData(importedForm);
+        setFormData({...importedForm});
         setIsAfterGettingData(true);
     }
 
@@ -93,7 +93,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     }
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
 
         return function onUnmount() {
             if (Object.keys(errors).length > 0) {
@@ -110,13 +110,6 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
         }
         return className;
     };
-
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
 
     const calcShare = (beneficiaryType : string) => {
         let totalShare = null; 

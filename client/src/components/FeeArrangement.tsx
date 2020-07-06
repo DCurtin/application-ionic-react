@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import {SessionApp, feeArrangementForm} from '../helpers/Utils';
+import {SessionApp, feeArrangementForm, showErrorToast} from '../helpers/Utils';
 import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput, IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers';
@@ -66,7 +66,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
     }
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
     }, [errors])
 
     const showError = (fieldName: string) => {
@@ -78,12 +78,6 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
         return className;
     };
 
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
     return (
         <IonContent className='ion-padding'>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>

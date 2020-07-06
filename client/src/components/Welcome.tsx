@@ -5,7 +5,7 @@ import {useForm} from 'react-hook-form';
 
 import {useHistory} from 'react-router-dom';
 
-import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes} from "../helpers/Utils";
+import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes, showErrorToast} from "../helpers/Utils";
 
 import {updateValidationTable} from '../helpers/CalloutHelpers'
 
@@ -157,7 +157,7 @@ const Welcome: React.FC<InitSessionApp> = props => {
     },[props.welcomePageFields]);
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, props.setShowErrorToast);
     }, [errors])
 
 
@@ -195,14 +195,6 @@ const Welcome: React.FC<InitSessionApp> = props => {
             }
             return className;
     };
-
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            props.setShowErrorToast(true);
-            props.updateMenuSections('is_welcome_page_valid', false);
-        }
-    }
 
     return (
         <IonContent className="ion-padding">
