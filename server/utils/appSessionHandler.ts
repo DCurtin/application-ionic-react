@@ -6,7 +6,7 @@ import {queryParameters} from './helperSchemas';
 import { ExecException } from 'child_process';
 
 export function createAppSession(appSession: Partial<postgresSchema.application_session>, pgClient:pg.Client, userInstances:any, res: express.Response){
-    appSession.last_active = Date.now()
+    appSession.last_active = Date.now();
     let intervalRef = setInterval(()=>{
       console.log(`check for activity: ${appSession.session_id}`)
       let query:{text:string, values:Array<string>} = {
@@ -33,8 +33,8 @@ export function createAppSession(appSession: Partial<postgresSchema.application_
     userInstances[appSession.session_id] = intervalRef
   
     let sessionInsert : queryParameters = {
-      text:'INSERT INTO salesforce.application_session(account_number, application_id, last_active, session_id) VALUES($1,$2,$3,$4)',
-      values:[appSession.account_number, appSession.application_id, appSession.last_active, appSession.session_id]
+      text:'INSERT INTO salesforce.application_session(account_number, application_id, last_active, heroku_token, session_id) VALUES($1,$2,$3,$4,$5)',
+      values:[appSession.account_number, appSession.application_id, appSession.last_active, appSession.heroku_token, appSession.session_id]
     }
     pgClient.query(sessionInsert).then((result:pg.QueryResult)=>{
       res.json({sessionId:appSession.session_id})
