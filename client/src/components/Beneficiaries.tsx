@@ -49,7 +49,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
 
     useEffect(()=>{
       return history.listen(()=>{
-        saveBenePage(sessionId, formData, () => {return;});
+        saveBenePage(sessionId, formData);
       })
     },[formData]);
 
@@ -72,7 +72,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
             setShowErrorToast(true); 
             return;
         }
-        saveBenePage(sessionId, formData, updateMenus);
+        saveBenePage(sessionId, formData).then(() => updateMenus())
     }
 
     const updateMenus = () => {

@@ -52,7 +52,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
     useEffect(()=>{
         return history.listen(()=>{
-            saveAppPage(sessionId, formData, () => {return;});
+            saveAppPage(sessionId, formData);
         })
     }, [formData]);
 

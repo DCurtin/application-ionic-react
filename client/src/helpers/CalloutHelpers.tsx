@@ -1,16 +1,16 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
 
-export function saveAppPage(sessionId: string, formData: applicantIdForm, callback: Function){
-    return makeSaveStateCalloutWithCallback(sessionId, 'appId',formData, callback);
+export function saveAppPage(sessionId: string, formData: applicantIdForm){
+    return makeSaveStateCallout(sessionId, 'appId', formData)
 }
 
 export function getAppPage(sessionId: string) {
     return makeGetPageInfoCallout(sessionId, 'appId');
 }
 
-export function saveBenePage(sessionId: string, formData: FormData, callback:Function)
+export function saveBenePage(sessionId: string, formData: FormData)
 {
-    return makeSaveStateCalloutWithCallback(sessionId, 'beneficiary', formData, callback)
+    return makeSaveStateCallout(sessionId, 'beneficiary', formData)
 }
 
 export function getBenePage(sessionId: string){
@@ -57,22 +57,6 @@ export function saveRolloverPage(sessionId: string, formData: FormData){
 
 export function getRolloverPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'rollover')
-}
-
-function makeSaveStateCalloutWithCallback(sessionId: string, page: string, formData: FormData, callback: Function){
-    let url = '/saveState'
-    let body : requestBody= {
-    session: {sessionId: sessionId, page: page},
-    data: formData
-    }
-    let options = {
-    method : 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
-    }
-    return fetch(url, options).then(function(response: any){ 
-        callback();
-    });
 }
 
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
