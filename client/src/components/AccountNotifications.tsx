@@ -65,11 +65,13 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
     const updateForm = (e:any) => {
         setFormData(prevState => {
             let newValue = e.target.value;
+            console.log(e.target.value);
             return {...prevState, [e.target.name]: newValue}
         });
     }
 
     const validateFields = (data: any, e: any) => {
+        saveAccountNotificationsPage(sessionId, formData);
         updateMenuSections('is_account_notifications_page_valid', true);
         setShowErrorToast(false);
     }

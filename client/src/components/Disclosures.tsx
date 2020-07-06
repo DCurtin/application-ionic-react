@@ -93,7 +93,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
                     <IonRow className="well">
                         <IonCol>
                             <p>
-                            <a target="_blank" href={disclosurePDF}>
+                            <a target="_blank" rel="noopener noreferrer" href={disclosurePDF}>
                                 Click here to download your complete account disclosure.
                                 </a> 
                             </p>

@@ -126,9 +126,9 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                     if (totalShare == null) {
                         totalShare = 0;
                     }
-                    let beneficiaryShare = getValues(`share_percentage__${i}`);
+                    let beneficiaryShare = +getValues(`share_percentage__${i}`);
                     if (beneficiaryShare !== null && totalShare !== null) {
-                        totalShare += Number(beneficiaryShare);
+                        totalShare += beneficiaryShare;
                     }
                 }
             }
@@ -255,7 +255,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                     <IonCol className='well' size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                        Calculated Share Percentage 
                        {
-                           (!!formData[`type__${beneficiaryNumber}`] && calcShare(formData[`type__${beneficiaryNumber}`]) !== null) ? (
+                           (!!formData[`type__${beneficiaryNumber}`] && !!calcShare(formData[`type__${beneficiaryNumber}`])) ? (
                                 <p>
                                         <strong>
                                         {formData[`type__${beneficiaryNumber}`]} Share Percentage : {calcShare(formData[`type__${beneficiaryNumber}`])} %

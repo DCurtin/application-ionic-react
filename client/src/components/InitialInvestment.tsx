@@ -160,7 +160,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
                         </IonLabel>
                         <IonItem className={showError('initial_investment_type')}>
                             <Controller name='initial_investment_type' control={control} as={
-                                <IonSelect value={formData.initial_investment_type} name='initial_investment_type'>
+                                <IonSelect value={formData.initial_investment_type} name='initial_investment_type' interface='action-sheet'>
                                     {investmentTypesArr.map((investmentType, index) => (
                                         <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                                     ))}
