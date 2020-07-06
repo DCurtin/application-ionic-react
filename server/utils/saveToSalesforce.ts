@@ -1,7 +1,7 @@
 import pg from 'pg'
 import jsforce from 'jsforce'
 import express from 'express'
-import * as salesforceSchema from './postgresSchema'
+import * as postgresSchema from './postgresSchema'
 import * as applicationInterfaces from '../../client/src/helpers/Utils'
 import {runQueryReturnPromise, insertApplicant} from './saveStateHandlers'
 import {queryParameters} from './helperSchemas';
@@ -11,20 +11,19 @@ import {Online_Application__c} from './onlineAppSchema'
 
 const { v4: uuidv4 } = require('uuid');
 
-export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string, res: express.Response){
+export function upsertSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string){
     herokuToken === undefined ? uuidv4() : herokuToken;
-    console.log('found no app')
 
     let welcomeParamsQuery = {
         text:'SELECT * FROM salesforce.body,salesforce.validated_pages WHERE body.session_id=validated_pages.session_id AND body.session_id = $1',
         values:[sessionId]
     }
 
-    type joinedInterface = salesforceSchema.body & salesforceSchema.validated_pages
+    type joinedInterface = postgresSchema.body & postgresSchema.validated_pages
     pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<joinedInterface>)=>{
 
         let appBody = appBodyResult.rows[0];
-        let validatedPages : Partial<salesforceSchema.validated_pages> = {
+        let validatedPages : Partial<postgresSchema.validated_pages> = {
             is_welcome_page_valid : appBody.is_welcome_page_valid,
             is_disclosure_page_valid: appBody.is_disclosure_page_valid,
             is_owner_info_page_valid: appBody.is_owner_info_page_valid,
@@ -85,21 +84,27 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
 
         let appQueryUpsert:queryParameters = insertApplicant(sessionId, herokuToken, applicantForm)
 
-        serverConn.sobject("Online_Application__c").upsert(insertValues, 'HerokuToken__c').then((result:any)=>{
-            serverConn.sobject("Online_Application__c").retrieve(result.id).then((queryResult: any)=>{
-            runQueryReturnPromise(appQueryUpsert,pgClient).then((queryUpsertResult:pg.QueryResult)=>{
-                createAppSession(queryResult['AccountNew__c'], result.id, sessionId,pgClient, {},res)
+        serverConn.sobject("Online_Application__c").upsert(insertValues, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
+            console.log('asset result: ')
+            console.log(onlineAppUpsertResult)
+            serverConn.sobject("Online_Application__c").retrieve(onlineAppUpsertResult.id).then((onlineAppQueryResult: Online_Application__c)=>{
+            runQueryReturnPromise(appQueryUpsert,pgClient).then(()=>{
+                let appSessionParams : Partial<postgresSchema.application_session> = {
+                    account_number: onlineAppQueryResult.AccountNew__c,
+                    application_id: onlineAppQueryResult.Id,
+                    session_id: onlineAppQueryResult.HerokuToken__c
+                } 
+                return appSessionParams
                 }).catch((err:any)=>{
                 console.log(err);
                 console.log('could not upsert app')
-                res.status(500).send('failed inserting app')
-                });
-
+                return null;
+                });  
             })
         }).catch(err=>{
             console.log(err)
             console.log('failed to start session');
-            res.status(500).send('failed to start session');
+            return null;
         });
     })
 }
