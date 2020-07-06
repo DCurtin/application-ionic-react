@@ -84,10 +84,10 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     const isSharePercentageValid = () => {
         let isValid = true; 
         if (calcShare('Primary') !== null) {
-            isValid = (calcShare('Primary') === 100);
+            isValid = isValid && (calcShare('Primary') === 100);
         }
         if (calcShare('Contingent') !== null) {
-            isValid = (calcShare('Contingent') === 100)
+            isValid = isValid && (calcShare('Contingent') === 100)
         }
         return isValid; 
     }
