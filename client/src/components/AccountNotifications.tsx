@@ -4,9 +4,11 @@ import { SessionApp, states, accountNotificationsForm } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers'
+import { DevTool } from "@hookform/devtools";
+
 const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterly', 'Mailed Annually']
 
-const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
+const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
     const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
         mode: 'onChange'
@@ -162,8 +164,9 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                     </IonSelect>
                                 } onChangeName="onIonChange" onChange={([selected]) => {
                                     updateForm(selected);
+                                    console.log(selected.detail);
                                     return selected.detail.value;
-                                  }} rules={{required:true}}/>
+                                  }}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -349,6 +352,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                     )}
                 </IonGrid>
             </form>
+            <DevTool control={control} />
         </IonContent>
     )
 }

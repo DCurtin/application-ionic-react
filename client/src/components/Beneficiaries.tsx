@@ -255,7 +255,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                     <IonCol className='well' size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                        Calculated Share Percentage 
                        {
-                           !!formData[`type__${beneficiaryNumber}`] ? (
+                           (!!formData[`type__${beneficiaryNumber}`] && calcShare(formData[`type__${beneficiaryNumber}`]) !== null) ? (
                                 <p>
                                         <strong>
                                         {formData[`type__${beneficiaryNumber}`]} Share Percentage : {calcShare(formData[`type__${beneficiaryNumber}`])} %
