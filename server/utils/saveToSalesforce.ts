@@ -1,11 +1,7 @@
 import pg from 'pg'
 import jsforce from 'jsforce'
-import express from 'express'
 import * as postgresSchema from './postgresSchema'
 import * as applicationInterfaces from '../../client/src/helpers/Utils'
-import {runQueryReturnPromise, insertApplicant} from './saveStateHandlers'
-import {queryParameters} from './helperSchemas';
-import { createAppSession } from './appSessionHandler';
 
 import {Online_Application__c} from './onlineAppSchema'
 
