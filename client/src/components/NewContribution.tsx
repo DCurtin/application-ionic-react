@@ -3,16 +3,15 @@ import { SessionApp, contributionForm } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
 import moment from 'moment'; 
 import { useHistory } from 'react-router-dom';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import {getContributionPage, saveContributionPage} from '../helpers/CalloutHelpers'
 
 const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowErrorToast, updateMenuSections}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+    const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
+        mode: 'onChange'
     });
-    let watchAllFields = watch();
+
     const [formData, setFormData] = useState<contributionForm>({
         new_contribution_amount: 0, 
         tax_year: '',
@@ -65,6 +64,9 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
     function ImportForm(data : any){
         let importedForm : contributionForm = data;
         setFormData(importedForm);
+        for (var fieldName in data) {
+            setValue(fieldName, data[fieldName])
+        }
     }
     
     useEffect(()=>{
@@ -81,14 +83,18 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
 
     useEffect(() => {
         showErrorToast();
-        console.log(errors)
+        return function onUnmount() {
+            if (Object.keys(errors).length > 0) {
+                updateMenuSections('is_new_contribution_page_valid', false);
+            }
+        }
     }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
@@ -122,7 +128,12 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                                 Amount
                             </IonLabel>
                             <IonItem className={showError('new_contribution_amount')}>
-                                <IonInput type='number' name='new_contribution_amount' value={formData.new_contribution_amount} onIonInput={updateForm} ref={register({required: true})}/>
+                                <Controller control={control} name='new_contribution_amount' as={
+                                    <IonInput type='number' name='new_contribution_amount' value={formData.new_contribution_amount}/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}}/>
                             </IonItem>
                         </IonCol>
                         {showTaxYearInput(formData.account_type) && (
@@ -131,12 +142,17 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                                     Tax Year
                                 </IonLabel>
                                 <IonItem className={showError('tax_year')}>
-                                    <IonSelect interface='action-sheet' value={formData.tax_year} name='tax_year' onIonChange={updateForm} ref={register({required: true})}>
-                                        <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
-                                        <IonSelectOption value='Last Year'>
-                                            Last Year
-                                        </IonSelectOption>
-                                    </IonSelect>
+                                    <Controller name='tax_year' control={control} as={
+                                        <IonSelect interface='action-sheet' value={formData.tax_year} name='tax_year'>
+                                            <IonSelectOption value='Current Year'>Current Year</IonSelectOption>
+                                            <IonSelectOption value='Last Year'>
+                                                Last Year
+                                            </IonSelectOption>
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                      }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                         )}
@@ -147,7 +163,12 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                                 Name on Account
                             </IonLabel>
                             <IonItem className={showError('name_on_account')}>
-                                <IonInput value={formData.name_on_account} name='name_on_account' onIonInput={updateForm} ref={register({required: true})}/>
+                                <Controller name='name_on_account' control={control} as={
+                                    <IonInput value={formData.name_on_account} name='name_on_account'/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}} />
                             </IonItem>
                         </IonCol>
                         <IonCol>
@@ -155,10 +176,15 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                                 Bank Account Type
                             </IonLabel>
                             <IonItem className={showError('bank_account_type')}>
-                                <IonSelect interface='action-sheet' value={formData.bank_account_type} name='bank_account_type' onIonChange={updateForm}  ref={register({required: true})}>
-                                    <IonSelectOption value='Checkings'>Checkings</IonSelectOption>
-                                    <IonSelectOption value='Savings'>Savings </IonSelectOption>
-                                </IonSelect>
+                                <Controller name='bank_account_type' control={control} as={
+                                    <IonSelect interface='action-sheet' value={formData.bank_account_type} name='bank_account_type'>
+                                        <IonSelectOption value='Checkings'>Checkings</IonSelectOption>
+                                        <IonSelectOption value='Savings'>Savings </IonSelectOption>
+                                    </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -168,7 +194,12 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                                 Bank ABA/Routing Number
                             </IonLabel>
                             <IonItem className={showError('routing_number')}>
-                                <IonInput type='number' name='routing_number' value={formData.routing_number} onIonInput={validateRoutingNumber} ref={register({required: true})}/>
+                                <Controller name='routing_number' control={control} as={
+                                    <IonInput type='number' name='routing_number' value={formData.routing_number}/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol>
@@ -176,7 +207,12 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                                 Account Number
                             </IonLabel>
                             <IonItem className={showError('account_number')}>
-                                <IonInput value={formData.account_number} onIonInput={updateForm} name='account_number' ref={register({required: true})}/>
+                                <Controller name='account_number' control={control} as={
+                                    <IonInput value={formData.account_number} name='account_number'/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}} />
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -184,7 +220,12 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
                         <IonCol size='6'>
                             <IonLabel>Bank Name</IonLabel>
                             <IonItem className={showError('bank_name')}>
-                                <IonInput value={formData.bank_name} onIonInput={updateForm} name='bank_name'  ref={register({required: true})}/>
+                                <Controller name='bank_name' control={control} as={
+                                    <IonInput value={formData.bank_name} name='bank_name' />
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}} />
                             </IonItem>
                         </IonCol>
                     </IonRow>

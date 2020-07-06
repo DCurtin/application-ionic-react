@@ -1,22 +1,23 @@
 import React, {useState, useEffect} from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData } from '../helpers/Utils';
-import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonItem } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonItem } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {saveRolloverPage, getRolloverPage} from '../helpers/CalloutHelpers'
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+    const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
+        mode: 'onChange'
     });
-    let watchAllFields = watch();
+
     const [formData, setFormData] = useState<FormData>({
         account_type: 'Traditional IRA',
         existing_employer_plan_roll_overs: 0
     });
+
+    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -31,8 +32,17 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
         }
     },[sessionId])
 
+    useEffect(() => {
+        if (isAfterGettingData) {
+            for (var fieldName in formData) {
+                setValue(fieldName, formData[fieldName]);
+            }
+        }
+    }, [isAfterGettingData])
+
     function ImportForm(data : any){
         setFormData(data);
+        setIsAfterGettingData(true);
     }
     
     useEffect(()=>{
@@ -66,14 +76,18 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
 
     useEffect(() => {
         showErrorToast();
-        console.log(errors)
+        return function onUnmount() {
+            if (Object.keys(errors).length > 0) {
+                updateMenuSections('is_rollover_plan_page_valid', false);
+            }
+        }
     }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
@@ -103,13 +117,23 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Institution Name</IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
-                                    <IonInput name={`institution_name__${i}`} value={formData[`institution_name__${i}`]} placeholder='Institution Name' onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`institution_name__${i}`} control={control} as={ 
+                                        <IonInput name={`institution_name__${i}`} value={formData[`institution_name__${i}`]} placeholder='Institution Name'/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Cash Amount (approximate value allowed)</IonLabel>
                                 <IonItem className={showError(`cash_amount__${i}`)}>
-                                    <IonInput name={`cash_amount__${i}`} value={formData[`cash_amount__${i}`]} onIonInput={updateForm} ref={register({required: true, pattern:/^([0-9]+\.[0-9]+|[0-9]+)$/})}/>
+                                    <Controller name={`cash_amount__${i}`} control={control} as={
+                                        <IonInput name={`cash_amount__${i}`} value={formData[`cash_amount__${i}`]}type='number'/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -119,7 +143,12 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Contact Name
                                 </IonLabel>
                                 <IonItem className={showError(`name__${i}`)}>
-                                    <IonInput name={`name__${i}`} value={formData[`name__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`name__${i}`} control={control} as={
+                                        <IonInput name={`name__${i}`} value={formData[`name__${i}`]}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value;
+                            }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -127,7 +156,12 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Contact Phone Number
                                 </IonLabel>
                                 <IonItem className={showError(`phone__${i}`)}>
-                                    <IonInput type='number' pattern='/^[(]{0,1}[0-9]{3}[)\.\- ]{0,1}[0-9]{3}[\.\- ]{0,1}[0-9]{4}$/' name={`phone__${i}`} value={formData[`phone__${i}`]} onIonInput={updateForm} placeholder='(555)555-5555'  ref={register({required: true})}/>
+                                    <Controller name={`phone__${i}`} control={control} as={
+                                        <IonInput type='tel' name={`phone__${i}`} value={formData[`phone__${i}`]} />
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -137,7 +171,12 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Street
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_street__${i}`)}>
-                                    <IonInput name={`mailing_street__${i}`} value={formData[`mailing_street__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`mailing_street__${i}`} control={control} as={
+                                        <IonInput name={`mailing_street__${i}`} value={formData[`mailing_street__${i}`]} />
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -145,7 +184,12 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     City
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_city__${i}`)}>
-                                    <IonInput name={`mailing_city__${i}`} value={formData[`mailing_city__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`mailing_city__${i}`} control={control} as={
+                                        <IonInput name={`mailing_city__${i}`} value={formData[`mailing_city__${i}`]} />
+                                    }onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -155,11 +199,16 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     State
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_state__${i}`)}>
-                                    <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm}  ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
-                                        {states.map((state,index) => (
-                                            <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
-                                        ))}
-                                    </IonSelect>
+                                    <Controller name={`mailing_state__${i}`} control={control} as={
+                                        <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} interfaceOptions={{cssClass: 'states-select'}}>
+                                            {states.map((state,index) => (
+                                                <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
+                                            ))}
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -167,7 +216,12 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Zip
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_zip__${i}`)}>
-                                    <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`} onIonInput={updateForm}  ref={register({required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/})}/>
+                                    <Controller name={`mailing_zip__${i}`} control={control} as={ 
+                                        <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/}} />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -177,38 +231,48 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Account Type
                                 </IonLabel>
                                 <IonItem className={showError(`account_type__${i}`)}>
-                                    <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
-                                        {formData.account_type.includes('Roth') ? (
-                                            <React.Fragment>
-                                                <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
-                                            </React.Fragment>
-                                        ) : (
-                                            <React.Fragment>
-                                                <IonSelectOption value='Traditional IRA'>
-                                                    Traditional IRA
-                                                </IonSelectOption>
-                                                <IonSelectOption value='SEP IRA'>
-                                                    SEP IRA
-                                                </IonSelectOption>
-                                                <IonSelectOption value='Simple IRA'>
-                                                    Simple IRA
-                                                </IonSelectOption>
-                                            </React.Fragment>
-                                        )}
-                                        <IonSelectOption value='Individual(k)'>Individual(k)</IonSelectOption>
-                                        <IonSelectOption value='Profit Sharing Plan'>
-                                            Profit Sharing Plan
-                                        </IonSelectOption>
-                                        <IonSelectOption value='401(k)'>401(k)</IonSelectOption>
-                                        <IonSelectOption value='403(b)'> 403(b)</IonSelectOption>
-                                        <IonSelectOption value='Defined Benefit Plan'>Defined Benefit Plan</IonSelectOption>
-                                    </IonSelect>
+                                    <Controller name={`account_type__${i}`} control={control} as={
+                                        <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} interfaceOptions={{cssClass: 'states-select'}}>
+                                            {formData.account_type.includes('Roth') ? (
+                                                <React.Fragment>
+                                                    <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
+                                                </React.Fragment>
+                                            ) : (
+                                                <React.Fragment>
+                                                    <IonSelectOption value='Traditional IRA'>
+                                                        Traditional IRA
+                                                    </IonSelectOption>
+                                                    <IonSelectOption value='SEP IRA'>
+                                                        SEP IRA
+                                                    </IonSelectOption>
+                                                    <IonSelectOption value='Simple IRA'>
+                                                        Simple IRA
+                                                    </IonSelectOption>
+                                                </React.Fragment>
+                                            )}
+                                            <IonSelectOption value='Individual(k)'>Individual(k)</IonSelectOption>
+                                            <IonSelectOption value='Profit Sharing Plan'>
+                                                Profit Sharing Plan
+                                            </IonSelectOption>
+                                            <IonSelectOption value='401(k)'>401(k)</IonSelectOption>
+                                            <IonSelectOption value='403(b)'> 403(b)</IonSelectOption>
+                                            <IonSelectOption value='Defined Benefit Plan'>Defined Benefit Plan</IonSelectOption>
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Account Number</IonLabel>
                                 <IonItem className={showError(`account_number__${i}`)}>
-                                    <IonInput name={`account_number__${i}`} value={formData[`account_number__${i}`]} onIonInput={updateForm}  ref={register({required: true})}/>
+                                    <Controller name={`account_number__${i}`} control={control} as={
+                                        <IonInput name={`account_number__${i}`} value={formData[`account_number__${i}`]}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -218,12 +282,17 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Rollover Type
                                 </IonLabel>
                                 <IonItem className={showError(`rollover_type__${i}`)}>
-                                    <IonSelect interface='action-sheet' value={formData[`rollover_type__${i}`]} name={`rollover_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
-                                        <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
-                                        <IonSelectOption value='Indirect Rollover'>
-                                            Indirect Rollover
-                                        </IonSelectOption>
-                                    </IonSelect>
+                                    <Controller name={`rollover_type__${i}`} control={control} as={
+                                        <IonSelect interface='action-sheet' value={formData[`rollover_type__${i}`]} name={`rollover_type__${i}`}>
+                                            <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
+                                            <IonSelectOption value='Indirect Rollover'>
+                                                Indirect Rollover
+                                            </IonSelectOption>
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                                 <em><b>Direct Rollover </b> - Funds are currently in an employer plan.<br/><b>Indirect Rollover</b> - I have or will receive the funds directly from my plan and would like to rollover those funds to my Midland Trust.<br/></em>
                             </IonCol>

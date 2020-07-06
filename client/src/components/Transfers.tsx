@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useForm} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
@@ -8,12 +8,10 @@ import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+    const {register,control, handleSubmit, errors, setValue, getValues, formState} = useForm({
+        mode: 'onChange'
     });
-    let watchAllFields = watch();
-
+    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         account_type: 'Traditional IRA',
         existing_transfers: 0
@@ -31,10 +29,18 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         }
     },[sessionId])
 
+    useEffect(() => {
+        if (isAfterGettingData) {
+            for (var fieldName in formData) {
+                setValue(fieldName, formData[fieldName]);
+            }
+        }
+    }, [isAfterGettingData])
     
     function ImportForm(data : any){
         let importedForm : FormData = data
         setFormData(importedForm);
+        setIsAfterGettingData(true);
     }
 
     useEffect(()=>{
@@ -67,14 +73,18 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
 
     useEffect(() => {
         showErrorToast();
-        console.log(errors)
+        return function onUnmount() {
+            if (Object.keys(errors).length > 0) {
+                updateMenuSections('is_transfer_ira_page_valid', false);
+            }
+        }
     }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
@@ -105,7 +115,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                    Account Number 
                                 </IonLabel>
                                 <IonItem className={showError(`account_number__${i}`)}>
-                                    <IonInput value={formData[`account_number__${i}`]} name={`account_number__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`account_number__${i}`} control={control} as={
+                                        <IonInput value={formData[`account_number__${i}`]} name={`account_number__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -113,7 +128,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Institution Name
                                 </IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
-                                    <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`institution_name__${i}`} control={control} as={
+                                        <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -123,7 +143,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Contact Name
                                 </IonLabel>
                                 <IonItem className={showError(`contact_name__${i}`)}>
-                                    <IonInput value={formData[`contact_name__${i}`]} name={`contact_name__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`contact_name__${i}`} control={control} as={
+                                        <IonInput value={formData[`contact_name__${i}`]} name={`contact_name__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -131,7 +156,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 Contact Phone Number
                                 </IonLabel>
                                 <IonItem className={showError(`contact_phone_number__${i}`)}>
-                                    <IonInput type='number' value={formData[`contact_phone_number__${i}`]} name={`contact_phone_number__${i}`} onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{10}$/})}/>
+                                    <Controller name={`contact_phone_number__${i}`} control={control} as={
+                                        <IonInput type='tel' value={formData[`contact_phone_number__${i}`]} name={`contact_phone_number__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -139,13 +169,23 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Street</IonLabel>
                                 <IonItem className={showError(`mailing_street__${i}`)}>
-                                    <IonInput value={formData[`mailing_street__${i}`]} name={`mailing_street__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`mailing_street__${i}`} control={control} as={
+                                        <IonInput value={formData[`mailing_street__${i}`]} name={`mailing_street__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> City</IonLabel>
                                 <IonItem className={showError(`mailing_city__${i}`)}>
-                                    <IonInput value={formData[`mailing_city__${i}`]} name={`mailing_city__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                    <Controller name={`mailing_city__${i}`} control={control} as={
+                                        <IonInput value={formData[`mailing_city__${i}`]} name={`mailing_city__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -153,9 +193,14 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> State </IonLabel>
                                 <IonItem className={showError(`mailing_state__${i}`)}>
-                                    <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} onIonChange={updateForm} ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
-                                    {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
-                                    </IonSelect>
+                                    <Controller name={`mailing_state__${i}`} control={control} as={
+                                        <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} interfaceOptions={{cssClass: 'states-select'}}>
+                                        {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}} />
                                 </IonItem>
                             </IonCol>
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -163,7 +208,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Zip
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_zip__${i}`)}>
-                                    <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`} onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/})}/>
+                                    <Controller name={`mailing_zip__${i}`} control={control} as={
+                                        <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`}/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/}}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -173,48 +223,23 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Transfer Type 
                                 </IonLabel>
                                 <IonItem className={showError(`transfer_type__${i}`)}>
-                                    <IonSelect interface='action-sheet' value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
-                                        <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
-                                        <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
-                                    </IonSelect>
+                                    <Controller name={`transfer-type__${i}`} control={control} as={
+                                        <IonSelect interface='action-sheet' value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`}>
+                                            <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
+                                            <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
+                                        </IonSelect>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                    }} rules={{required: true}}/>
                                 </IonItem>
                             </IonCol>
                             {formData[`transfer_type__${i}`] === 'Cash Transfer' && (
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Account Type</IonLabel>
                                     <IonItem className={showError(`account_type__${i}`)}>
-                                        <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
-                                            {formData.account_type.includes('Roth') ? (
-                                                <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
-                                            ) : (
-                                                <React.Fragment>
-                                                    <IonSelectOption value='Traditional IRA'>Traditional IRA</IonSelectOption>
-                                                    <IonSelectOption value='SEP IRA'>SEP IRA</IonSelectOption>
-                                                    <IonSelectOption value='Simple IRA'> Simple IRA</IonSelectOption>
-                                                </React.Fragment>
-                                            )}
-                                        </IonSelect>
-                                    </IonItem>
-                                </IonCol>
-                            )}
-                            {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
-                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
-                                    <IonLabel>
-                                        Holding Name
-                                    </IonLabel>
-                                    <IonItem className={showError(`asset_name_1__${i}`)}>
-                                        <IonInput name={`asset_name_1__${i}`} value={formData[`asset_name_1__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
-                                    </IonItem>
-                                </IonCol>
-                            )}
-                        </IonRow>
-                        {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
-                            <React.Fragment>
-                                <IonRow>
-                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
-                                        <IonLabel> Account Type</IonLabel>
-                                        <IonItem className={showError(`account_type__${i}`)}>
-                                            <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} onIonChange={updateForm} ref={register({required: true})}>
+                                        <Controller name={`account_type__${i}`} control={control} as={
+                                            <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`}>
                                                 {formData.account_type.includes('Roth') ? (
                                                     <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
                                                 ) : (
@@ -225,6 +250,51 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                                     </React.Fragment>
                                                 )}
                                             </IonSelect>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                        }} rules={{required: true}}/>
+                                    </IonItem>
+                                </IonCol>
+                            )}
+                            {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
+                                <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
+                                    <IonLabel>
+                                        Holding Name
+                                    </IonLabel>
+                                    <IonItem className={showError(`asset_name_1__${i}`)}>
+                                        <Controller name={`asset_name_1__${i}`} control={control} as={
+                                            <IonInput name={`asset_name_1__${i}`} value={formData[`asset_name_1__${i}`]}/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                        }} rules={{required: true}}/>
+                                    </IonItem>
+                                </IonCol>
+                            )}
+                        </IonRow>
+                        {formData[`transfer_type__${i}`] === 'In-Kind Transfer' && (
+                            <React.Fragment>
+                                <IonRow>
+                                    <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
+                                        <IonLabel> Account Type</IonLabel>
+                                        <IonItem className={showError(`account_type__${i}`)}>
+                                            <Controller name={`account_type__${i}`} control={control} as={
+                                                <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`}>
+                                                    {formData.account_type.includes('Roth') ? (
+                                                        <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
+                                                    ) : (
+                                                        <React.Fragment>
+                                                            <IonSelectOption value='Traditional IRA'>Traditional IRA</IonSelectOption>
+                                                            <IonSelectOption value='SEP IRA'>SEP IRA</IonSelectOption>
+                                                            <IonSelectOption value='Simple IRA'> Simple IRA</IonSelectOption>
+                                                        </React.Fragment>
+                                                    )}
+                                                </IonSelect>
+                                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                                updateForm(selected);
+                                                return selected.detail.value;
+                                            }} rules={{required: true}} />
                                         </IonItem>
                                     </IonCol>
                                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -232,7 +302,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             Holding 2 Name (if applicable)
                                         </IonLabel>
                                         <IonItem className={showError(`asset_name_2__${i}`)}>
-                                            <IonInput value={formData[`asset_name_2__${i}`]} name={`asset_name_2__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                            <Controller name={`asset_name_2__${i}`} control={control} as={
+                                                <IonInput value={formData[`asset_name_2__${i}`]} name={`asset_name_2__${i}`}/>
+                                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                                updateForm(selected);
+                                                return selected.detail.value;
+                                            }} rules={{required: true}} />
                                         </IonItem>
                                     </IonCol>
                                 </IonRow>
@@ -242,10 +317,15 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             Complete or Partial Transfer *
                                         </IonLabel>
                                         <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
-                                            <IonSelect interface='action-sheet' value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm} ref={register({required: true})}>
-                                                <IonSelectOption value='All Available Cash'> Complete </IonSelectOption>
-                                                <IonSelectOption value=''>Partial</IonSelectOption>
-                                            </IonSelect>
+                                            <Controller name={`full_or_partial_cash_transfer__${i}`} control={control} as={
+                                                <IonSelect interface='action-sheet' value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`}>
+                                                    <IonSelectOption value='All Available Cash'> Complete </IonSelectOption>
+                                                    <IonSelectOption value=''>Partial</IonSelectOption>
+                                                </IonSelect>
+                                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                                updateForm(selected);
+                                                return selected.detail.value;
+                                            }} rules={{required: true}}/>
                                         </IonItem>
                                     </IonCol>
                                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -253,7 +333,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             Holding 3 Name (if applicable)
                                         </IonLabel>
                                         <IonItem className={showError(`asset_name_3__${i}`)}>
-                                            <IonInput name={`asset_name_3__${i}`} value={formData[`asset_name_3__${i}`]} onIonInput={updateForm} ref={register({required: true})}/>
+                                            <Controller name={`asset_name_3__${i}`} control={control} as={
+                                                <IonInput name={`asset_name_3__${i}`} value={formData[`asset_name_3__${i}`]}/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                        }} rules={{required: true}}/>
                                         </IonItem>
                                     </IonCol>
                                 </IonRow>
@@ -266,17 +351,27 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel> Transfer Amount * </IonLabel>
                                         <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
-                                            <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} onIonChange={updateForm} ref={register({required: true})}>
-                                                <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
-                                                <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
-                                            </IonSelect>
+                                            <Controller name={`full_or_partial_cash_transfer__${i}`} control={control} as={
+                                                <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`}>
+                                                    <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
+                                                    <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
+                                                </IonSelect>
+                                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                                updateForm(selected);
+                                                return selected.detail.value;
+                                            }} rules={{required: true}}/>
                                         </IonItem>
                                     </IonCol>
                                     {formData[`full_or_partial_cash_transfer__${i}`] == 'Partial Cash Transfer' && (
                                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                             <IonLabel>Cash Amount</IonLabel>
                                             <IonItem className={showError(`cash_amount__${i}`)}>
-                                                <IonInput value={formData[`cash_amount__${i}`]} name={`cash_amount__${i}`} onIonInput={updateForm} ref={register({required: true})}/>
+                                                <Controller name={`cash_amount__${i}`} control={control} as={
+                                                    <IonInput value={formData[`cash_amount__${i}`]} name={`cash_amount__${i}`}/>
+                                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                                    updateForm(selected);
+                                                    return selected.detail.value;
+                                                }} rules={{required: true}} />
                                             </IonItem>
                                         </IonCol>
                                     )}
@@ -290,17 +385,22 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 </IonLabel>
                                 <div className="ion-text-wrap">
                                     <IonList className={showError(`delivery_method__${i}`)}>
-                                        <IonRadioGroup name={`delivery_method__${i}`} value={formData[`delivery_method__${i}`]} onIonChange={updateForm} ref={register({required: true})}>
-                                            <IonItem>
-                                                <IonLabel>Mail (No charge)</IonLabel>
-                                                <IonRadio value='Certified Mail'>
-                                                </IonRadio>
-                                            </IonItem>
-                                            <IonItem>
-                                                <IonLabel>Overnight ($30 Fee Applies)</IonLabel>
-                                                <IonRadio value='FedEx Overnight'></IonRadio>
-                                            </IonItem>
-                                        </IonRadioGroup>
+                                        <Controller name={`delivery_method__${i}`} control={control} as={
+                                            <IonRadioGroup name={`delivery_method__${i}`} value={formData[`delivery_method__${i}`]}>
+                                                <IonItem>
+                                                    <IonLabel>Mail (No charge)</IonLabel>
+                                                    <IonRadio value='Certified Mail'>
+                                                    </IonRadio>
+                                                </IonItem>
+                                                <IonItem>
+                                                    <IonLabel>Overnight ($30 Fee Applies)</IonLabel>
+                                                    <IonRadio value='FedEx Overnight'></IonRadio>
+                                                </IonItem>
+                                            </IonRadioGroup>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                        }} rules={{required: true}} />
                                     </IonList>
                                 </div>
                             </IonCol>

@@ -5,7 +5,6 @@ import {SessionApp, states, FormData} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers';
-import {DevTool} from '@hookform/devtools';
 
 const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setErrorMessage, setShowSpinner}) => {
     const history = useHistory();
@@ -162,7 +161,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                             } onChangeName="onIonChange" onChange={([selected]) => {
                                 updateForm(selected);
                                 return selected.detail.value;
-                            }} rules={{required: true}} value={formData[`first_name__${beneficiaryNumber}`]} />
+                            }} rules={{required: true}} />
                         </IonItem>
                     </IonCol>
                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -379,7 +378,6 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
                         </IonCol>
                     </IonRow>
                 </IonGrid>
-                <DevTool control={control} />
             </form>
         </IonContent>
     )

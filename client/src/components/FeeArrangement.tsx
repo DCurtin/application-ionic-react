@@ -7,10 +7,9 @@ import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHe
 
 const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {control, register, handleSubmit, watch, errors, setValue} = useForm({
+    const {control, handleSubmit, errors, setValue, formState} = useForm({
         mode: 'onChange'
     });
-    let watchAllFields = watch();
 
     const [formData, setFormData] = useState<feeArrangementForm>({
         initial_investment_type: '',
@@ -23,14 +22,15 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
     useEffect(()=>{
         if(sessionId !== '')
         {
-            setShowSpinner(true);
+            // setShowSpinner(true);
             getFeeArrangementPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
+                    // setShowSpinner(false);
                     return;
                 }
                 ImportForm(data);
-                setShowSpinner(false);
+                // setShowSpinner(false);
             })
         }
     },[sessionId])
@@ -71,11 +71,11 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-            let className = errorsArr.includes(fieldName) ? 'danger' : '';
-            if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
-                className = '';
-            }
-            return className;
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
+        }
+        return className;
     };
 
     const showErrorToast = () => {
@@ -121,7 +121,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
                             Select fee agreement
                         </IonLabel>
                         <IonItem className={showError('fee_schedule')}>
-                            <Controller name='fee_schedule' as={
+                            <Controller name='fee_schedule' control={control} as={
                                 <IonSelect interface='action-sheet' value={formData.fee_schedule} name='fee_schedule'>
                                     <IonSelectOption value='Asset Based ($295)'>
                                     Option 1 - Asset Based
@@ -144,10 +144,15 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
                     <IonCol>
                         <IonLabel>
                             <IonItem className={showError('payment_method')}>
-                                <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method' onIonChange={updateForm} ref={register({required: true})}>
-                                    <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
-                                    <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
-                                </IonSelect>
+                                <Controller name='payment_method' control={control} as={
+                                    <IonSelect interface='action-sheet' value={formData.payment_method} name='payment_method'>
+                                        <IonSelectOption value='Account'>Deduct My Account</IonSelectOption>
+                                        <IonSelectOption value='Credit Card'>Credit Card</IonSelectOption>
+                                    </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}}/>
                             </IonItem>
                         </IonLabel>
                     </IonCol>
@@ -159,13 +164,23 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
                                 Credit Card Number
                             </IonLabel>
                             <IonItem className={showError('cc_number')}>
-                                <IonInput type='number' name='cc_number' value={formData.cc_number} onIonInput={updateForm} clearInput ref={register({required: true})}/>
+                                <Controller name='cc_number' control={control} as={
+                                    <IonInput type='number' name='cc_number' value={formData.cc_number}/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                             <IonLabel> Expiration Date</IonLabel>
                             <IonItem className={showError('cc_exp_date')}>
-                                <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date' onIonInput={updateForm} ref={register({required: true})}/>
+                                <Controller name='cc_exp_date' control={control} as={
+                                    <IonInput type='date' value={formData.cc_exp_date} name='cc_exp_date'/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required: true}} />
                             </IonItem>
                         </IonCol>
                     </IonRow>
