@@ -2,4 +2,5 @@ Identifier,Type,Unique,Required
 account_number,text,,yes
 application_id,text,,yes
 last_active,decimal,,yes
+heroku_token,uuid,yes,yes
 session_id,uuid,yes,yes
