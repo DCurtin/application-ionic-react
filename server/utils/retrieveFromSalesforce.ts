@@ -1,7 +1,7 @@
 import pg from 'pg'
 import express from 'express'
 import jsforce from 'jsforce'
-import * as salesforceSchema from './postgresSchema'
+import * as postgresSchema from './postgresSchema'
 import * as saveStateHandlers from './saveStateHandlers'
 import {createAppSession} from './appSessionHandler';
 import {Online_Application__c} from './onlineAppSchema'
@@ -54,7 +54,7 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
       {
         serverConn.sobject("Online_Application__c").retrieve(record.Id).then((onlineAppresult:Online_Application__c)=>{
         let sessionId : string = uuidv4();
-        let bodyInfo : Partial<salesforceSchema.body> ={
+        let bodyInfo : Partial<postgresSchema.body> ={
           has_read_diclosure: onlineAppresult.Disclosures_Viewed__c,
           account_type: onlineAppresult.Account_Type__c,
           transfer_form: onlineAppresult.Existing_IRA_Transfer__c,
@@ -65,7 +65,7 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
           session_id: sessionId
         }
         let bodyParams = saveStateHandlers.generateQueryString('body',bodyInfo,'session_id')
-        let ownerInfo : Partial<salesforceSchema.applicant> ={
+        let ownerInfo : Partial<postgresSchema.applicant> ={
           application_id: onlineAppresult.Id,
           account_number: onlineAppresult.AccountNew__c,
           salutation: onlineAppresult.Salutation__c,
@@ -102,7 +102,7 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
         }
         let applicantQueryParams = saveStateHandlers.generateQueryString('applicant', ownerInfo, 'session_id')
   
-        let validatedPages : salesforceSchema.validated_pages = {
+        let validatedPages : postgresSchema.validated_pages = {
           is_welcome_page_valid: false,
           ...JSON.parse(onlineAppresult.HerokuValidatedPages__c),
           session_id:sessionId}
@@ -111,7 +111,12 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
         saveStateHandlers.runQueryReturnPromise(applicantQueryParams, pgClient).then((result:pg.QueryResult)=>{
           saveStateHandlers.runQueryReturnPromise(bodyParams, pgClient).then((bodyResult: pg.QueryResult)=>{
             saveStateHandlers.runQueryReturnPromise(validatedPagesQueryParams, pgClient).then((validatedPagesResult: pg.QueryResult)=>{
-              createAppSession(salesforceOnlineApp.AccountNew__c, salesforceOnlineApp.Id, sessionId, pgClient, userInstances, res)
+              let appSession: Partial<postgresSchema.application_session>={
+                account_number: salesforceOnlineApp.AccountNew__c, 
+                application_id:salesforceOnlineApp.Id, 
+                session_id: sessionId
+              }
+              createAppSession(appSession, pgClient, userInstances, res)
             }).catch(err=>{
               console.log(err)
               console.group('failed validation query')

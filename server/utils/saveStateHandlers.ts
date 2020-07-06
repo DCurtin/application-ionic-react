@@ -4,7 +4,7 @@ import {addressSchema, identificationSchema, queryParameters} from './helperSche
 import express from 'express';
 import pg from 'pg';
 import {Connection as jsfConection, RecordResult} from 'jsforce'
-import {startSFOnlineApp} from './saveToSalesforce'
+import {upsertSFOnlineApp} from './saveToSalesforce'
 const { v4: uuidv4 } = require('uuid');
 
 export function initializeApplication(welcomeParameters : applicationInterfaces.welcomePageParameters, res: express.Response, pgClient: pg.Client){
@@ -26,7 +26,7 @@ export function saveWelcomeParameters(sessionId: string, welcomeParameters: appl
   runQuery(welcomePageUpsertQuery, res, pgClient);
 }
 
-export function saveApplicationIdPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, pgClient: pg.Client, serverConn: Partial<jsfConection>, userInstances:any){
+export function saveOwnerInformationPage(sessionId: string, applicantForm : applicationInterfaces.applicantIdForm, res: express.Response, pgClient: pg.Client, serverConn: Partial<jsfConection>, userInstances:any){
     //query for application_session
     //if none exists
     //insert on SF and create a new application_session
@@ -38,7 +38,7 @@ export function saveApplicationIdPage(sessionId: string, applicantForm : applica
       if(appSessionResult.rowCount == 0 && serverConn.accessToken !== 'test_conn')
       {
         let appQueryUpsert : queryParameters = updateApplicant(sessionId, applicantForm);
-        startSFOnlineApp(sessionId,pgClient, serverConn,applicantForm,res)
+        upsertSFOnlineApp(sessionId,pgClient, serverConn,applicantForm,res)
         //insert salesforce app
       }else
       {

@@ -332,7 +332,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'appId'){
-    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn, userInstances);
+    saveStateHandlers.saveOwnerInformationPage(sessionId, packet.data, res, client, serverConn, userInstances);
     return
   }
 
