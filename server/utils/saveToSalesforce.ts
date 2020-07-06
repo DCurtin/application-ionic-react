@@ -13,10 +13,10 @@ const { v4: uuidv4 } = require('uuid');
 
 export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm):Promise<any>{
     let newHerokuToken = uuidv4();
-    return upsertSFOnlineApp(sessionId, pgClient, serverConn, applicantForm, newHerokuToken)
+    return saveFirstStageToSalesforce(sessionId, pgClient, serverConn, applicantForm, newHerokuToken)
 }
 
-export function upsertSFOnlineApp(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string): Promise<any>{
+export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string): Promise<Partial<postgresSchema.application_session>>{
     let welcomeParamsQuery = {
         text:'SELECT * FROM salesforce.body,salesforce.validated_pages WHERE body.session_id=validated_pages.session_id AND body.session_id = $1',
         values:[sessionId]
@@ -86,9 +86,21 @@ export function upsertSFOnlineApp(sessionId: string, pgClient : pg.Client, serve
         //still need salesRep, Referallcode if that goes here
         }
 
-        let appQueryUpsert:queryParameters = insertApplicant(sessionId, herokuToken, applicantForm)
+        
+        return upsertSFOnlineApp(sessionId, serverConn, insertValues, herokuToken);
 
-        return serverConn.sobject("Online_Application__c").upsert(insertValues, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
+        /*
+        if(appSessionParams === null){
+                return null
+            }
+            let appQueryUpsert:queryParameters = insertApplicant(sessionId, herokuToken, applicantForm)
+            return runQueryReturnPromise(appQueryUpsert,pgClient).then(()=>{
+                return appSessionParams;
+            })
+         */
+
+
+        /*return serverConn.sobject("Online_Application__c").upsert(insertValues, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
             console.log('asset result: ')
             console.log(onlineAppUpsertResult)
             let options :jsforce.ExecuteOptions ={}
@@ -112,6 +124,33 @@ export function upsertSFOnlineApp(sessionId: string, pgClient : pg.Client, serve
             console.log(err)
             console.log('failed to upser to salesforce');
             return null;
-        });
+        });*/
     })
 }
+
+export function upsertSFOnlineApp(sessionId: string, serverConn: Partial<jsforce.Connection>, onlineApp : Partial<Online_Application__c>, herokuToken: string): Promise<Partial<postgresSchema.application_session>>{   
+        return serverConn.sobject("Online_Application__c").upsert(onlineApp, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
+            console.log('result: ')
+            console.log(onlineAppUpsertResult)
+            let options :jsforce.ExecuteOptions ={}
+            type FoundOnlineApp = {Id?:string}[] & Online_Application__c
+            return serverConn.sobject("Online_Application__c").findOne({HerokuToken__c:herokuToken}, ['Id','AccountNew__c','HerokuToken__c']).execute(options,(err, onlineAppQueryResult:FoundOnlineApp)=>{
+                if(err){
+                    console.log('failed to query upserted app');
+                    console.log(err);
+                }
+                let appSessionParams : Partial<postgresSchema.application_session> = {
+                    account_number: onlineAppQueryResult.AccountNew__c,
+                    application_id: onlineAppQueryResult.Id,
+                    heroku_token: onlineAppQueryResult.HerokuToken__c,
+                    session_id: sessionId
+                } 
+                return appSessionParams
+            })
+        }).catch((err)=>{
+            console.log(err)
+            console.log('failed to upsert to salesforce');
+            return null;
+        });
+}
+

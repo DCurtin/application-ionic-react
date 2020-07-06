@@ -4,7 +4,7 @@ import {addressSchema, identificationSchema, queryParameters} from './helperSche
 import express from 'express';
 import pg from 'pg';
 import {Connection as jsfConection, RecordResult} from 'jsforce'
-import {startSFOnlineApp, upsertSFOnlineApp} from './saveToSalesforce'
+import {startSFOnlineApp, saveFirstStageToSalesforce} from './saveToSalesforce'
 import {createAppSession} from './appSessionHandler'
 const { v4: uuidv4 } = require('uuid');
 
@@ -40,14 +40,21 @@ export function saveOwnerInformationPage(sessionId: string, applicantForm : appl
       {
         //let appQueryUpsert : queryParameters = updateApplicant(sessionId, applicantForm);
         startSFOnlineApp(sessionId, pgClient, serverConn,applicantForm).then(( appSessionParams : Partial<postgresSchema.application_session> )=>{
-          createAppSession(appSessionParams,pgClient, {}, res);
+          if(appSessionParams === null){
+            return null
+          }
+          let appQueryUpsert:queryParameters = insertApplicant(sessionId, appSessionParams.heroku_token, applicantForm)
+          return runQueryReturnPromise(appQueryUpsert,pgClient).then(()=>{
+            return createAppSession(appSessionParams,pgClient, {}, res);
+          })
         })
         //insert salesforce app
       }else
       {
-        upsertSFOnlineApp(sessionId, pgClient, serverConn, applicantForm, appSessionResult.rows[0].heroku_token)
-        let appQueryUpsert : queryParameters = updateApplicant(sessionId, applicantForm);
-        runQuery(appQueryUpsert, res, pgClient);
+        saveFirstStageToSalesforce(sessionId, pgClient, serverConn, applicantForm, appSessionResult.rows[0].heroku_token).then((appSessionParams)=>{
+          let appQueryUpsert : queryParameters = updateApplicant(sessionId, applicantForm);
+          runQuery(appQueryUpsert, res, pgClient);
+        })
       }
     }).catch(err=>{
       console.log(err)
