@@ -6,7 +6,7 @@ import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
 
-const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast}) => {
+const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
     const {register,control, handleSubmit, errors, setValue, getValues, formState} = useForm({
         mode: 'onChange'
@@ -19,12 +19,15 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
     useEffect(()=>{
         if(sessionId !== '')
         {
+            setShowSpinner(true);
             getTransferPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
+                    setShowSpinner(false);
                     return;
                 }
                 ImportForm(data);
+                setShowSpinner(false);
             })
         }
     },[sessionId])
@@ -223,7 +226,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Transfer Type 
                                 </IonLabel>
                                 <IonItem className={showError(`transfer_type__${i}`)}>
-                                    <Controller name={`transfer-type__${i}`} control={control} as={
+                                    <Controller name={`transfer_type__${i}`} control={control} as={
                                         <IonSelect interface='action-sheet' value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`}>
                                             <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
                                             <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
@@ -352,7 +355,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                         <IonLabel> Transfer Amount * </IonLabel>
                                         <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
                                             <Controller name={`full_or_partial_cash_transfer__${i}`} control={control} as={
-                                                <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`}>
+                                                <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} interface="action-sheet">
                                                     <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
                                                     <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
                                                 </IonSelect>

@@ -71,7 +71,10 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
         let importedForm : applicantIdForm = data;
         setFormData(importedForm);
         for (var fieldName in data) {
-        setValue(fieldName, data[fieldName])
+            if (fieldName === 'email') {
+                setValue('confirm_email', data.email);
+            }
+            setValue(fieldName, data[fieldName]);
         }
     }
 

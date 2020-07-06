@@ -14,11 +14,11 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
 
     const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({
-        initial_investment_type : 'Futures/Forex',
-        min_cash_balance_checkbox: false
+        initial_investment_type : 'Futures/Forex'
     });
-    const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
+    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
 
+    const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -39,9 +39,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
         let formData : initialInvestmentForm = data.formData;
         setFormData(formData);
         setconditionalParameters(conditionalParameters);
-        for (var fieldName in data) {
-            setValue(fieldName, data[fieldName]);
-        }
+        setIsAfterGettingData(true);
     }
 
     useEffect(()=>{
@@ -49,6 +47,15 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
         saveInitialInvestmentPage(sessionId, formData);
       })
     },[formData])
+
+    useEffect(() => {
+        if (isAfterGettingData) {
+            let data : any = {...formData};
+            for (var fieldName in data) {
+                setValue(fieldName, data[fieldName]);
+            }
+        }
+    }, [isAfterGettingData])
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
@@ -112,6 +119,10 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
     }
 
     const validateFields = (e: any) => {
+        if (showNotEnoughProjectedCashWarning(formData.investment_amount, conditionalParameters)) {
+            setShowErrorToast(true); 
+            return;
+        }
         saveInitialInvestmentPage(sessionId, formData);
         updateMenuSections('is_investment_details_page_valid', true);
         setShowErrorToast(false);
@@ -227,8 +238,8 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
                 {showMinCashBalanceCheckbox(formData) && (
                     <IonRow>
                         <IonCol>
-                            <Controller name='min_cash_balance_checkbox' control={control} as={
-                                <IonCheckbox onIonChange={updateForm} className={showError('min_cash_balance_checkbox')} name='min_cash_balance_checkbox'></IonCheckbox> 
+                            <Controller name='hasReadMinCashBal' control={control} as={
+                                <IonCheckbox onIonChange={updateForm} className={showError('hasReadMinCashBal')} name='hasReadMinCashBal'></IonCheckbox> 
                             } onChangeName="onIonChange" onChange={([selected]) => {
                                 updateForm(selected);
                                 return selected.detail.checked;

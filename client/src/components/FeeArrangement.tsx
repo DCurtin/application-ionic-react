@@ -22,15 +22,15 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
     useEffect(()=>{
         if(sessionId !== '')
         {
-            // setShowSpinner(true);
+            setShowSpinner(true);
             getFeeArrangementPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
-                    // setShowSpinner(false);
+                    setShowSpinner(false);
                     return;
                 }
                 ImportForm(data);
-                // setShowSpinner(false);
+                setShowSpinner(false);
             })
         }
     },[sessionId])

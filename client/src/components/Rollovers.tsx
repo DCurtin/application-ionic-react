@@ -6,7 +6,7 @@ import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {saveRolloverPage, getRolloverPage} from '../helpers/CalloutHelpers'
 
-const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef}) => {
+const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef, setShowSpinner}) => {
     const history = useHistory();
     const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
         mode: 'onChange'
@@ -22,12 +22,15 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
     useEffect(()=>{
         if(sessionId !== '')
         {
+            setShowSpinner(true);
             getRolloverPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
+                    setShowSpinner(false);
                     return;
                 }
                 ImportForm(data);
+                setShowSpinner(false);
             })
         }
     },[sessionId])
@@ -306,7 +309,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
     }
 
     return (
-        <IonContent className='ion-padding' style={{height: '110%'}}>
+        <IonContent className='ion-padding'>
             <form ref={formRef} onSubmit={handleSubmit(validateFields)}>
             <IonGrid>
                 <IonRow className='well'>
