@@ -82,7 +82,12 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
         }
 
         
-        return upsertSFOnlineApp(serverConn, insertValues, herokuToken);
+        return upsertSFOnlineApp(serverConn, insertValues, herokuToken).then((value:postgresSchema.application_session)=>{
+            if(value !== null){
+                value.session_id=sessionId
+            }
+            return value;
+        })
     })
 }
 
@@ -96,6 +101,7 @@ export function upsertSFOnlineApp(serverConn: Partial<jsforce.Connection>, onlin
                 if(err){
                     console.log('failed to query upserted app');
                     console.log(err);
+                    return null;
                 }
                 let appSessionParams : Partial<postgresSchema.application_session> = {
                     account_number: onlineAppQueryResult.AccountNew__c,
@@ -112,14 +118,51 @@ export function upsertSFOnlineApp(serverConn: Partial<jsforce.Connection>, onlin
 }
 
 export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgClient : pg.Client){
+    let singleRowTables = ['body',
+    'validated_pages',
+    'applicant',
+    'contribution',
+    'fee_arrangement',
+    'initial_investment',
+    'interested_party',
+    'payment']
+
+    let queryString = generateQueryStringForSingleRow(singleRowTables, 'session_id');
+
+    type joinedType = postgresSchema.validated_pages & 
+    postgresSchema.applicant & 
+    postgresSchema.contribution & 
+    postgresSchema.fee_arrangement & 
+    postgresSchema.initial_investment & 
+    postgresSchema.interested_party & 
+    postgresSchema.payment
+
     let singleRowQuery ={
-        text:'SELECT * FROM salesforce.body,salesforce.validated_pages,salesforce.applicant WHERE body.session_id=validated_pages.session_id AND body.session_id=applicant.session_id AND body.session_id = $1',
+        //text:'SELECT * FROM salesforce.body,salesforce.validated_pages,salesforce.applicant WHERE body.session_id=$1 AND applicant.session_id=$1 AND body.session_id=$1',
+        text:queryString,
         values:[sessionId]
     }
 
-    pgClient.query(singleRowQuery).then((result)=>{
+    return pgClient.query(singleRowQuery).then((result:pg.QueryResult<joinedType>)=>{
         console.log(result.rowCount)
+        return result
     }).catch(err=>{
         console.log(err)
+        return null
     })
+}
+
+function generateQueryStringForSingleRow(singleRowTableList:Array<string>, constraint:string):string{
+    let queryFieldList : Array<string> = []
+    let whereClauseList : Array<string> = []
+
+    singleRowTableList.forEach((value)=>{
+        queryFieldList.push(`salesforce.${value}`)
+        whereClauseList.push(`${value}.${constraint}=\$1`)
+    })
+
+    let queryString = `SELECT * FROM ${queryFieldList.join(',')} WHERE ${whereClauseList.join(' AND ')}`
+    console.log(queryString)
+
+    return queryString;
 }
