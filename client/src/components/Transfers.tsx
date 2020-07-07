@@ -2,13 +2,36 @@ import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
+import AutoSuggest from 'react-autosuggest';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
+import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers';
+
+const custodians: string[] = [
+    "Company1",
+    "Company2",
+    "Big Corp",
+    "Happy Toy Company",
+    'ccc',
+    'cccc',
+    'cccccc',
+    'cccccccc',
+    'cccccccccccc',
+    'cccccccccccccc',
+    'ccccccccccccccc',
+    'cccccccccccccccccccccc',
+    'cheese',
+    'chuck',
+    'check e cheese',
+    'check',
+    'checkmate'
+  ];
+
+  const lowerCasedCustodians = custodians.map(custodian => custodian.toLowerCase());
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {control, handleSubmit, errors, setValue, formState} = useForm({
+    const {control, handleSubmit, errors, formState} = useForm({
         mode: 'onChange'
     });
 
@@ -16,6 +39,9 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         account_type: 'Traditional IRA',
         existing_transfers: 0
     })
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [value, setValue] = useState('');
+
     useEffect(()=>{
         if(sessionId !== '')
         {
@@ -78,6 +104,10 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         }
         return className;
     };
+
+    const getSuggestions = (value: string) => {
+        return lowerCasedCustodians.filter(custodian => custodian.startsWith(value.trim().toLowerCase()));
+    }
 
     const displayTransferForm = (transferCount: number) => {
         if (transferCount > 0) {
@@ -438,6 +468,31 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 Add Transfer
                             </IonButton>
                         )}
+                    </IonCol>
+                    <IonCol>
+                        <IonItem>
+                            <AutoSuggest
+                                suggestions={suggestions}
+                                onSuggestionsClearRequested={() => setSuggestions([])}
+                                onSuggestionsFetchRequested={({ value }) => {
+                                setValue(value);
+                                setSuggestions(getSuggestions(value));
+                                }}
+                                onSuggestionSelected={(_, { suggestionValue }) =>
+                                console.log("Selected: " + suggestionValue)
+                                }
+                                getSuggestionValue={suggestion => suggestion}
+                                renderSuggestion={suggestion => <span>{suggestion}</span>}
+                                inputProps={{
+                                value: value,
+                                onChange: (_, { newValue, method }) => {
+                                    setValue(newValue);
+                                }
+                                }}
+                                highlightFirstSuggestion={true}
+                            />
+
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 
