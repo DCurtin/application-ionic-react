@@ -8,10 +8,10 @@ import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {register,control, handleSubmit, errors, setValue, getValues, formState} = useForm({
+    const {control, handleSubmit, errors, setValue, formState} = useForm({
         mode: 'onChange'
     });
-    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
+
     const [formData, setFormData] = useState<FormData>({
         account_type: 'Traditional IRA',
         existing_transfers: 0
@@ -31,19 +31,10 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
             })
         }
     },[sessionId])
-
-    useEffect(() => {
-        if (isAfterGettingData) {
-            for (var fieldName in formData) {
-                setValue(fieldName, formData[fieldName]);
-            }
-        }
-    }, [isAfterGettingData])
     
     function ImportForm(data : any){
         let importedForm : FormData = data
         setFormData(importedForm);
-        setIsAfterGettingData(true);
     }
 
     useEffect(()=>{
@@ -111,7 +102,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                    Account Number 
                                 </IonLabel>
                                 <IonItem className={showError(`account_number__${i}`)}>
-                                    <Controller name={`account_number__${i}`} control={control} as={
+                                    <Controller name={`account_number__${i}`} control={control} defaultValue={formData[`account_number__${i}`]} as={
                                         <IonInput value={formData[`account_number__${i}`]} name={`account_number__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -124,7 +115,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Institution Name
                                 </IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
-                                    <Controller name={`institution_name__${i}`} control={control} as={
+                                    <Controller name={`institution_name__${i}`} defaultValue={formData[`institution_name__${i}`]} control={control} as={
                                         <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -139,7 +130,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Contact Name
                                 </IonLabel>
                                 <IonItem className={showError(`contact_name__${i}`)}>
-                                    <Controller name={`contact_name__${i}`} control={control} as={
+                                    <Controller name={`contact_name__${i}`} control={control} defaultValue={formData[`contact_name__${i}`]} as={
                                         <IonInput value={formData[`contact_name__${i}`]} name={`contact_name__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -152,7 +143,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 Contact Phone Number
                                 </IonLabel>
                                 <IonItem className={showError(`contact_phone_number__${i}`)}>
-                                    <Controller name={`contact_phone_number__${i}`} control={control} as={
+                                    <Controller name={`contact_phone_number__${i}`} control={control} defaultValue={formData[`contact_phone_number__${i}`]}  as={
                                         <IonInput type='tel' value={formData[`contact_phone_number__${i}`]} name={`contact_phone_number__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -165,7 +156,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel>Street</IonLabel>
                                 <IonItem className={showError(`mailing_street__${i}`)}>
-                                    <Controller name={`mailing_street__${i}`} control={control} as={
+                                    <Controller name={`mailing_street__${i}`} control={control} defaultValue={formData[`mailing_street__${i}`]} as={
                                         <IonInput value={formData[`mailing_street__${i}`]} name={`mailing_street__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -176,7 +167,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> City</IonLabel>
                                 <IonItem className={showError(`mailing_city__${i}`)}>
-                                    <Controller name={`mailing_city__${i}`} control={control} as={
+                                    <Controller name={`mailing_city__${i}`} control={control} defaultValue={formData[`mailing_city__${i}`]} as={
                                         <IonInput value={formData[`mailing_city__${i}`]} name={`mailing_city__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -189,7 +180,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> State </IonLabel>
                                 <IonItem className={showError(`mailing_state__${i}`)}>
-                                    <Controller name={`mailing_state__${i}`} control={control} as={
+                                    <Controller name={`mailing_state__${i}`} control={control} defaultValue={formData[`mailing_state__${i}`]} as={
                                         <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} interfaceOptions={{cssClass: 'states-select'}}>
                                         {states.map((state, index) => (<IonSelectOption key={index} value={state}>{state}</IonSelectOption>))}
                                         </IonSelect>
@@ -204,7 +195,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Zip
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_zip__${i}`)}>
-                                    <Controller name={`mailing_zip__${i}`} control={control} as={
+                                    <Controller name={`mailing_zip__${i}`} defaultValue={formData[`mailing_zip__${i}`]} control={control} as={
                                         <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -219,7 +210,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Transfer Type 
                                 </IonLabel>
                                 <IonItem className={showError(`transfer_type__${i}`)}>
-                                    <Controller name={`transfer_type__${i}`} control={control} as={
+                                    <Controller defaultValue={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`} control={control} as={
                                         <IonSelect interface='action-sheet' value={formData[`transfer_type__${i}`]} name={`transfer_type__${i}`}>
                                             <IonSelectOption value='Cash Transfer'>Cash (Most Common)</IonSelectOption>
                                             <IonSelectOption value='In-Kind Transfer'> In-Kind (Private Holding)</IonSelectOption>
@@ -234,7 +225,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Account Type</IonLabel>
                                     <IonItem className={showError(`account_type__${i}`)}>
-                                        <Controller name={`account_type__${i}`} control={control} as={
+                                        <Controller name={`account_type__${i}`} control={control} defaultValue={formData[`account_type__${i}`]} as={
                                             <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`}>
                                                 {formData.account_type.includes('Roth') ? (
                                                     <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
@@ -259,7 +250,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                         Holding Name
                                     </IonLabel>
                                     <IonItem className={showError(`asset_name_1__${i}`)}>
-                                        <Controller name={`asset_name_1__${i}`} control={control} as={
+                                        <Controller name={`asset_name_1__${i}`} defaultValue={formData[`asset_name_1__${i}`]} control={control} as={
                                             <IonInput name={`asset_name_1__${i}`} value={formData[`asset_name_1__${i}`]}/>
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                             updateForm(selected);
@@ -275,7 +266,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel> Account Type</IonLabel>
                                         <IonItem className={showError(`account_type__${i}`)}>
-                                            <Controller name={`account_type__${i}`} control={control} as={
+                                            <Controller name={`account_type__${i}`} control={control} defaultValue={formData[`account_type__${i}`]} as={
                                                 <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`}>
                                                     {formData.account_type.includes('Roth') ? (
                                                         <IonSelectOption value='Roth IRA'>Roth IRA</IonSelectOption>
@@ -298,7 +289,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             Holding 2 Name (if applicable)
                                         </IonLabel>
                                         <IonItem className={showError(`asset_name_2__${i}`)}>
-                                            <Controller name={`asset_name_2__${i}`} control={control} as={
+                                            <Controller name={`asset_name_2__${i}`} defaultValue={formData[`asset_name_2__${i}`]} control={control} as={
                                                 <IonInput value={formData[`asset_name_2__${i}`]} name={`asset_name_2__${i}`}/>
                                             } onChangeName="onIonChange" onChange={([selected]) => {
                                                 updateForm(selected);
@@ -313,7 +304,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             Complete or Partial Transfer *
                                         </IonLabel>
                                         <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
-                                            <Controller name={`full_or_partial_cash_transfer__${i}`} control={control} as={
+                                            <Controller name={`full_or_partial_cash_transfer__${i}`} control={control} defaultValue={formData[`full_or_partial_cash_transfer__${i}`]} as={
                                                 <IonSelect interface='action-sheet' value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`}>
                                                     <IonSelectOption value='All Available Cash'> Complete </IonSelectOption>
                                                     <IonSelectOption value=''>Partial</IonSelectOption>
@@ -329,7 +320,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             Holding 3 Name (if applicable)
                                         </IonLabel>
                                         <IonItem className={showError(`asset_name_3__${i}`)}>
-                                            <Controller name={`asset_name_3__${i}`} control={control} as={
+                                            <Controller name={`asset_name_3__${i}`} defaultValue={formData[`asset_name_3__${i}`]} control={control} as={
                                                 <IonInput name={`asset_name_3__${i}`} value={formData[`asset_name_3__${i}`]}/>
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                             updateForm(selected);
@@ -347,7 +338,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                         <IonLabel> Transfer Amount * </IonLabel>
                                         <IonItem className={showError(`full_or_partial_cash_transfer__${i}`)}>
-                                            <Controller name={`full_or_partial_cash_transfer__${i}`} control={control} as={
+                                            <Controller name={`full_or_partial_cash_transfer__${i}`} defaultValue={formData[`full_or_partial_cash_transfer__${i}`]} control={control} as={
                                                 <IonSelect value={formData[`full_or_partial_cash_transfer__${i}`]} name={`full_or_partial_cash_transfer__${i}`} interface="action-sheet">
                                                     <IonSelectOption value='All Available Cash'>All Available Cash</IonSelectOption>
                                                     <IonSelectOption value='Partial Cash Transfer'>Partial Cash Transfer</IonSelectOption>
@@ -362,7 +353,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                             <IonLabel>Cash Amount</IonLabel>
                                             <IonItem className={showError(`cash_amount__${i}`)}>
-                                                <Controller name={`cash_amount__${i}`} control={control} as={
+                                                <Controller name={`cash_amount__${i}`} control={control} defaultValue={formData[`cash_amount__${i}`]} as={
                                                     <IonInput value={formData[`cash_amount__${i}`]} name={`cash_amount__${i}`}/>
                                                 } onChangeName="onIonChange" onChange={([selected]) => {
                                                     updateForm(selected);
@@ -381,7 +372,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 </IonLabel>
                                 <div className="ion-text-wrap">
                                     <IonList className={showError(`delivery_method__${i}`)}>
-                                        <Controller name={`delivery_method__${i}`} control={control} as={
+                                        <Controller defaultValue={formData[`delivery_method__${i}`]} name={`delivery_method__${i}`} control={control} as={
                                             <IonRadioGroup name={`delivery_method__${i}`} value={formData[`delivery_method__${i}`]}>
                                                 <IonItem>
                                                     <IonLabel>Mail (No charge)</IonLabel>

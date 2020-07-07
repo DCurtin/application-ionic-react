@@ -8,7 +8,7 @@ import {saveRolloverPage, getRolloverPage} from '../helpers/CalloutHelpers'
 
 const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef, setShowSpinner}) => {
     const history = useHistory();
-    const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
+    const {control, handleSubmit, errors, formState} = useForm({
         mode: 'onChange'
     });
 
@@ -17,7 +17,6 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
         existing_employer_plan_roll_overs: 0
     });
 
-    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -35,17 +34,8 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
         }
     },[sessionId])
 
-    useEffect(() => {
-        if (isAfterGettingData) {
-            for (var fieldName in formData) {
-                setValue(fieldName, formData[fieldName]);
-            }
-        }
-    }, [isAfterGettingData])
-
     function ImportForm(data : any){
         setFormData(data);
-        setIsAfterGettingData(true);
     }
     
     useEffect(()=>{
@@ -113,7 +103,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Institution Name</IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
-                                    <Controller name={`institution_name__${i}`} control={control} as={ 
+                                    <Controller name={`institution_name__${i}`} defaultValue={formData[`institution_name__${i}`]}  control={control} as={ 
                                         <IonInput name={`institution_name__${i}`} value={formData[`institution_name__${i}`]} placeholder='Institution Name'/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -124,7 +114,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Cash Amount (approximate value allowed)</IonLabel>
                                 <IonItem className={showError(`cash_amount__${i}`)}>
-                                    <Controller name={`cash_amount__${i}`} control={control} as={
+                                    <Controller name={`cash_amount__${i}`} defaultValue={formData[`cash_amount__${i}`]} control={control} as={
                                         <IonInput name={`cash_amount__${i}`} value={formData[`cash_amount__${i}`]}type='number'/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -139,7 +129,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Contact Name
                                 </IonLabel>
                                 <IonItem className={showError(`name__${i}`)}>
-                                    <Controller name={`name__${i}`} control={control} as={
+                                    <Controller name={`name__${i}`} control={control} defaultValue={formData[`name__${i}`]} as={
                                         <IonInput name={`name__${i}`} value={formData[`name__${i}`]}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                 updateForm(selected);
@@ -152,7 +142,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Contact Phone Number
                                 </IonLabel>
                                 <IonItem className={showError(`phone__${i}`)}>
-                                    <Controller name={`phone__${i}`} control={control} as={
+                                    <Controller name={`phone__${i}`} control={control} defaultValue={formData[`phone__${i}`]} as={
                                         <IonInput type='tel' name={`phone__${i}`} value={formData[`phone__${i}`]} />
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -167,7 +157,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Street
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_street__${i}`)}>
-                                    <Controller name={`mailing_street__${i}`} control={control} as={
+                                    <Controller name={`mailing_street__${i}`} control={control} defaultValue={formData[`mailing_street__${i}`]} as={
                                         <IonInput name={`mailing_street__${i}`} value={formData[`mailing_street__${i}`]} />
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -180,7 +170,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     City
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_city__${i}`)}>
-                                    <Controller name={`mailing_city__${i}`} control={control} as={
+                                    <Controller name={`mailing_city__${i}`} control={control} defaultValue={formData[`mailing_city__${i}`]} as={
                                         <IonInput name={`mailing_city__${i}`} value={formData[`mailing_city__${i}`]} />
                                     }onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -195,7 +185,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     State
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_state__${i}`)}>
-                                    <Controller name={`mailing_state__${i}`} control={control} as={
+                                    <Controller name={`mailing_state__${i}`} control={control} defaultValue={formData[`mailing_state__${i}`]} as={
                                         <IonSelect interface='action-sheet' value={formData[`mailing_state__${i}`]} name={`mailing_state__${i}`} interfaceOptions={{cssClass: 'states-select'}}>
                                             {states.map((state,index) => (
                                                 <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
@@ -212,7 +202,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Zip
                                 </IonLabel>
                                 <IonItem className={showError(`mailing_zip__${i}`)}>
-                                    <Controller name={`mailing_zip__${i}`} control={control} as={ 
+                                    <Controller name={`mailing_zip__${i}`} defaultValue={formData[`mailing_zip__${i}`]}  control={control} as={ 
                                         <IonInput value={formData[`mailing_zip__${i}`]} name={`mailing_zip__${i}`}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -227,7 +217,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Account Type
                                 </IonLabel>
                                 <IonItem className={showError(`account_type__${i}`)}>
-                                    <Controller name={`account_type__${i}`} control={control} as={
+                                    <Controller name={`account_type__${i}`} control={control} defaultValue={formData[`account_type__${i}`]}  as={
                                         <IonSelect interface='action-sheet' value={formData[`account_type__${i}`]} name={`account_type__${i}`} interfaceOptions={{cssClass: 'states-select'}}>
                                             {formData.account_type.includes('Roth') ? (
                                                 <React.Fragment>
@@ -263,7 +253,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                             <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                 <IonLabel> Account Number</IonLabel>
                                 <IonItem className={showError(`account_number__${i}`)}>
-                                    <Controller name={`account_number__${i}`} control={control} as={
+                                    <Controller name={`account_number__${i}`} control={control} defaultValue={formData[`account_number__${i}`]} as={
                                         <IonInput name={`account_number__${i}`} value={formData[`account_number__${i}`]}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -278,7 +268,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
                                     Rollover Type
                                 </IonLabel>
                                 <IonItem className={showError(`rollover_type__${i}`)}>
-                                    <Controller name={`rollover_type__${i}`} control={control} as={
+                                    <Controller name={`rollover_type__${i}`} control={control} defaultValue={formData[`rollover_type__${i}`]} as={
                                         <IonSelect interface='action-sheet' value={formData[`rollover_type__${i}`]} name={`rollover_type__${i}`}>
                                             <IonSelectOption value='Direct Rollover'>Direct Rollover</IonSelectOption>
                                             <IonSelectOption value='Indirect Rollover'>

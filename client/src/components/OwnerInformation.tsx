@@ -80,7 +80,6 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
         const validateFields = () => {
             saveAppPage(sessionId, formData).then(()=>{
-                //could do error handling here
                 updateMenuSections('is_owner_info_page_valid', true);
             })
             setShowErrorToast(false);
@@ -126,7 +125,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                                 } onChangeName="onIonChange" onChange={([selected]) => {
                                     updateForm(selected);
                                     return selected.detail.value;
-                                  }} rules={{required: true}} />
+                                  }} rules={{required: true}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="4" sizeMd="4" sizeSm="12" sizeXs="12">

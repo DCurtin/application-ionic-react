@@ -220,8 +220,8 @@ export const showErrorToast = (errors: any, setShowErrorToast: Function) => {
     }
 }
 
-export function reValidateOnUnmmount(errors: any, updateMenuSections: Function) {
+export function reValidateOnUnmmount(errors: any, updateMenuSections: Function, pageName: string) {
     if (Object.keys(errors).length > 0) {
-        updateMenuSections('is_beneficiaries_page_valid', false);
+        updateMenuSections(pageName, false);
     }
 }
