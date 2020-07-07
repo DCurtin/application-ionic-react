@@ -6,6 +6,7 @@ import {transformBeneClientToServer} from './server/utils/transformBeneficiaries
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import {transformRolloverClientToServer} from './server/utils/transformRollovers'
 import {resumeApplication} from './server/utils/retrieveFromSalesforce'
+import {generateOnlineAppJsonFromSingleRowTables} from './server/utils/saveToSalesforce'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
@@ -144,6 +145,15 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
       }).catch()
     })
   })
+})
+
+app.post('/getJoinedTable', (req, res) =>{
+  let sessionId : string = req.body.sessionId;
+  console.log(sessionId);
+  generateOnlineAppJsonFromSingleRowTables(sessionId, client).then((result=>{
+    console.log(result)
+    res.send(result);
+  }));
 })
 
 app.post('/getESignUrl', (req, res) => {
@@ -286,11 +296,11 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   let welcomePageData : applicationInterfaces.saveWelcomeParameters = req.body;
   let sessionId : string = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
-
+  console.log(req.body)
   if(sessionId !== ''){
     console.log('application has already been started');
     console.log(sessionId);
-    res.status(500).send('SessionId not set');
+    res.status(500).send('SessionId set');
     return;
   }
   
