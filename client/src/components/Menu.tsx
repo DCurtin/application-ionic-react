@@ -85,7 +85,7 @@ function getLink( url:string, appPagesInOrder:Array<AppPage>){
   if (currentPageIndex >= 0 && !appPagesArr[currentPageIndex].isValid){
     let lastValidPageIndex = appPagesArr.reverse().findIndex(appPage => appPage.isValid);
 
-    if (lastValidPageIndex == -1) {
+    if (lastValidPageIndex === -1) {
       url = appPagesInOrder[0].url;  
     } else {
       url = appPagesInOrder[appPagesInOrder.length-lastValidPageIndex].url;

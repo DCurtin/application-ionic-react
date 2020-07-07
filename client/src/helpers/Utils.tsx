@@ -3,7 +3,9 @@ export interface SessionApp {
     setSessionId : Function, 
     updateMenuSections:Function,
     formRef: any, 
-    setShowErrorToast: Function
+    setShowErrorToast: Function,
+    setErrorMessage: Function,
+    setShowSpinner: Function
 }
 
 export interface welcomePageParameters {
@@ -210,3 +212,16 @@ export interface initialInvestmentConditionalParameters{
 export const states = [ 'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA',  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY' ];
 
 export const initialInvestmentTypes = ['I\'m Not Sure', 'Futures/Forex', 'Closely-Held LLC', 'Private Placement', 'Promissory Note (Unsecured)', 'Promissory Note (Secured by Real Estate)', 'Promissory Note (Secured by Other)', 'Precious Metals', 'Real Estate', 'Other'];
+
+export const showErrorToast = (errors: any, setShowErrorToast: Function) => {
+    let errorsArr = Object.keys(errors);
+    if (errorsArr.length > 0) {
+        setShowErrorToast(true);
+    }
+}
+
+export function reValidateOnUnmmount(errors: any, updateMenuSections: Function, pageName: string) {
+    if (Object.keys(errors).length > 0) {
+        updateMenuSections(pageName, false);
+    }
+}

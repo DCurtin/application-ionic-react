@@ -1,26 +1,24 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters} from '../helpers/Utils';
+import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import {useForm} from 'react-hook-form';
-import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers'
+import {useForm, Controller} from 'react-hook-form';
+import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers';
 
 const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur'
+    const {control, handleSubmit, errors, setValue, formState}  = useForm({
+        mode: 'onChange'
     });
-    let watchAllFields = watch();
 
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
 
     const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({
-        initial_investment_type : 'Futures/Forex',
-        min_cash_balance_checkbox: false
+        initial_investment_type : 'Futures/Forex'
     });
-    const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
+    const [isAfterGettingData, setIsAfterGettingData] = useState(false);
 
+    const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -40,7 +38,8 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
         let conditionalParameters : initialInvestmentConditionalParameters = data.parameters;
         let formData : initialInvestmentForm = data.formData;
         setFormData(formData);
-        setconditionalParameters(conditionalParameters)
+        setconditionalParameters(conditionalParameters);
+        setIsAfterGettingData(true);
     }
 
     useEffect(()=>{
@@ -48,6 +47,15 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
         saveInitialInvestmentPage(sessionId, formData);
       })
     },[formData])
+
+    useEffect(() => {
+        if (isAfterGettingData) {
+            let data : any = {...formData};
+            for (var fieldName in data) {
+                setValue(fieldName, data[fieldName]);
+            }
+        }
+    }, [isAfterGettingData])
 
     const updateForm = (e:any) => {
         let newValue = e.target.value;
@@ -111,33 +119,28 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
     }
 
     const validateFields = (e: any) => {
+        if (showNotEnoughProjectedCashWarning(formData.investment_amount, conditionalParameters)) {
+            setShowErrorToast(true); 
+            return;
+        }
         saveInitialInvestmentPage(sessionId, formData);
         updateMenuSections('is_investment_details_page_valid', true);
         setShowErrorToast(false);
     }
 
     useEffect(() => {
-        showErrorToast();
-        console.log(errors)
+        showErrorToast(errors, setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_investment_details_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)) {
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
-
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
-
-    
 
     return (
         <IonContent className='ion-padding'>
@@ -161,17 +164,27 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
                             What type of asset?
                         </IonLabel>
                         <IonItem className={showError('initial_investment_type')}>
-                            <IonSelect value={formData.initial_investment_type} name='initial_investment_type' onIonChange={updateForm} ref={register({required: true})}>
-                                {investmentTypesArr.map((investmentType, index) => (
-                                    <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
-                                ))}
-                            </IonSelect>
+                            <Controller name='initial_investment_type' control={control} as={
+                                <IonSelect value={formData.initial_investment_type} name='initial_investment_type' interface='action-sheet'>
+                                    {investmentTypesArr.map((investmentType, index) => (
+                                        <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
+                                    ))}
+                                </IonSelect>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value;
+                              }} rules={{required:true}}/>
                         </IonItem>
                     </IonCol>
                     <IonCol>
                             <IonLabel>{displayEntityNameLabel(formData.initial_investment_type)}</IonLabel>
                             <IonItem className={showError('initial_investment_name')}>
-                                <IonInput name='initial_investment_name' value={formData.initial_investment_name} onIonInput={updateForm} ref={register({required: true})}/>
+                                <Controller name='initial_investment_name' control={control} as={
+                                    <IonInput name='initial_investment_name' value={formData.initial_investment_name}/>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                     </IonCol>
                 </IonRow>
@@ -181,7 +194,12 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
                             Contact Person
                         </IonLabel>
                         <IonItem className={showError('investment_contact_person')}>
-                            <IonInput name='investment_contact_person' value={formData.investment_contact_person} onIonInput={updateForm} ref={register({required: true})}/>
+                            <Controller name='investment_contact_person' control={control} as={
+                                <IonInput name='investment_contact_person' value={formData.investment_contact_person}/>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value;
+                              }} rules={{required:true}} />
                         </IonItem>
                     </IonCol>
                     <IonCol>
@@ -189,7 +207,12 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
                             Contact Phone
                         </IonLabel>
                         <IonItem className={showError('investment_contact_person_phone')}>
-                            <IonInput type='number' name='investment_contact_person_phone' value={formData.investment_contact_person_phone} onIonInput={updateForm} placeholder='(555)555-5555'  ref={register({required: true})}/>
+                            <Controller name='investment_contact_person_phone' control={control} as={
+                                <IonInput type='number' name='investment_contact_person_phone' value={formData.investment_contact_person_phone} placeholder='(555)555-5555' />
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.value;
+                              }} rules={{required:true}} />
                         </IonItem>
                     </IonCol>
                 </IonRow>
@@ -197,14 +220,27 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
                     <IonCol size='6'>
                         <IonLabel>Investment Amount</IonLabel>
                         <IonItem className={showError('investment_amount')}>
-                            <IonInput type='number' value={formData.investment_amount} name='investment_amount' onIonInput={updateForm} ref={register({required: true})}/>
+                            <Controller name='investment_amount' control={control} as={
+                                <IonInput type='number' value={formData.investment_amount} name='investment_amount'/>
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} />
                         </IonItem>
                     </IonCol>
                 </IonRow>
                 {showMinCashBalanceCheckbox(formData) && (
                     <IonRow>
                         <IonCol>
-                                <IonCheckbox onIonChange={updateForm} className={showError('min_cash_balance_checkbox')} name='min_cash_balance_checkbox' ref={register({required: true})}></IonCheckbox> &nbsp; 
+                            <Controller name='hasReadMinCashBal' control={control} as={
+                                <IonCheckbox onIonChange={updateForm} className={showError('hasReadMinCashBal')} name='hasReadMinCashBal'></IonCheckbox> 
+                            } onChangeName="onIonChange" onChange={([selected]) => {
+                                updateForm(selected);
+                                return selected.detail.checked;
+                              }} rules={{required:true, validate: (value) => {
+                                  return (value === true);
+                              } }}/>
+                                &nbsp; 
                             <IonText className='ion-padding-left'>
                                 Midland has a minimum cash balance requirement of $250 which cannot be included in the investment amount. *   
                             </IonText>

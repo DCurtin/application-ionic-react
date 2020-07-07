@@ -26,6 +26,7 @@ form ion-item {
 .android-fit-content {
     height: fit-content(130%);
     font-size: 88%;
+    overflow-y: scroll;
 }
 
 
@@ -36,7 +37,7 @@ ion-select {
 
 .well {
     min-height: 20px;
-    padding: 19px;
+    padding: 10px;
     margin-bottom: 20px;
     background-color: #f5f5f5;
     border: 1px solid #e3e3e3;

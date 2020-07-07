@@ -1,15 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {useForm} from 'react-hook-form';
-import { SessionApp, states, accountNotificationsForm } from '../helpers/Utils';
+import {useForm, Controller} from 'react-hook-form';
+import { SessionApp, states, accountNotificationsForm, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers'
+import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers';
+
 const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterly', 'Mailed Annually']
 
-const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, updateMenuSections, formRef, setShowErrorToast}) => {
+const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {register, handleSubmit, watch, errors} = useForm(); 
-    let watchAllFields = watch();
+    const {control, handleSubmit, errors, setValue, getValues, formState} = useForm({
+        mode: 'onChange'
+    }); 
+
     const [formData, setFormData] = useState<accountNotificationsForm>({
         statement_option: '', 
         include_interested_party: false,
@@ -30,12 +33,15 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
     useEffect(()=>{
         if(sessionId !== '')
         {
+            setShowSpinner(true);
             getAccountNotificationsPage(sessionId).then(data =>{
                 if(data === undefined)
                 {
+                    setShowSpinner(false);
                     return;
                 }
                 ImportForm(data);
+                setShowSpinner(false);
             })
         }
     },[sessionId])
@@ -44,6 +50,9 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
     function ImportForm(data : any){
         let importedForm : accountNotificationsForm = data
         setFormData(importedForm);
+        for (var fieldName in data) {
+            setValue(fieldName, data[fieldName])
+        }
     }
 
     useEffect(()=>{
@@ -55,35 +64,29 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
     const updateForm = (e:any) => {
         setFormData(prevState => {
             let newValue = e.target.value;
+            console.log(e.target.value);
             return {...prevState, [e.target.name]: newValue}
         });
     }
 
     const validateFields = (data: any, e: any) => {
+        saveAccountNotificationsPage(sessionId, formData);
         updateMenuSections('is_account_notifications_page_valid', true);
         setShowErrorToast(false);
     }
 
     const showError = (fieldName: string) => {
         let errorsArr = (Object.keys(errors));
-        console.log(errors);
-        let className = errorsArr.includes(fieldName) ? 'danger' : '';
-        console.log(watchAllFields);
-        if (watchAllFields[fieldName] && !errorsArr.includes(fieldName)){
-            className = '';
+        let className = '';
+        if ((formState.submitCount > 0) && errorsArr.includes(fieldName)) {
+            className = 'danger';
         }
         return className;
     };
 
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            setShowErrorToast(true);
-        }
-    }
-
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_account_notifications_page_valid');
     }, [errors])
   
 
@@ -114,13 +117,18 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 Paper Statement Options
                             </IonLabel>
                             <IonItem className={showError('ira_statement_option')}>
-                                <IonSelect name='ira_statement_option' value={formData.ira_statement_option} onIonChange={updateForm} interface='action-sheet' ref={register({required: true})}>
-                                    {paperStatementOptions.map((statementOption, index) => (
-                                        <IonSelectOption key={index} value={statementOption}>
-                                            {statementOption == 'e-Statement' ? 'No Paper Statement' : statementOption}
-                                        </IonSelectOption>
-                                    ))}
-                                </IonSelect>
+                                <Controller name='ira_statement_option' control={control} as={
+                                    <IonSelect name='ira_statement_option' value={formData.ira_statement_option} interface='action-sheet'>
+                                        {paperStatementOptions.map((statementOption, index) => (
+                                            <IonSelectOption key={index} value={statementOption}>
+                                                {statementOption == 'e-Statement' ? 'No Paper Statement' : statementOption}
+                                            </IonSelectOption>
+                                        ))}
+                                    </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -142,12 +150,18 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                             Do you want to provide someone else access to your account? *
                             </IonLabel>
                             <IonItem className={showError('include_interested_party')}>
-                                <IonSelect value={formData.include_interested_party} name='include_interested_party' onIonChange={updateForm} interface='action-sheet' ref={register({required: false})}>
-                                    <IonSelectOption value={false}>No</IonSelectOption>
-                                    <IonSelectOption value={true}>
-                                        Yes
-                                    </IonSelectOption>
-                                </IonSelect>
+                                <Controller name='include_interested_party' control={control} as={
+                                    <IonSelect value={formData.include_interested_party} name='include_interested_party' interface='action-sheet'>
+                                        <IonSelectOption value={false}>No</IonSelectOption>
+                                        <IonSelectOption value={true}>
+                                            Yes
+                                        </IonSelectOption>
+                                    </IonSelect>
+                                } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    console.log(selected.detail);
+                                    return selected.detail.value;
+                                  }}/>
                             </IonItem>
                         </IonCol>
                     </IonRow>
@@ -160,7 +174,12 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         First Name
                                     </IonLabel>
                                     <IonItem className={showError('first_name')}>
-                                        <IonInput value={formData.first_name} name='first_name' onIonInput={updateForm} ref={register({required: true})}/>
+                                        <Controller name='first_name' control={control} as={
+                                        <IonInput value={formData.first_name} name='first_name'/>
+                                    } onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                      }} rules={{required:true}} defaultValue={formData.first_name}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -168,7 +187,12 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         Last Name
                                     </IonLabel>
                                     <IonItem className={showError('last_name')}>
-                                        <IonInput value={formData.last_name} name='last_name' onIonInput={updateForm} ref={register({required: true})}/>
+                                        <Controller name='last_name' control={control} as={
+                                            <IonInput value={formData.last_name} name='last_name'/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                    updateForm(selected);
+                                    return selected.detail.value;
+                                  }} rules={{required:true}} defaultValue={formData.last_name}/>
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
@@ -178,13 +202,26 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         Email
                                     </IonLabel>
                                     <IonItem className={showError('email')}>
-                                        <IonInput value={formData.email} name='email' onIonInput={updateForm} ref={register({required: true, pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/})}/>
+                                        <Controller name='email' control={control} defaultValue={formData.email} as={
+                                            <IonInput value={formData.email} name='email'/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required: true, pattern: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/}}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Phone</IonLabel>
                                     <IonItem className={showError('phone')}>
-                                        <IonInput value={formData.phone} type='number' name='phone' onIonInput={updateForm} ref={register({required: true,pattern:/^[0-9]{10}$/})}/>
+                                        <Controller name='phone' control={control} defaultValue={formData.phone} as={
+                                            <IonInput value={formData.phone} type='tel' name='phone'/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{
+                                            required: true,
+                                            pattern:/^[0-9]{10}$/
+                                        }}/>
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
@@ -192,7 +229,12 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Street</IonLabel>
                                     <IonItem className={showError('mailing_street')}>
-                                        <IonInput value={formData.mailing_street} name='mailing_street' onIonInput={updateForm} ref={register({required: true})}/>
+                                        <Controller name='mailing_street' control={control} as={
+                                            <IonInput value={formData.mailing_street} name='mailing_street'/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required:true}}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -200,7 +242,12 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         City
                                     </IonLabel>
                                     <IonItem className={showError('mailing_city')}>
-                                        <IonInput value={formData.mailing_city} name='mailing_city' onIonInput={updateForm} ref={register({required: true})}/>
+                                        <Controller name='mailing_city' control={control} as={
+                                            <IonInput value={formData.mailing_city} name='mailing_city' />
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required:true}} />
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
@@ -210,18 +257,28 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         State
                                     </IonLabel>
                                     <IonItem className={showError('mailing_state')}>
-                                        <IonSelect value={formData.mailing_state} name='mailing_state' onIonChange={updateForm} interface='action-sheet' ref={register({required: true})} interfaceOptions={{cssClass: 'states-select'}}>
-                                            {states.map((state, index) => (
-                                                <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
-                                                )
-                                        )}
-                                        </IonSelect>
+                                        <Controller name='mailing_state' control={control} as={
+                                            <IonSelect value={formData.mailing_state} name='mailing_state' interface='action-sheet'interfaceOptions={{cssClass: 'states-select'}}>
+                                                {states.map((state, index) => (
+                                                    <IonSelectOption value={state} key={index}>{state}</IonSelectOption>
+                                                    )
+                                            )}
+                                            </IonSelect>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required:true}}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel> Zip</IonLabel>
                                     <IonItem className={showError('mailing_zip')}>
-                                        <IonInput value={formData.mailing_zip} type='number' name='mailing_zip' onIonInput={updateForm} ref={register({required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/})}/>
+                                        <Controller name='mailing_zip' control={control} as={
+                                            <IonInput value={formData.mailing_zip} type='number' name='mailing_zip'/>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required: true, pattern:/^[0-9]{5}(?:-[0-9]{4})?$/}} />
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
@@ -231,7 +288,12 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         Company Name
                                     </IonLabel>
                                     <IonItem className={showError('company_name')}>
-                                        <IonInput value={formData.company_name} name='company_name' onIonInput={updateForm}  ref={register({required: true})}/>
+                                        <Controller name='company_name' control={control} as={
+                                            <IonInput value={formData.company_name} name='company_name' />
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required:true}} defaultValue={formData.company_name}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -239,7 +301,12 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         Title
                                     </IonLabel>
                                     <IonItem className={showError('title')}>
-                                        <IonInput value={formData.title} name='title' onIonInput={updateForm}  ref={register({required: true})}/>
+                                        <Controller name='title' control={control} defaultValue={formData.title} as={
+                                            <IonInput value={formData.title} name='title'/>
+                                        }onChangeName="onIonChange" onChange={([selected]) => {
+                                        updateForm(selected);
+                                        return selected.detail.value;
+                                      }} rules={{required:true}} />
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
@@ -247,10 +314,15 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Online Access</IonLabel>
                                     <IonItem className={showError('online_access')}>
-                                        <IonSelect value={formData.online_access} name='online_access' onIonChange={updateForm} interface='action-sheet'  ref={register({required: false})}>
-                                            <IonSelectOption value={true}>Yes</IonSelectOption>
-                                            <IonSelectOption  value={false}>No</IonSelectOption>
-                                        </IonSelect>
+                                        <Controller name='online_access' control={control} as={
+                                             <IonSelect value={formData.online_access} name='online_access' interface='action-sheet'>
+                                             <IonSelectOption value={true}>Yes</IonSelectOption>
+                                             <IonSelectOption  value={false}>No</IonSelectOption>
+                                         </IonSelect>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -258,11 +330,16 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, setSessionId, up
                                         Paper Statement Options
                                     </IonLabel>
                                     <IonItem className={showError('statement_option')}>
-                                        <IonSelect value={formData.statement_option} name='statement_option' onIonChange={updateForm} interface='action-sheet'  ref={register({required: true})}>
-                                            {paperStatementOptions.map((statementOption, index) => (
-                                                <IonSelectOption value={statementOption} key={index}>{statementOption}</IonSelectOption>
-                                            ))}
-                                        </IonSelect>
+                                        <Controller name='statement_option' control={control} as={
+                                            <IonSelect value={formData.statement_option} name='statement_option'  interface='action-sheet'>
+                                                {paperStatementOptions.map((statementOption, index) => (
+                                                    <IonSelectOption value={statementOption} key={index}>{statementOption}</IonSelectOption>
+                                                ))}
+                                            </IonSelect>
+                                        } onChangeName="onIonChange" onChange={([selected]) => {
+                                            updateForm(selected);
+                                            return selected.detail.value;
+                                          }} rules={{required:true}}/>
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
