@@ -94,10 +94,13 @@ export function handleFeeArrangementPage(sessionId:string, res: express.Response
       let investMentType : string = bodyResult.rows[0]?.investment_type
 
       let feeArrangementForm : feeArrangementForm = {...feeArrangementData, initial_investment_type: investMentType};
+      console.log(feeArrangementForm)
       res.json({data:feeArrangementForm});
-    })
+      }).catch(err=>{
+        res.status(500).send('failed getting body data');
+      })
   }).catch(err=>{
-    res.status(500).send('failed getting bene data');
+    res.status(500).send('failed getting fee arangement data');
   })
 }
 
