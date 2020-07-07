@@ -25,9 +25,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
         )
     }
 
-    const {register, handleSubmit, watch, errors} = useForm({
-        mode: 'onBlur'
-    });
+    const {register, handleSubmit, watch, errors} = useForm();
     const watchAllFields = watch(); 
 
     const onSubmit = () => { 
