@@ -54,7 +54,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 }
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
-  //generateOnlineAppJsonFromSingleRowTables(sessionId, client); WIP this is just for testing purposes
+  generateOnlineAppJsonFromSingleRowTables(sessionId, client);
   let beneQuery = {
     text: 'SELECT * FROM salesforce.beneficiary WHERE session_id = $1',
     values: [sessionId]
