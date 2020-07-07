@@ -3,6 +3,7 @@ import * as postgresSchema from './postgresSchema'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
 import {transformTransferServerToClient} from '../utils/transformTransfers'
 import {transformRolloverServerToClient} from '../utils/transformRollovers'
+import {generateOnlineAppJsonFromSingleRowTables} from './saveToSalesforce'
 import express from 'express';
 import pg from 'pg';
 
@@ -53,6 +54,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 }
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
+  generateOnlineAppJsonFromSingleRowTables(sessionId, client);
   let beneQuery = {
     text: 'SELECT * FROM salesforce.beneficiary WHERE session_id = $1',
     values: [sessionId]
@@ -68,6 +70,8 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
 }
 
 export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
+  
+  
   let feeArrangementQuery = {
     text: 'SELECT * FROM salesforce.fee_arrangement WHERE session_id = $1',
     values: [sessionId]
