@@ -9,7 +9,7 @@ import {resumeApplication} from './server/utils/retrieveFromSalesforce'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
-import * as salesforceSchema from './server/utils/salesforce'
+import * as salesforceSchema from './server/utils/postgresSchema'
 import * as validatedPages from './server/utils/validatePages'
 import {createAppSession} from './server/utils/appSessionHandler';
 import jsforce, {Connection as jsfConnection} from 'jsforce'
@@ -332,7 +332,7 @@ app.post('/saveState', function(req : express.Request, res : express.Response){
   }
 
   if(page === 'appId'){
-    saveStateHandlers.saveApplicationIdPage(sessionId, packet.data, res, client, serverConn, userInstances);
+    saveStateHandlers.saveOwnerInformationPage(sessionId, packet.data, res, client, serverConn, userInstances);
     return
   }
 

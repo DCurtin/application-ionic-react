@@ -1,8 +1,9 @@
 import {welcomePageParameters, applicantIdForm, feeArrangementForm, accountNotificationsForm, initialInvestmentConditionalParameters, rollover, transfer, contributionForm} from '../../client/src/helpers/Utils'
-import * as salesforceSchema from './salesforce'
+import * as postgresSchema from './postgresSchema'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
 import {transformTransferServerToClient} from '../utils/transformTransfers'
 import {transformRolloverServerToClient} from '../utils/transformRollovers'
+import {generateOnlineAppJsonFromSingleRowTables} from './saveToSalesforce'
 import express from 'express';
 import pg from 'pg';
 
@@ -16,7 +17,7 @@ export function handleWelcomePageRequest(sessionId: string, res: express.Respons
       //get data from database
       //load into response
       let welcomePage : Partial<welcomePageParameters> = {};
-      let row :salesforceSchema.body = result.rows[0];
+      let row :postgresSchema.body = result.rows[0];
       welcomePage.account_type = row.account_type;
       welcomePage.transfer_form = row.transfer_form;
       welcomePage.rollover_form = row.rollover_form;
@@ -38,7 +39,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
         values : [sessionId]
       }
       client.query(applicantQuery).then( function(applicantResult:pg.QueryResult ){
-        let applicantInfo : salesforceSchema.applicant = applicantResult.rows[0]
+        let applicantInfo : postgresSchema.applicant = applicantResult.rows[0]
         if(applicantInfo === undefined){
           res.json({data:applicantInfo});
           return;
@@ -53,13 +54,14 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 }
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
+  //generateOnlineAppJsonFromSingleRowTables(sessionId, client); WIP this is just for testing purposes
   let beneQuery = {
     text: 'SELECT * FROM salesforce.beneficiary WHERE session_id = $1',
     values: [sessionId]
   }
 
   client.query(beneQuery).then( function( result : pg.QueryResult){
-  let beneficiaryList : Array<salesforceSchema.beneficiary> = result.rows;
+  let beneficiaryList : Array<postgresSchema.beneficiary> = result.rows;
   let returnData = transformBeneficiariesServerToClient(beneficiaryList)
   res.json({data:returnData});
   }).catch(err=>{
@@ -68,6 +70,8 @@ export function handleBeneficiaryPage(sessionId: string, res: express.Response, 
 }
 
 export function handleFeeArrangementPage(sessionId:string, res: express.Response, client: pg.Client){
+  
+  
   let feeArrangementQuery = {
     text: 'SELECT * FROM salesforce.fee_arrangement WHERE session_id = $1',
     values: [sessionId]
@@ -79,21 +83,24 @@ export function handleFeeArrangementPage(sessionId:string, res: express.Response
   }
 
   client.query(feeArrangementQuery).then( function( feeArrangementResult : pg.QueryResult){
-    let feeArrangementData : salesforceSchema.fee_arrangement = feeArrangementResult.rows[0];
+    let feeArrangementData : postgresSchema.fee_arrangement = feeArrangementResult.rows[0];
     if(feeArrangementData === undefined)
     {
-      res.send('no rows');
+      res.status(500).send('no rows')
       return
     }
 
     client.query(bodyQuery).then( function(bodyResult:pg.QueryResult){
-    let investMentType : string = bodyResult.rows[0]?.investment_type
+      let investMentType : string = bodyResult.rows[0]?.investment_type
 
-    let feeArrangementForm : feeArrangementForm = {...feeArrangementData, initial_investment_type: investMentType};
-    res.json({data:feeArrangementForm});
-    })
+      let feeArrangementForm : feeArrangementForm = {...feeArrangementData, initial_investment_type: investMentType};
+      console.log(feeArrangementForm)
+      res.json({data:feeArrangementForm});
+      }).catch(err=>{
+        res.status(500).send('failed getting body data');
+      })
   }).catch(err=>{
-    res.status(500).send('failed getting bene data');
+    res.status(500).send('failed getting fee arangement data');
   })
 }
 
@@ -104,7 +111,7 @@ export function handleAccountNotificationPage(sessionId:string, res: express.Res
   }
 
   client.query(interestedPartyQuery).then(function(result : pg.QueryResult){
-    let interestedPartyInfo : salesforceSchema.interested_party = result.rows[0];
+    let interestedPartyInfo : postgresSchema.interested_party = result.rows[0];
     let accountNotificationsForm : accountNotificationsForm = interestedPartyInfo;
     res.json({data:accountNotificationsForm});
   }).catch(err=>{
@@ -127,7 +134,7 @@ export function handleTransferPage(sessionId:string, res: express.Response, clie
     let accountType = bodyResult.rows[0].account_type
 
     client.query(transferQuery).then(function(result: pg.QueryResult){
-      let transferInfo : Array<salesforceSchema.transfer> = result.rows
+      let transferInfo : Array<postgresSchema.transfer> = result.rows
       let returnData = transformTransferServerToClient(transferInfo, accountType)
       res.json({data:returnData})
     })
@@ -144,7 +151,7 @@ export function handleContributionPage(sessionId: string, res: express.Response,
   }
 
   client.query(contributionQuery).then(function(result: pg.QueryResult){
-    let contributionInfo : salesforceSchema.contribution = result.rows[0];
+    let contributionInfo : postgresSchema.contribution = result.rows[0];
     res.json({data : contributionInfo});
   })
 }
@@ -156,7 +163,7 @@ export function handleRolloverPage(sessionId: string, res: express.Response, cli
   }
 
   client.query(rolloverQuery).then(function(result: pg.QueryResult){
-    let rolloverInfo : Array<salesforceSchema.rollover> = result.rows;
+    let rolloverInfo : Array<postgresSchema.rollover> = result.rows;
     let returnData = transformRolloverServerToClient(rolloverInfo, 'Traditional IRA')
     res.json({data : returnData});
   })
@@ -191,7 +198,7 @@ export function handleInitialInvestmentPage(sessionId: string, res: express.Resp
     client.query(rolloverQuery).then((rolloverResult:pg.QueryResult)=>{
       client.query(transferQuery).then((transferResult:pg.QueryResult)=>{
         client.query(contributionQuery).then((contributionResult:pg.QueryResult)=>{
-          let initialInvestmentInfo : salesforceSchema.initial_investment = result.rows[0];
+          let initialInvestmentInfo : postgresSchema.initial_investment = result.rows[0];
           res.json({data : {formData: initialInvestmentInfo, parameters : gatherInitialInvestmentParameters(rolloverResult, transferResult, contributionResult) }});
         })
       })
