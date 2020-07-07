@@ -54,7 +54,7 @@ export function handleApplicationIdPage(sessionId: string, res: express.Response
 }
 
 export function handleBeneficiaryPage(sessionId: string, res: express.Response, client: pg.Client){
-  generateOnlineAppJsonFromSingleRowTables(sessionId, client);
+  //generateOnlineAppJsonFromSingleRowTables(sessionId, client); WIP this is just for testing purposes
   let beneQuery = {
     text: 'SELECT * FROM salesforce.beneficiary WHERE session_id = $1',
     values: [sessionId]
@@ -86,15 +86,15 @@ export function handleFeeArrangementPage(sessionId:string, res: express.Response
     let feeArrangementData : postgresSchema.fee_arrangement = feeArrangementResult.rows[0];
     if(feeArrangementData === undefined)
     {
-      res.send('no rows');
+      res.status(500).send('no rows')
       return
     }
 
     client.query(bodyQuery).then( function(bodyResult:pg.QueryResult){
-    let investMentType : string = bodyResult.rows[0]?.investment_type
+      let investMentType : string = bodyResult.rows[0]?.investment_type
 
-    let feeArrangementForm : feeArrangementForm = {...feeArrangementData, initial_investment_type: investMentType};
-    res.json({data:feeArrangementForm});
+      let feeArrangementForm : feeArrangementForm = {...feeArrangementData, initial_investment_type: investMentType};
+      res.json({data:feeArrangementForm});
     })
   }).catch(err=>{
     res.status(500).send('failed getting bene data');
