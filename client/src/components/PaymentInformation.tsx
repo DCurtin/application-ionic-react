@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { SessionApp, FormData } from '../helpers/Utils';
 import {useForm} from 'react-hook-form';
-import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonLabel, IonInput, IonLoading } from '@ionic/react';
+import { IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonButton, IonLabel, IonInput, IonLoading, IonItem } from '@ionic/react';
 import {chargeCreditCard} from '../helpers/CalloutHelpers'
 
 const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef}) => {
@@ -58,13 +58,17 @@ const PaymentInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections
                                     <IonLabel>
                                         Credit Card Number
                                     </IonLabel>
-                                    <IonInput class='item-input' name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
+                                    <IonItem>
+                                        <IonInput class='item-input' name='creditCardNumber' value={formData.creditCardNumber} onIonChange={updateForm}></IonInput>
+                                    </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>
                                         Expiration Date
                                     </IonLabel>
-                                    <IonInput class='item-input' name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
+                                    <IonItem>
+                                        <IonInput class='item-input' name='expirationDateString' value={formData.expirationDateString} onIonChange={updateForm} placeholder='10/2025'></IonInput>
+                                    </IonItem>
                                 </IonCol>
                             </IonRow>
                             <IonRow>

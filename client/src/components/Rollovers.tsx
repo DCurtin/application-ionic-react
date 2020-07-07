@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { SessionApp, states, FormData, showErrorToast } from '../helpers/Utils';
+import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonItem } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
@@ -69,11 +69,7 @@ const Rollovers : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateM
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
-        return function onUnmount() {
-            if (Object.keys(errors).length > 0) {
-                updateMenuSections('is_rollover_plan_page_valid', false);
-            }
-        }
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_rollover_plan_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {

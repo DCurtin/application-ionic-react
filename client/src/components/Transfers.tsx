@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { SessionApp, states, FormData, showErrorToast } from '../helpers/Utils';
+import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
@@ -67,11 +67,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
-        return function onUnmount() {
-            if (Object.keys(errors).length > 0) {
-                updateMenuSections('is_transfer_ira_page_valid', false);
-            }
-        }
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_transfer_ira_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters, showErrorToast} from '../helpers/Utils';
+import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {useForm, Controller} from 'react-hook-form';
@@ -130,6 +130,7 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_investment_details_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {

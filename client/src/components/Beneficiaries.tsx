@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'; 
 import {useForm, Controller} from 'react-hook-form';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonLabel, IonInput, IonSelect, IonSelectOption, IonText } from '@ionic/react';
-import {SessionApp, states, FormData, showErrorToast} from '../helpers/Utils';
+import {SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getBenePage, saveBenePage} from '../helpers/CalloutHelpers';
@@ -85,11 +85,7 @@ const Beneficiaries: React.FC<SessionApp> = ({sessionId, updateMenuSections, for
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
 
-        return function onUnmount() {
-            if (Object.keys(errors).length > 0) {
-                updateMenuSections('is_beneficiaries_page_valid', false);
-            }
-        }
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_beneficiaries_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {

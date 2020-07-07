@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, contributionForm, showErrorToast } from '../helpers/Utils';
+import { SessionApp, contributionForm, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonLabel, IonItemDivider, IonText, IonInput, IonSelect, IonSelectOption } from '@ionic/react';
 import moment from 'moment'; 
 import { useHistory } from 'react-router-dom';
@@ -83,11 +83,7 @@ const NewContribution: React.FC<SessionApp> = ({sessionId, formRef, setShowError
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
-        return function onUnmount() {
-            if (Object.keys(errors).length > 0) {
-                updateMenuSections('is_new_contribution_page_valid', false);
-            }
-        }
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_new_contribution_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {

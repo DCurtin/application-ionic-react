@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import { IonContent, IonText, IonGrid, IonRow, IonCol, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput,IonCheckbox, IonRadioGroup, IonRadio,IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { SessionApp, states, applicantIdForm, showErrorToast} from '../helpers/Utils';
+import { SessionApp, states, applicantIdForm, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
 
@@ -58,11 +58,7 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
-        return function onUnmount() {
-            if (Object.keys(errors).length > 0) {
-                updateMenuSections('is_owner_info_page_valid', false);
-            }
-        }
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_owner_info_page_valid');
     }, [errors]);
 
 

@@ -1,10 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import { SessionApp, states, accountNotificationsForm, showErrorToast } from '../helpers/Utils';
+import { SessionApp, states, accountNotificationsForm, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers'
-import { DevTool } from "@hookform/devtools";
+import {getAccountNotificationsPage, saveAccountNotificationsPage} from '../helpers/CalloutHelpers';
 
 const paperStatementOptions = ['e-Statement', 'Mailed Monthly', 'Mailed Quarterly', 'Mailed Annually']
 
@@ -87,6 +86,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_account_notifications_page_valid');
     }, [errors])
   
 
@@ -179,7 +179,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
                                         return selected.detail.value;
-                                      }} rules={{required:true}}/>
+                                      }} rules={{required:true}} defaultValue={formData.first_name}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -192,7 +192,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                     updateForm(selected);
                                     return selected.detail.value;
-                                  }} rules={{required:true}}/>
+                                  }} rules={{required:true}} defaultValue={formData.last_name}/>
                                     </IonItem>
                                 </IonCol>
                             </IonRow>
@@ -202,7 +202,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                         Email
                                     </IonLabel>
                                     <IonItem className={showError('email')}>
-                                        <Controller name='email' control={control} as={
+                                        <Controller name='email' control={control} defaultValue={formData.email} as={
                                             <IonInput value={formData.email} name='email'/>
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                             updateForm(selected);
@@ -213,8 +213,8 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
                                     <IonLabel>Phone</IonLabel>
                                     <IonItem className={showError('phone')}>
-                                        <Controller name='phone' control={control} as={
-                                            <IonInput value={formData.phone} type='number' name='phone'/>
+                                        <Controller name='phone' control={control} defaultValue={formData.phone} as={
+                                            <IonInput value={formData.phone} type='tel' name='phone'/>
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                             updateForm(selected);
                                             return selected.detail.value;
@@ -293,7 +293,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                             updateForm(selected);
                                             return selected.detail.value;
-                                          }} rules={{required:true}}/>
+                                          }} rules={{required:true}} defaultValue={formData.company_name}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -301,7 +301,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                         Title
                                     </IonLabel>
                                     <IonItem className={showError('title')}>
-                                        <Controller name='title' control={control} as={
+                                        <Controller name='title' control={control} defaultValue={formData.title} as={
                                             <IonInput value={formData.title} name='title'/>
                                         }onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
@@ -322,7 +322,7 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                                         } onChangeName="onIonChange" onChange={([selected]) => {
                                             updateForm(selected);
                                             return selected.detail.value;
-                                          }} rules={{required:true}} />
+                                          }}/>
                                     </IonItem>
                                 </IonCol>
                                 <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">
@@ -347,7 +347,6 @@ const AccountNotifications: React.FC<SessionApp> = ({sessionId, updateMenuSectio
                     )}
                 </IonGrid>
             </form>
-            <DevTool control={control} />
         </IonContent>
     )
 }

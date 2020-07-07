@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
-import {SessionApp, feeArrangementForm, showErrorToast} from '../helpers/Utils';
+import {SessionApp, feeArrangementForm, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import { IonContent, IonRow, IonCol, IonGrid, IonItemDivider, IonLabel, IonSelect, IonSelectOption, IonInput, IonItem } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {getFeeArrangementPage, saveFeeArangementPage} from '../helpers/CalloutHelpers';
@@ -67,6 +67,7 @@ const FeeArrangement: React.FC<SessionApp> = ({sessionId, updateMenuSections, fo
 
     useEffect(() => {
         showErrorToast(errors, setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, updateMenuSections, 'is_fee_arrangement_page_valid');
     }, [errors])
 
     const showError = (fieldName: string) => {

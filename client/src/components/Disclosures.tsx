@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
-import {welcomePageParameters, saveWelcomeParameters, showErrorToast} from "../helpers/Utils";
+import {welcomePageParameters, saveWelcomeParameters, showErrorToast, reValidateOnUnmmount} from "../helpers/Utils";
 import {useForm } from 'react-hook-form';
 
 interface InitSessionApp {
@@ -25,7 +25,9 @@ const Disclosures: React.FC<InitSessionApp> = props => {
         )
     }
 
-    const {register, handleSubmit, watch, errors} = useForm();
+    const {register, handleSubmit, watch, errors} = useForm({
+        mode: 'onBlur'
+    });
     const watchAllFields = watch(); 
 
     const onSubmit = () => { 
@@ -63,6 +65,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
 
     useEffect(() => {
         showErrorToast(errors, props.setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, props.updateMenuSections, 'is_disclosure_page_valid');
     }, [errors])
 
 
