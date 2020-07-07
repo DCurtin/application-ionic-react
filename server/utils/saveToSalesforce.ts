@@ -14,13 +14,13 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
 
 export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string): Promise<Partial<postgresSchema.application_session>>{
     let welcomeParamsQuery = {
-        text:'SELECT * FROM salesforce.body,salesforce.validated_pages WHERE body.session_id=validated_pages.session_id AND body.session_id = $1',
+        text:'SELECT * FROM salesforce.body FULL OUTER JOIN salesforce.validated_pages ON (body.session_id=validated_pages.session_id) WHERE body.session_id = $1',
         values:[sessionId]
     }
 
     type joinedInterface = postgresSchema.body & postgresSchema.validated_pages
     return pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<joinedInterface>)=>{
-
+        console.log(appBodyResult)
         let appBody = appBodyResult.rows[0];
         let validatedPages : Partial<postgresSchema.validated_pages> = {
             is_welcome_page_valid : appBody.is_welcome_page_valid,
@@ -49,8 +49,8 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
         'Marital_Status__c':applicantForm.marital_status,
         'Mother_s_Maiden_Name__c':applicantForm.mothers_maiden_name,
         'Occupation__c':applicantForm.occupation,
-        'IsSelfEmployed__c':applicantForm.is_self_employed,
-        'HasHSA__c':applicantForm.has_hsa,
+        'IsSelfEmployed__c':applicantForm.is_self_employed ? true: false,
+        'HasHSA__c':applicantForm.has_hsa ? true: false,
         'ID_Type__c': applicantForm.id_type,
         'ID_Number__c':applicantForm.id_number,
         'Issued_By__c':applicantForm.id_issued_by,
@@ -71,12 +71,12 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
         'Alternate_Phone__c':applicantForm.alternate_phone,
         'Alternate_Phone_Type__c':applicantForm.alternate_phone_type,
         'Account_Type__c':appBody.account_type, //welcome page fields start here
-        'Existing_IRA_Transfer__c':appBody.transfer_form,
-        'Existing_Employer_Plan_Rollover__c':appBody.rollover_form,
-        'New_IRA_Contribution__c':appBody.cash_contribution_form,
+        'Existing_IRA_Transfer__c':appBody.transfer_form ? true: false,
+        'Existing_Employer_Plan_Rollover__c':appBody.rollover_form ? true: false,
+        'New_IRA_Contribution__c':appBody.cash_contribution_form ? true: false,
         'Initial_Investment_Type__c':appBody.investment_type,
         'Referred_By__c':appBody.referred_by,
-        'Disclosures_Viewed__c':appBody.has_read_diclosure,
+        'Disclosures_Viewed__c':appBody.has_read_diclosure ? true: false,
         'HerokuValidatedPages__c':JSON.stringify(validatedPages)
         //still need salesRep, Referallcode if that goes here
         }
@@ -118,7 +118,7 @@ export function upsertSFOnlineApp(serverConn: Partial<jsforce.Connection>, onlin
 }
 
 export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgClient : pg.Client){
-    let singleRowTables = ['body',
+    let singleRowTables = [
     'validated_pages',
     'applicant',
     'contribution',
@@ -127,15 +127,15 @@ export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgCl
     'interested_party',
     'payment']
 
-    let queryString = generateQueryStringForSingleRow(singleRowTables, 'session_id');
+    let queryString = generateQueryStringForSingleRow(singleRowTables, 'body', 'session_id');
 
-    type joinedType = postgresSchema.validated_pages & 
-    postgresSchema.applicant & 
-    postgresSchema.contribution & 
-    postgresSchema.fee_arrangement & 
-    postgresSchema.initial_investment & 
-    postgresSchema.interested_party & 
-    postgresSchema.payment
+    type singleRowFields = {'validated_pages':postgresSchema.validated_pages,
+    'applicant':postgresSchema.applicant,
+    'contribution':postgresSchema.contribution,
+    'fee_arrangement':postgresSchema.fee_arrangement,
+    'initial_investment':postgresSchema.initial_investment,
+    'interested_party':postgresSchema.interested_party,
+    'payment':postgresSchema.payment}
 
     let singleRowQuery ={
         //text:'SELECT * FROM salesforce.body,salesforce.validated_pages,salesforce.applicant WHERE body.session_id=$1 AND applicant.session_id=$1 AND body.session_id=$1',
@@ -143,26 +143,59 @@ export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgCl
         values:[sessionId]
     }
 
-    return pgClient.query(singleRowQuery).then((result:pg.QueryResult<joinedType>)=>{
+    return pgClient.query(singleRowQuery).then((result:pg.QueryResult<singleRowFields>)=>{
         console.log(result.rowCount)
-        return result
+        return result.rows[0]
     }).catch(err=>{
         console.log(err)
         return null
     })
 }
 
-function generateQueryStringForSingleRow(singleRowTableList:Array<string>, constraint:string):string{
-    let queryFieldList : Array<string> = []
-    let whereClauseList : Array<string> = []
+export function queryMultiRowTables(sessionId: string, pgClient: pg.Client){
+    let multiRowTables = [
+        'transfer',
+        'rollover',
+        'beneficiary'
+    ]
+    let queryStrings = generateQueryStringsForMultiRow(multiRowTables,'session_id', sessionId);
+    queryTables(queryStrings, pgClient).then((queriedTables:Partial<Array<{tableName: string, tables:Array<any>}>>)=>{
+        console.log(queriedTables)
+    })
+}
 
-    singleRowTableList.forEach((value)=>{
-        queryFieldList.push(`salesforce.${value}`)
-        whereClauseList.push(`${value}.${constraint}=\$1`)
+async function queryTables (queryList: Array<{tableName: string,table:{text: string, values:Array<any>}}>, pgClient: pg.Client){
+    let queriedTables:Partial<Array<{tableName: string, tables:Array<any>}>> = [];
+    queryList.forEach( async(value)=>{
+        let response = await pgClient.query(value.table);
+        queriedTables.push({tableName:value.tableName, tables: response.rows})
     })
 
-    let queryString = `SELECT * FROM ${queryFieldList.join(',')} WHERE ${whereClauseList.join(' AND ')}`
+    return queriedTables;
+}
+
+function generateQueryStringsForMultiRow(multiRowTableList: Array<string>, constraint: string, constraintValue: string):Array<{tableName: string,table:{text: string, values:Array<any>}}>{
+    let queryStringList: Array<{tableName: string,table:{text: string, values:Array<any>}}> = []
+    multiRowTableList.forEach((value)=>{
+        queryStringList.push({tableName: value,table:{text:`SELECT * FROM salesforce.${value} WHERE ${value}.${constraint}=$1`, values:[constraintValue]}})
+    })
+
+    return queryStringList;
+}
+
+function generateQueryStringForSingleRow(singleRowTableList:Array<string>, rootTable:string, constraint:string):string{
+    let queryFieldList : Array<string> = []
+    let selectList :Array<string> =[`to_json(${rootTable}.*) AS ${rootTable}`]
+    
+    //to_json(a.*) AS table1, to_json(b.*) AS table2
+    singleRowTableList.forEach((value)=>{
+        queryFieldList.push(`FULL OUTER JOIN salesforce.${value} ON (${rootTable}.${constraint}=${value}.${constraint})`)
+        selectList.push(`to_json(${value}.*) AS ${value}`)
+        
+    })
+    let queryString = `SELECT ${selectList.join(',')} FROM salesforce.${rootTable} ${queryFieldList.join(' ')} WHERE salesforce.${rootTable}.${constraint}=$1`
     console.log(queryString)
 
     return queryString;
 }
+
