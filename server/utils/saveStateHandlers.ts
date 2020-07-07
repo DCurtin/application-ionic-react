@@ -45,6 +45,7 @@ export function saveOwnerInformationPage(sessionId: string, applicantForm : appl
           }
           let appQueryUpsert:queryParameters = insertApplicant(sessionId, appSessionParams.heroku_token, applicantForm)
           return runQueryReturnPromise(appQueryUpsert,pgClient).then(()=>{
+            appSessionParams.session_id = sessionId;
             return createAppSession(appSessionParams,pgClient, {}, res);
           })
         })

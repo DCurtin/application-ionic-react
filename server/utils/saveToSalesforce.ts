@@ -77,17 +77,16 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
         'Initial_Investment_Type__c':appBody.investment_type,
         'Referred_By__c':appBody.referred_by,
         'Disclosures_Viewed__c':appBody.has_read_diclosure,
-        'HerokuValidatedPages__c':JSON.stringify(validatedPages),
-        'Id':undefined
+        'HerokuValidatedPages__c':JSON.stringify(validatedPages)
         //still need salesRep, Referallcode if that goes here
         }
 
         
-        return upsertSFOnlineApp(sessionId, serverConn, insertValues, herokuToken);
+        return upsertSFOnlineApp(serverConn, insertValues, herokuToken);
     })
 }
 
-export function upsertSFOnlineApp(sessionId: string, serverConn: Partial<jsforce.Connection>, onlineApp : Partial<Online_Application__c>, herokuToken: string): Promise<Partial<postgresSchema.application_session>>{   
+export function upsertSFOnlineApp(serverConn: Partial<jsforce.Connection>, onlineApp : Partial<Online_Application__c>, herokuToken: string): Promise<Partial<postgresSchema.application_session>>{   
         return serverConn.sobject("Online_Application__c").upsert(onlineApp, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
             console.log('result: ')
             console.log(onlineAppUpsertResult)
@@ -102,7 +101,6 @@ export function upsertSFOnlineApp(sessionId: string, serverConn: Partial<jsforce
                     account_number: onlineAppQueryResult.AccountNew__c,
                     application_id: onlineAppQueryResult.Id,
                     heroku_token: onlineAppQueryResult.HerokuToken__c,
-                    session_id: sessionId
                 } 
                 return appSessionParams
             })
@@ -113,3 +111,15 @@ export function upsertSFOnlineApp(sessionId: string, serverConn: Partial<jsforce
         });
 }
 
+export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgClient : pg.Client){
+    let singleRowQuery ={
+        text:'SELECT * FROM salesforce.body,salesforce.validated_pages,salesforce.applicant WHERE body.session_id=validated_pages.session_id AND body.session_id=applicant.session_id AND body.session_id = $1',
+        values:[sessionId]
+    }
+
+    pgClient.query(singleRowQuery).then((result)=>{
+        console.log(result.rowCount)
+    }).catch(err=>{
+        console.log(err)
+    })
+}
