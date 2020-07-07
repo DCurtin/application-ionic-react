@@ -90,6 +90,9 @@ function makeGetPageInfoCallout(sessionId: string, page: string)
             return response.json().then(function(data: any){
                 console.log('after json parse')
                 return data.data;
+            }).catch((err:any)=>{
+                console.log(err);
+                return undefined
             })
         })
 }
