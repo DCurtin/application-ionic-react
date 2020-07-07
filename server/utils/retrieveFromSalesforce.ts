@@ -113,7 +113,8 @@ export function resumeApplication(pgClient: pg.Client, userInstances: any, serve
             saveStateHandlers.runQueryReturnPromise(validatedPagesQueryParams, pgClient).then((validatedPagesResult: pg.QueryResult)=>{
               let appSession: Partial<postgresSchema.application_session>={
                 account_number: salesforceOnlineApp.AccountNew__c, 
-                application_id:salesforceOnlineApp.Id, 
+                application_id:salesforceOnlineApp.Id,
+                heroku_token: herokuToken,
                 session_id: sessionId
               }
               createAppSession(appSession, pgClient, userInstances, res)
