@@ -143,6 +143,24 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 <IonItem className={showError(`institution_name__${i}`)}>
                                     <Controller name={`institution_name__${i}`} defaultValue={formData[`institution_name__${i}`]} control={control} as={
                                         <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`}/>
+                                    //     <AutoSuggest
+                                    //         suggestions={suggestions}
+                                    //         onSuggestionsClearRequested={() => setSuggestions([])}
+                                    //         onSuggestionsFetchRequested={({ value }) => {
+                                    //         setSuggestions(getSuggestions(value));
+                                    //         }}
+                                    //         onSuggestionSelected={(_, { suggestionValue }) =>
+                                    //             setFormData
+                                    //         }
+                                    //         getSuggestionValue={suggestion => suggestion}
+                                    //         renderSuggestion={suggestion => <span>{suggestion}</span>}
+                                    //         inputProps={{
+                                    //         value: value,
+                                    //         onChange: (_, { newValue, method }) => {
+                                    //             setValue(newValue);
+                                    //         }
+                                    //         }}
+                                    //         highlightFirstSuggestion={true}/>
                                     } onChangeName="onIonChange" onChange={([selected]) => {
                                         updateForm(selected);
                                         return selected.detail.value;
@@ -472,26 +490,22 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                     <IonCol>
                         <IonItem>
                             <AutoSuggest
-                                suggestions={suggestions}
+                                suggestions={suggestions} id='test'
                                 onSuggestionsClearRequested={() => setSuggestions([])}
                                 onSuggestionsFetchRequested={({ value }) => {
                                 setValue(value);
                                 setSuggestions(getSuggestions(value));
                                 }}
-                                onSuggestionSelected={(_, { suggestionValue }) =>
-                                console.log("Selected: " + suggestionValue)
-                                }
                                 getSuggestionValue={suggestion => suggestion}
                                 renderSuggestion={suggestion => <span>{suggestion}</span>}
                                 inputProps={{
                                 value: value,
                                 onChange: (_, { newValue, method }) => {
+                                    console.log(_.target);
                                     setValue(newValue);
                                 }
                                 }}
-                                highlightFirstSuggestion={true}
-                            />
-
+                                highlightFirstSuggestion={true}/>
                         </IonItem>
                     </IonCol>
                 </IonRow>

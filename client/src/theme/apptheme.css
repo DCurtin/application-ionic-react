@@ -7,11 +7,9 @@ ion-thumbnail {
     --size: 4rem;
 }
 
-
 .ios ion-toolbar {
     background-color: #1A1B3F;
 }
-
 
 form ion-item {
    border-radius: 10px;
@@ -85,6 +83,27 @@ ion-select {
     transition: opacity 500ms, transform 500ms;
   }
 
+  .react-autosuggest__container {
+    position: relative;
+  }
+
+  .react-autosuggest__suggestions-container--open{
+    height: 9rem;
+    overflow: scroll;
+    width: 30rem;
+  }
+  
+  .react-autosuggest__input {
+    width: 100%;
+    height: 30px;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+  
   .react-autosuggest__input--focused {
     outline: none;
   }
@@ -92,40 +111,6 @@ ion-select {
   .react-autosuggest__input--open {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-  }
-  
-  .react-autosuggest__suggestions-container {
-    display: none;
-  }
-  
-  .react-autosuggest__suggestions-container--open {
-    display: block;
-    position: absolute;
-    top: 51px;
-    width: 280px;
-    border: 1px solid #aaa;
-    background-color: #fff;
-    font-family: Helvetica, sans-serif;
-    font-weight: 300;
-    font-size: 16px;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    z-index: 2;
-  }
-
-  .react-autosuggest__container {
-    position: relative;
-  }
-  
-  .react-autosuggest__input {
-    width: 240px;
-    height: 30px;
-    padding: 10px 20px;
-    font-family: Helvetica, sans-serif;
-    font-weight: 300;
-    font-size: 16px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
   }
   
   .react-autosuggest__suggestions-list {
