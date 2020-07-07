@@ -1,4 +1,4 @@
-import { IonButtons, IonContent, IonPage, IonToolbar, IonButton, IonIcon, IonToast } from '@ionic/react';
+import { IonButtons, IonContent, IonPage, IonToolbar, IonButton, IonIcon, IonToast, IonLoading } from '@ionic/react';
 import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import {isPlatform } from '@ionic/react'
@@ -69,12 +69,12 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   });
 
   const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showSpinner, setShowSpinner]  = useState(false); 
   const [showPageTransition, setShowPageTransition] = useState(true);
 
   useLayoutEffect(function(){
     let formParams = {...menuParams};
-
-    
     formParams.transferForm = welcomePageFields.transfer_form;
     formParams.rolloverForm = welcomePageFields.rollover_form;
     formParams.newContribution = welcomePageFields.cash_contribution_form;
@@ -177,31 +177,32 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   const displayPage = (pageName:string) => {
     switch (pageName) {
       case 'Welcome': 
-        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'Disclosures':
-        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} />;
+        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setShowSpinner={setShowSpinner} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}
+        setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'AccountNotifications':
-        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'TransferIRA':
-        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'RolloverPlan':
-        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'NewContribution':
-        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'PaymentInformation':
-        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       default: 
-        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}/>;
+        return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
     }
   }
 
@@ -256,14 +257,15 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
   }
 
   return (
-    <IonPage className={isPlatform('android') ? 'android-fit-content' : ''}> 
+    <IonPage className={isPlatform('android') ? 'android-fit-content ion-justify-content-around' : ''}> 
       <IonContent>
-        <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message="Required Fields Missing." buttons={[
+        <IonToast color="danger shade" position="top" isOpen={showErrorToast} onDidDismiss={() => setShowErrorToast(false)} message={errorMessage === '' ? 'Required Fields Missing' : errorMessage} buttons={[
           {
             icon: 'close',
             role: 'cancel'
           }
         ]}/>
+        <IonLoading isOpen={showSpinner} message={'Loading..'} spinner="lines"></IonLoading>
         {isMobile() && (
             <IonToolbar>
               <IonButtons className="ion-justify-content-center">

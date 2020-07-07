@@ -1,5 +1,4 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
-import { FromTo } from 'moment';
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)

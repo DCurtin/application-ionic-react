@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
-import {welcomePageParameters, saveWelcomeParameters} from "../helpers/Utils";
+import {welcomePageParameters, saveWelcomeParameters, showErrorToast, reValidateOnUnmmount} from "../helpers/Utils";
 import {useForm } from 'react-hook-form';
 
 interface InitSessionApp {
@@ -10,7 +10,8 @@ interface InitSessionApp {
     selectedAccountType: string,
     updateMenuSections:Function,
     formRef: any,
-    setShowErrorToast: Function
+    setShowErrorToast: Function,
+    setShowSpinner: Function
 }
 
 const Disclosures: React.FC<InitSessionApp> = props => {
@@ -61,15 +62,10 @@ const Disclosures: React.FC<InitSessionApp> = props => {
     };
 
     useEffect(() => {
-        showErrorToast();
+        showErrorToast(errors, props.setShowErrorToast);
+        return () => reValidateOnUnmmount(errors, props.updateMenuSections, 'is_disclosure_page_valid');
     }, [errors])
 
-    const showErrorToast = () => {
-        let errorsArr = Object.keys(errors);
-        if (errorsArr.length > 0) {
-            props.setShowErrorToast(true);
-        }
-    }
 
     return (
         <IonContent className="ion-padding">
@@ -92,7 +88,7 @@ const Disclosures: React.FC<InitSessionApp> = props => {
                     <IonRow className="well">
                         <IonCol>
                             <p>
-                            <a target="_blank" href={disclosurePDF}>
+                            <a target="_blank" rel="noopener noreferrer" href={disclosurePDF}>
                                 Click here to download your complete account disclosure.
                                 </a> 
                             </p>
