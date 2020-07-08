@@ -1,21 +1,11 @@
 import React, { useEffect } from 'react';
 import { IonContent, IonGrid, IonRow, IonCol, IonCheckbox } from '@ionic/react';
-import {welcomePageParameters, saveWelcomeParameters, showErrorToast, reValidateOnUnmmount} from "../helpers/Utils";
+import {SesssionAppExtended, welcomePageParameters, saveWelcomeParameters, showErrorToast, reValidateOnUnmmount} from "../helpers/Utils";
 import {useForm } from 'react-hook-form';
 
-interface InitSessionApp {
-    welcomePageFields: welcomePageParameters,
-    setWelcomePageFields: Function,
-    sessionId: string,
-    selectedAccountType: string,
-    updateMenuSections:Function,
-    formRef: any,
-    setShowErrorToast: Function,
-    setShowSpinner: Function
-}
 
-const Disclosures: React.FC<InitSessionApp> = props => {
-    let disclosurePDF = props.selectedAccountType.includes('Roth') ? 'https://www.midlandira.com/wp-content/uploads/2015/12/ROTH-IRA-5305-RA.pdf' : 'https://www.midlandira.com/wp-content/uploads/2015/12/Traditional-IRA-5305-A.pdf';
+const Disclosures: React.FC<SesssionAppExtended> = props => {
+    let disclosurePDF = props.welcomePageFields.account_type.includes('Roth') ? 'https://www.midlandira.com/wp-content/uploads/2015/12/ROTH-IRA-5305-RA.pdf' : 'https://www.midlandira.com/wp-content/uploads/2015/12/Traditional-IRA-5305-A.pdf';
     const handleReadDisclosure = (event: any) => {       
         props.setWelcomePageFields(
             {
