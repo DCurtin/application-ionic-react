@@ -159,17 +159,18 @@ export function queryMultiRowTables(sessionId: string, pgClient: pg.Client){
         'beneficiary'
     ]
     let queryStrings = generateQueryStringsForMultiRow(multiRowTables,'session_id', sessionId);
-    queryTables(queryStrings, pgClient).then((queriedTables:Partial<Array<{tableName: string, tables:Array<any>}>>)=>{
-        console.log(queriedTables)
-    })
+    return queryTables(queryStrings, pgClient)/*.then((queriedTables:Partial<Array<{tableName: string, tables:Array<any>}>>)=>{
+        //console.log(queriedTables)
+    })*/
 }
 
 async function queryTables (queryList: Array<{tableName: string,table:{text: string, values:Array<any>}}>, pgClient: pg.Client){
-    let queriedTables:Partial<Array<{tableName: string, tables:Array<any>}>> = [];
-    queryList.forEach( async(value)=>{
+    var queriedTables:Partial<Array<{tableName: string, tables:Array<any>}>> = [];
+    await Promise.all(queryList.map(async (value)=>{
         let response = await pgClient.query(value.table);
         queriedTables.push({tableName:value.tableName, tables: response.rows})
-    })
+    }))
+    console.log(queriedTables)
 
     return queriedTables;
 }
