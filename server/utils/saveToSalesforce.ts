@@ -75,27 +75,6 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
         })
     })
 }
-function getValidatedPages(queriedValidatedPages:Partial<bodyAndValidatedPages>){
-    if(!queriedValidatedPages){
-        return {}
-    }
-    
-    let validatedPages : Partial<postgresSchema.validated_pages> = {
-        is_welcome_page_valid : queriedValidatedPages.is_welcome_page_valid,
-        is_disclosure_page_valid: queriedValidatedPages.is_disclosure_page_valid,
-        is_owner_info_page_valid: queriedValidatedPages.is_owner_info_page_valid,
-        is_beneficiaries_page_valid: queriedValidatedPages.is_beneficiaries_page_valid,
-        is_fee_arrangement_page_valid: queriedValidatedPages.is_fee_arrangement_page_valid,
-        is_account_notifications_page_valid: queriedValidatedPages.is_account_notifications_page_valid,
-        is_transfer_ira_page_valid: queriedValidatedPages.is_transfer_ira_page_valid,
-        is_rollover_plan_page_valid: queriedValidatedPages.is_rollover_plan_page_valid,
-        is_investment_details_page_valid: queriedValidatedPages.is_investment_details_page_valid,
-        is_payment_information_page_valid: queriedValidatedPages.is_payment_information_page_valid,
-        is_new_contribution_page_valid: queriedValidatedPages.is_new_contribution_page_valid,
-        is_review_and_sign_page_valid: queriedValidatedPages.is_review_and_sign_page_valid
-    }
-    return validatedPages
-}
 
 export function upsertSFOnlineApp(serverConn: Partial<jsforce.Connection>, onlineApp : Partial<Online_Application__c>): Promise<Partial<postgresSchema.application_session>>{   
         return serverConn.sobject("Online_Application__c").upsert(onlineApp, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
@@ -141,9 +120,85 @@ export function saveCurrentStateOfApplication(sessionId: string, pgClient : pg.C
         return queryMultiRowTables(sessionId, pgClient).then((multiRowResults)=>{
             let onlineApp:Partial<Online_Application__c> = generateOnlineAppJson(singleRowTableResults, multiRowResults);
             return upsertSFOnlineApp(serverConn,onlineApp)
-            //return onlineApp
         })
     })
+}
+
+function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgClient : pg.Client){
+    let singleRowTables = [
+    'validated_pages',
+    'applicant',
+    'contribution',
+    'fee_arrangement',
+    'initial_investment',
+    'interested_party',
+    'payment']
+
+    let queryString = generateQueryStringForSingleRow(singleRowTables, 'body', 'session_id');
+
+    
+
+    let singleRowQuery ={
+        //text:'SELECT * FROM salesforce.body,salesforce.validated_pages,salesforce.applicant WHERE body.session_id=$1 AND applicant.session_id=$1 AND body.session_id=$1',
+        text:queryString,
+        values:[sessionId]
+    }
+
+    return pgClient.query(singleRowQuery).then((result:pg.QueryResult<singleRowFields>)=>{
+        return result.rows[0]
+    }).catch(err=>{
+        console.log(err)
+        return null
+    })
+}
+
+function generateQueryStringForSingleRow(singleRowTableList:Array<string>, rootTable:string, constraint:string):string{
+    let queryFieldList : Array<string> = []
+    let selectList :Array<string> =[`to_json(${rootTable}.*) AS ${rootTable}`]
+    
+    //to_json(a.*) AS table1, to_json(b.*) AS table2
+    singleRowTableList.forEach((value)=>{
+        queryFieldList.push(`FULL OUTER JOIN salesforce.${value} ON (${rootTable}.${constraint}=${value}.${constraint})`)
+        selectList.push(`to_json(${value}.*) AS ${value}`)
+        
+    })
+    let queryString = `SELECT ${selectList.join(',')} FROM salesforce.${rootTable} ${queryFieldList.join(' ')} WHERE salesforce.${rootTable}.${constraint}=$1`
+
+    return queryString;
+}
+
+function queryMultiRowTables(sessionId: string, pgClient: pg.Client){
+    let multiRowTables = [
+        'transfer',
+        'rollover',
+        'beneficiary'
+    ]
+    let queryStrings = generateQueryStringsForMultiRow(multiRowTables,'session_id', sessionId);
+    return queryTables(queryStrings, pgClient)
+}
+
+function generateQueryStringsForMultiRow(multiRowTableList: Array<string>, constraint: string, constraintValue: string): multiRowTableQueryParams{
+    let queryStringList: multiRowTableQueryParams = []
+    multiRowTableList.forEach((value)=>{
+        queryStringList.push({tableName: value,table:{text:`SELECT * FROM salesforce.${value} WHERE ${value}.${constraint}=$1`, values:[constraintValue]}})
+    })
+
+    return queryStringList;
+}
+
+async function queryTables (queryList: multiRowTableQueryParams, pgClient: pg.Client){
+    type joinedType = multiRowTableNameToRows & {[name:string]: Array<any>}
+    var queriedTables: joinedType = {
+        beneficiary: [],
+        transfer: [],
+        rollover: []
+    };
+    await Promise.all(queryList.map(async (value)=>{
+        let response = await pgClient.query(value.table);
+        queriedTables[value.tableName] = response.rows
+    }))
+
+    return queriedTables;
 }
 
 function generateOnlineAppJson(singleRowTableResults:singleRowFields, multiRowTableResults: multiRowTableNameToRows){
@@ -230,6 +285,7 @@ function generateOnlineAppJson(singleRowTableResults:singleRowFields, multiRowTa
         'Interested_Party_Online_Access__c':singleRowTableResults.interested_party?.online_access ? true: false,
         'Interested_Party_IRA_Statement__c':singleRowTableResults.interested_party?.statement_option,
 
+        //trasnfers
         'Existing_IRA_Transfers__c':multiRowTableResults.transfer?.length ? multiRowTableResults.transfer?.length : 0,
         //transfer1
         'IRA_Account_Number_1__c':multiRowTableResults.transfer[0]?.account_number,
@@ -260,6 +316,7 @@ function generateOnlineAppJson(singleRowTableResults:singleRowFields, multiRowTa
         'IRA_Contact_Phone_Number_2__c':multiRowTableResults.transfer[1]?.contact_phone_number,
         'Delivery_Method_2__c':multiRowTableResults.transfer[1]?.delivery_method,
 
+        //rollovers
         'Existing_Employer_Plan_Roll_Overs__c':multiRowTableResults.rollover?.length ? multiRowTableResults.rollover?.length : 0,
         //rollover 1
         'Employer_Institution_Name_1__c':multiRowTableResults.rollover[0]?.institution_name,
@@ -286,8 +343,8 @@ function generateOnlineAppJson(singleRowTableResults:singleRowFields, multiRowTa
         'Employer_Contact_Name_2__c':multiRowTableResults.rollover[1]?.name,
         'Employer_Contact_Phone_2__c':multiRowTableResults.rollover[1]?.phone,
 
+        //beneficiaries
         'Beneficiary_Count__c':multiRowTableResults.beneficiary?.length ? multiRowTableResults.beneficiary?.length : 0,
-        //'Beneficiary_Provided__c':multiRowTableResults.beneficiary?.length ? true: false,
         //beneficiary 1
         'Beneficiary_First_Name_1__c':multiRowTableResults.beneficiary[0]?.first_name,
         'Beneficiary_Last_Name_1__c':multiRowTableResults.beneficiary[0]?.last_name,
@@ -335,79 +392,24 @@ function generateOnlineAppJson(singleRowTableResults:singleRowFields, multiRowTa
     return sfOnlineApp;
 }
 
-export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgClient : pg.Client){
-    let singleRowTables = [
-    'validated_pages',
-    'applicant',
-    'contribution',
-    'fee_arrangement',
-    'initial_investment',
-    'interested_party',
-    'payment']
-
-    let queryString = generateQueryStringForSingleRow(singleRowTables, 'body', 'session_id');
-
-    
-
-    let singleRowQuery ={
-        //text:'SELECT * FROM salesforce.body,salesforce.validated_pages,salesforce.applicant WHERE body.session_id=$1 AND applicant.session_id=$1 AND body.session_id=$1',
-        text:queryString,
-        values:[sessionId]
+function getValidatedPages(queriedValidatedPages:Partial<bodyAndValidatedPages>){
+    if(!queriedValidatedPages){
+        return {}
     }
-
-    return pgClient.query(singleRowQuery).then((result:pg.QueryResult<singleRowFields>)=>{
-        return result.rows[0]
-    }).catch(err=>{
-        console.log(err)
-        return null
-    })
-}
-
-export function queryMultiRowTables(sessionId: string, pgClient: pg.Client){
-    let multiRowTables = [
-        'transfer',
-        'rollover',
-        'beneficiary'
-    ]
-    let queryStrings = generateQueryStringsForMultiRow(multiRowTables,'session_id', sessionId);
-    return queryTables(queryStrings, pgClient)
-}
-
-async function queryTables (queryList: multiRowTableQueryParams, pgClient: pg.Client){
-    type joinedType = multiRowTableNameToRows & {[name:string]: Array<any>}
-    var queriedTables: joinedType = {
-        beneficiary: [],
-        transfer: [],
-        rollover: []
-    };
-    await Promise.all(queryList.map(async (value)=>{
-        let response = await pgClient.query(value.table);
-        queriedTables[value.tableName] = response.rows
-    }))
-
-    return queriedTables;
-}
-
-function generateQueryStringsForMultiRow(multiRowTableList: Array<string>, constraint: string, constraintValue: string): multiRowTableQueryParams{
-    let queryStringList: multiRowTableQueryParams = []
-    multiRowTableList.forEach((value)=>{
-        queryStringList.push({tableName: value,table:{text:`SELECT * FROM salesforce.${value} WHERE ${value}.${constraint}=$1`, values:[constraintValue]}})
-    })
-
-    return queryStringList;
-}
-
-function generateQueryStringForSingleRow(singleRowTableList:Array<string>, rootTable:string, constraint:string):string{
-    let queryFieldList : Array<string> = []
-    let selectList :Array<string> =[`to_json(${rootTable}.*) AS ${rootTable}`]
     
-    //to_json(a.*) AS table1, to_json(b.*) AS table2
-    singleRowTableList.forEach((value)=>{
-        queryFieldList.push(`FULL OUTER JOIN salesforce.${value} ON (${rootTable}.${constraint}=${value}.${constraint})`)
-        selectList.push(`to_json(${value}.*) AS ${value}`)
-        
-    })
-    let queryString = `SELECT ${selectList.join(',')} FROM salesforce.${rootTable} ${queryFieldList.join(' ')} WHERE salesforce.${rootTable}.${constraint}=$1`
-
-    return queryString;
+    let validatedPages : Partial<postgresSchema.validated_pages> = {
+        is_welcome_page_valid : queriedValidatedPages.is_welcome_page_valid,
+        is_disclosure_page_valid: queriedValidatedPages.is_disclosure_page_valid,
+        is_owner_info_page_valid: queriedValidatedPages.is_owner_info_page_valid,
+        is_beneficiaries_page_valid: queriedValidatedPages.is_beneficiaries_page_valid,
+        is_fee_arrangement_page_valid: queriedValidatedPages.is_fee_arrangement_page_valid,
+        is_account_notifications_page_valid: queriedValidatedPages.is_account_notifications_page_valid,
+        is_transfer_ira_page_valid: queriedValidatedPages.is_transfer_ira_page_valid,
+        is_rollover_plan_page_valid: queriedValidatedPages.is_rollover_plan_page_valid,
+        is_investment_details_page_valid: queriedValidatedPages.is_investment_details_page_valid,
+        is_payment_information_page_valid: queriedValidatedPages.is_payment_information_page_valid,
+        is_new_contribution_page_valid: queriedValidatedPages.is_new_contribution_page_valid,
+        is_review_and_sign_page_valid: queriedValidatedPages.is_review_and_sign_page_valid
+    }
+    return validatedPages
 }
