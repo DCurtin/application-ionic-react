@@ -1,39 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {useForm, Controller, ErrorMessage} from 'react-hook-form';
+import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers';
+import {getTransferPage, saveTransferPage, getAllCustodians} from '../helpers/CalloutHelpers';
 import {DevTool} from '@hookform/devtools';
 
-const custodians: string[] = [
-    "Company1",
-    "Company2",
-    "Big Corp",
-    "Happy Toy Company",
-    'ccc',
-    'cccc',
-    'cccccc',
-    'cccccccc',
-    'cccccccccccc',
-    'cccccccccccccc',
-    'ccccccccccccccc',
-    'cccccccccccccccccccccc',
-    'cheese',
-    'chuck',
-    'check e cheese',
-    'check',
-    'checkmate'
-  ];
-
-  const lowerCasedCustodians = custodians.map(custodian => custodian.toLowerCase());
+let custodians: string[] = [];
+let custodianOptions: any[] = [];
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {control, handleSubmit, errors, formState} = useForm({
+    const {control, handleSubmit, errors, formState, setValue} = useForm({
         mode: 'onChange'
     });
 
@@ -43,19 +24,24 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
     })
 
     useEffect(()=>{
-        if(sessionId !== '')
-        {
-            setShowSpinner(true);
-            getTransferPage(sessionId).then(data =>{
-                if(data === undefined)
-                {
+        getAllCustodians().then(response => response.json()).then(data => {
+            custodianOptions = [...data.data];
+            custodians = custodianOptions.map(custodian => custodian.name)
+            
+            if(sessionId !== '')
+            {
+                setShowSpinner(true);
+                getTransferPage(sessionId).then(data =>{
+                    if(data === undefined)
+                    {
+                        setShowSpinner(false);
+                        return;
+                    }
+                    ImportForm(data);
                     setShowSpinner(false);
-                    return;
-                }
-                ImportForm(data);
-                setShowSpinner(false);
-            })
-        }
+                })
+            }
+        })
     },[sessionId])
     
     function ImportForm(data : any){
@@ -136,9 +122,9 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 <IonLabel>
                                     Institution Name
                                 </IonLabel>
-                                <IonItem className={showError(`institution_name__${i}`)}>
+                                <IonItem className={showError(`instution_name__${i}`)}>
                                     <Controller name={`instution_name__${i}`} control={control} defaultValue={formData[`institution_name__${i}`]} as={
-                                        <Autocomplete value={formData[`institution_name__${i}`]} freeSolo={true} options={custodians} getOptionLabel={option => option} renderOption={option =>(
+                                        <Autocomplete value={formData[`institution_name__${i}`]} freeSolo={true} options={custodians}  getOptionLabel={option => option} renderOption={option =>(
                                         <span> {option}</span>
                                         )} renderInput={params => {
                                             let newInputProps = {...params.InputProps, disableUnderline: true};
@@ -149,6 +135,20 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                         onChangeName='onInputChange'
                                         onChange={([, data, method]) => {
                                             console.log(method);
+                                            let matchedOptions: any[] = [];
+                                            if(method === 'reset'){
+                                                let custodianOptionsArr  = [...custodianOptions];
+                                                matchedOptions = custodianOptionsArr.filter(custodian => custodian.name === data);
+                                            }
+                                            if (matchedOptions.length > 0) {
+                                                let matchedOption = matchedOptions[0];
+                                                
+                                                setValue(`contact_phone_number__${i}`, matchedOption.phone);
+                                                setValue(`mailing_street__${i}`, matchedOption.billing_street);
+                                                setValue(`mailing_city__${i}`, matchedOption.billing_city);
+                                                setValue(`mailing_state__${i}`, matchedOption.billing_state);
+                                                setValue(`mailing_zip__${i}`, matchedOption.billing_zip);
+                                            }
                                             setFormData(prevState => {
                                                 let newState = {...prevState};
                                                 newState[`institution_name__${i}`] = data;

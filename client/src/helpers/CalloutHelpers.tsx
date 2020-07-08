@@ -1,5 +1,10 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
 
+export function getAllCustodians() {
+    let url = '/custodians';
+    return fetch(url);
+}
+
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
 }

@@ -273,6 +273,10 @@ app.get('/loaderio-18abbe8b69ba76fa08ae8d129f865a2f/', (req : express.Request, r
   res.download(file); // Set disposition and send it.
 });
 
+app.get('/custodians', (req: express.Request, res: express.Response) => {
+  getPageInfoHandlers.getAllCustodians(res, client);
+})
+
 app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
