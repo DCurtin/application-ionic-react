@@ -5,17 +5,9 @@ import {useForm} from 'react-hook-form';
 
 import {useHistory} from 'react-router-dom';
 
-import {welcomePageParameters, SessionApp, saveWelcomeParameters, initialInvestmentTypes, showErrorToast} from "../helpers/Utils";
+import {welcomePageParameters, InitSessionApp, saveWelcomeParameters, initialInvestmentTypes, showErrorToast} from "../helpers/Utils";
 
 import {updateValidationTable} from '../helpers/CalloutHelpers'
-
-interface InitSessionApp extends SessionApp {
-    welcomePageFields: welcomePageParameters,
-    setWelcomePageFields: Function,
-    updateMenuSections: Function,
-    formRef: any
-}
-
 const Welcome: React.FC<InitSessionApp> = props => {
     const history = useHistory();
     const accountTypes = [
