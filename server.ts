@@ -294,7 +294,7 @@ app.post('/startApplication', function(req : express.Request, res : express.Resp
   let welcomePageData : applicationInterfaces.saveWelcomeParameters = req.body;
   let sessionId : string = welcomePageData.session.sessionId;
   let page : string = welcomePageData.session.page;
-  console.log(req.body)
+
   if(sessionId !== ''){
     console.log('application has already been started');
     console.log(sessionId);
@@ -412,15 +412,6 @@ app.post('/getValidatedPages', function(req: express.Request, res: express.Respo
   }
   validatedPages.getValidatedPages(sessionId, client, res);
 })
-
-/*app.post('/saveApplication', function(req : express.Request, res : express.Response){
-  var session = req.body.session;
-
-  //merge data in forms
-  //insert or upsert data to salesforce
-  
-  res.send('ok');
-})*/
 
 app.post('/getPageFields', function(req : express.Request, res : express.Response){
   let requestPacket:applicationInterfaces.requestBody = req.body;
