@@ -6,7 +6,7 @@ import {transformBeneClientToServer} from './server/utils/transformBeneficiaries
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import {transformRolloverClientToServer} from './server/utils/transformRollovers'
 import {resumeApplication} from './server/utils/retrieveFromSalesforce'
-import {generateOnlineAppJsonFromSingleRowTables, queryMultiRowTables} from './server/utils/saveToSalesforce'
+import {generateOnlineAppJsonFromSingleRowTables, queryMultiRowTables, saveCurrentStateOfApplication} from './server/utils/saveToSalesforce'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'
@@ -147,16 +147,21 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
   })
 })
 
-app.post('/getJoinedTable', (req, res) =>{
+app.post('/saveApplication', (req, res) =>{
   let sessionId : string = req.body.sessionId;
   console.log(sessionId);
-  generateOnlineAppJsonFromSingleRowTables(sessionId, client).then((singleRowQuery)=>{
+  /*generateOnlineAppJsonFromSingleRowTables(sessionId, client).then((singleRowQuery)=>{
     console.log(singleRowQuery)
     queryMultiRowTables(sessionId, client).then((multiRowQuery)=>{
       console.log(multiRowQuery)
       res.send(multiRowQuery);
     })
-  });
+  });*/
+
+  saveCurrentStateOfApplication(sessionId, client, serverConn).then((result)=>{
+    console.log(result);
+    res.send(result);
+  })
 })
 
 app.post('/getESignUrl', (req, res) => {
@@ -418,14 +423,14 @@ app.post('/getValidatedPages', function(req: express.Request, res: express.Respo
   validatedPages.getValidatedPages(sessionId, client, res);
 })
 
-app.post('/saveApplication', function(req : express.Request, res : express.Response){
+/*app.post('/saveApplication', function(req : express.Request, res : express.Response){
   var session = req.body.session;
 
   //merge data in forms
   //insert or upsert data to salesforce
   
   res.send('ok');
-})
+})*/
 
 app.post('/getPageFields', function(req : express.Request, res : express.Response){
   let requestPacket:applicationInterfaces.requestBody = req.body;
