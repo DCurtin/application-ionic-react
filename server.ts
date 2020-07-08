@@ -6,7 +6,7 @@ import {transformBeneClientToServer} from './server/utils/transformBeneficiaries
 import {transformTransferClientToServer} from './server/utils/transformTransfers'
 import {transformRolloverClientToServer} from './server/utils/transformRollovers'
 import {resumeApplication} from './server/utils/retrieveFromSalesforce'
-import {generateOnlineAppJsonFromSingleRowTables, queryMultiRowTables, saveCurrentStateOfApplication} from './server/utils/saveToSalesforce'
+import {saveCurrentStateOfApplication} from './server/utils/saveToSalesforce'
 import * as getPageInfoHandlers from './server/utils/getPageInfoHandlers'
 import * as saveStateHandlers from './server/utils/saveStateHandlers'
 import * as applicationInterfaces from './client/src/helpers/Utils'

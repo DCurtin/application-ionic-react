@@ -254,8 +254,8 @@ function generateOnlineAppJson(singleRowTableResults:singleRowFields, multiRowTa
         'Account_Number__c':singleRowTableResults.contribution?.account_number,
         'Bank_Name__c':singleRowTableResults.contribution?.bank_name,
         'Routing_Number__c':singleRowTableResults.contribution?.routing_number,
+        'Bank_Account_Type__c':singleRowTableResults.contribution?.bank_account_type,
         'Account_Name__c':singleRowTableResults.contribution?.name_on_account,
-        //'Account_Type__c':singleRowTableResults.contribution.account_type,//may need to get this from body
         
         //fee arangement
         'Fee_Schedule__c':singleRowTableResults.fee_arrangement?.fee_schedule,
