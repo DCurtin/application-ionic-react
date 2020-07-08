@@ -126,10 +126,6 @@ export function getAllCustodians(res: express.Response, client: pg.Client) {
 
   client.query(custodiansQuery).then(function(result: pg.QueryResult) {
     let custodiansInfo : Array<postgresSchema.custodians> = result.rows;
-    console.log(result);
-    console.log(custodiansInfo);
-    console.log(custodiansInfo);
-
     res.json({data: custodiansInfo})
 
   }).catch(err => {

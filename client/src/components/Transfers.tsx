@@ -24,13 +24,13 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
     })
 
     useEffect(()=>{
+        setShowSpinner(true);
         getAllCustodians().then(response => response.json()).then(data => {
             custodianOptions = [...data.data];
             custodians = custodianOptions.map(custodian => custodian.name)
             
             if(sessionId !== '')
             {
-                setShowSpinner(true);
                 getTransferPage(sessionId).then(data =>{
                     if(data === undefined)
                     {
@@ -41,6 +41,11 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                     setShowSpinner(false);
                 })
             }
+            setShowSpinner(false);
+        }).catch(err => {
+            setShowSpinner(false);
+            console.log(err);
+            throw err; 
         })
     },[sessionId])
     
