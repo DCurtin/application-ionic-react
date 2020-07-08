@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import { SessionApp, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
+import { SesssionAppExtended, initialInvestmentTypes, initialInvestmentForm , initialInvestmentConditionalParameters, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {useForm, Controller} from 'react-hook-form';
 import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers';
 
-const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast, updateMenuSections, formRef}) => {
+const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowErrorToast, setShowSpinner, updateMenuSections, formRef}) => {
     const history = useHistory();
     const {control, handleSubmit, errors, setValue, formState}  = useForm({
         mode: 'onChange'
@@ -23,12 +23,14 @@ const InitialInvestment : React.FC<SessionApp> = ({sessionId, setShowErrorToast,
     useEffect(()=>{
         if(sessionId !== '')
         {
-            getInitialInvestmentPage(sessionId).then(data =>{
+            setShowSpinner(true);
+            getInitialInvestmentPage(sessionId).then((data:any)=>{
                 if(data.formData === undefined || data.parameters === undefined)
                 {
-                    return;
+                    setShowSpinner?(false)
                 }
                 ImportForm(data);
+                setShowSpinner(false)
             })
         }
     },[sessionId])
