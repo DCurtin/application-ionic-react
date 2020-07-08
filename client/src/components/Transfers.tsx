@@ -2,12 +2,12 @@ import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
-import AutoSuggest from 'react-autosuggest';
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers';
+import {DevTool } from '@hookform/devtools';
 
 const custodians: string[] = [
     "Company1",
@@ -144,17 +144,28 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 </IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
                                     <Controller name={`instution_name__${i}`} control={control} defaultValue={formData[`institution_name__${i}`]} as={
-                                        <Autocomplete options={custodians} getOptionLabel={option => option} renderOption={option =>(
+                                        <Autocomplete value={formData[`institution_name__${i}`]} freeSolo={true} options={custodians} getOptionLabel={option => option} renderOption={option =>(
                                         <span> {option}</span>
                                         )} renderInput={params => (
-                                            <TextField {...params} variant="outlined" label="Institution Name" />
-                                        )} />} onChange={([, data]) => {
+                                            <TextField {...params} />
+                                        )} />} 
+                                        onChange={([, data]) => {
                                             setFormData(prevState => {
                                                 let newState = {...prevState};
                                                 newState[`institution_name__${i}`] = data;
-                                                return {...prevState, newState};
+                                                return {...prevState, ...newState};
                                             })
-                                            return data;}}/>
+                                            console.log(data);
+                                            return data;
+                                        }} onInputChange={(e: any, data: any) => {
+                                            setFormData(prevState => {
+                                                let newState = {...prevState};
+                                                newState[`institution_name__${i}`] = data;
+                                                return {...prevState, ...newState};
+                                            });
+                                            console.log(data);
+                                            return data; 
+                                        }}/>
                                     
                                 </IonItem>
                             </IonCol>
@@ -478,31 +489,11 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                             </IonButton>
                         )}
                     </IonCol>
-                    <IonCol>
-                        <IonItem>
-                            <AutoSuggest
-                                suggestions={suggestions} id='test'
-                                onSuggestionsClearRequested={() => setSuggestions([])}
-                                onSuggestionsFetchRequested={({ value }) => {
-                                setValue(value);
-                                setSuggestions(getSuggestions(value));
-                                }}
-                                getSuggestionValue={suggestion => suggestion}
-                                renderSuggestion={suggestion => <span>{suggestion}</span>}
-                                inputProps={{
-                                value: value,
-                                onChange: (_, { newValue, method }) => {
-                                    console.log(_.target);
-                                    setValue(newValue);
-                                }
-                                }}
-                                highlightFirstSuggestion={true}/>
-                        </IonItem>
-                    </IonCol>
                 </IonRow>
                 
             </IonGrid> 
-            </form>           
+            </form>    
+            <DevTool control={control} />       
         </IonContent>
     )
 }
