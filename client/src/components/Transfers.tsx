@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useForm, Controller} from 'react-hook-form';
+import {useForm, Controller, ErrorMessage} from 'react-hook-form';
 import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
 import TextField from "@material-ui/core/TextField";
@@ -7,7 +7,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers';
-import {DevTool } from '@hookform/devtools';
+import {DevTool} from '@hookform/devtools';
 
 const custodians: string[] = [
     "Company1",
@@ -33,7 +33,7 @@ const custodians: string[] = [
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {register, control, handleSubmit, errors, formState} = useForm({
+    const {control, handleSubmit, errors, formState} = useForm({
         mode: 'onChange'
     });
 
@@ -41,8 +41,6 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         account_type: 'Traditional IRA',
         existing_transfers: 0
     })
-    const [suggestions, setSuggestions] = useState<string[]>([]);
-    const [value, setValue] = useState('');
 
     useEffect(()=>{
         if(sessionId !== '')
@@ -107,10 +105,6 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         return className;
     };
 
-    const getSuggestions = (value: string) => {
-        return lowerCasedCustodians.filter(custodian => custodian.startsWith(value.trim().toLowerCase()));
-    }
-
     const displayTransferForm = (transferCount: number) => {
         if (transferCount > 0) {
             let formRows = [];
@@ -152,24 +146,17 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             return (
                                             <TextField {...newParams} />
                                         )}} />} 
-                                        onChange={([, data]) => {
+                                        onChangeName='onInputChange'
+                                        onChange={([, data, method]) => {
+                                            console.log(method);
                                             setFormData(prevState => {
                                                 let newState = {...prevState};
                                                 newState[`institution_name__${i}`] = data;
                                                 return {...prevState, ...newState};
                                             })
-                                            console.log(data);
                                             return data;
-                                        }} onInputChange={(e: any, data: any) => {
-                                            setFormData(prevState => {
-                                                let newState = {...prevState};
-                                                newState[`institution_name__${i}`] = data;
-                                                return {...prevState, ...newState};
-                                            });
-                                            console.log(data);
-                                            return data; 
-                                        }} rules={{required: true}}/>
-                                    
+                                        }} rules={{required:true}}
+                                     />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -495,8 +482,8 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                 </IonRow>
                 
             </IonGrid> 
-            </form>    
-            <DevTool control={control} />       
+            </form>  
+            <DevTool control={control} />      
         </IonContent>
     )
 }
