@@ -11,7 +11,7 @@ export function startSFOnlineApp(sessionId: string, pgClient : pg.Client, server
     let newHerokuToken = uuidv4();
     return saveFirstStageToSalesforce(sessionId, pgClient, serverConn, applicantForm, newHerokuToken)
 }
-type joinedInterface = postgresSchema.body & postgresSchema.validated_pages
+type bodyAndValidatedPages = postgresSchema.body & postgresSchema.validated_pages
 export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Client, serverConn: Partial<jsforce.Connection>, applicantForm : applicationInterfaces.applicantIdForm, herokuToken: string): Promise<Partial<postgresSchema.application_session>>{
     let welcomeParamsQuery = {
         text:'SELECT * FROM salesforce.body FULL OUTER JOIN salesforce.validated_pages ON (body.session_id=validated_pages.session_id) WHERE body.session_id = $1',
@@ -19,7 +19,7 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
     }
 
     
-    return pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<joinedInterface>)=>{
+    return pgClient.query(welcomeParamsQuery).then((appBodyResult:pg.QueryResult<bodyAndValidatedPages>)=>{
         console.log(appBodyResult)
         let appBody = appBodyResult.rows[0];
         let validatedPages = getValidatedPages(appBody)
@@ -75,33 +75,30 @@ export function saveFirstStageToSalesforce(sessionId: string, pgClient : pg.Clie
         })
     })
 }
-function getValidatedPages(appBody:Partial<joinedInterface>){
-    console.log(appBody)
-    if(!appBody){
+function getValidatedPages(queriedValidatedPages:Partial<bodyAndValidatedPages>){
+    if(!queriedValidatedPages){
         return {}
     }
     
     let validatedPages : Partial<postgresSchema.validated_pages> = {
-        is_welcome_page_valid : appBody.is_welcome_page_valid,
-        is_disclosure_page_valid: appBody.is_disclosure_page_valid,
-        is_owner_info_page_valid: appBody.is_owner_info_page_valid,
-        is_beneficiaries_page_valid: appBody.is_beneficiaries_page_valid,
-        is_fee_arrangement_page_valid: appBody.is_fee_arrangement_page_valid,
-        is_account_notifications_page_valid: appBody.is_account_notifications_page_valid,
-        is_transfer_ira_page_valid: appBody.is_transfer_ira_page_valid,
-        is_rollover_plan_page_valid: appBody.is_rollover_plan_page_valid,
-        is_investment_details_page_valid: appBody.is_investment_details_page_valid,
-        is_payment_information_page_valid: appBody.is_payment_information_page_valid,
-        is_new_contribution_page_valid: appBody.is_new_contribution_page_valid,
-        is_review_and_sign_page_valid: appBody.is_review_and_sign_page_valid
+        is_welcome_page_valid : queriedValidatedPages.is_welcome_page_valid,
+        is_disclosure_page_valid: queriedValidatedPages.is_disclosure_page_valid,
+        is_owner_info_page_valid: queriedValidatedPages.is_owner_info_page_valid,
+        is_beneficiaries_page_valid: queriedValidatedPages.is_beneficiaries_page_valid,
+        is_fee_arrangement_page_valid: queriedValidatedPages.is_fee_arrangement_page_valid,
+        is_account_notifications_page_valid: queriedValidatedPages.is_account_notifications_page_valid,
+        is_transfer_ira_page_valid: queriedValidatedPages.is_transfer_ira_page_valid,
+        is_rollover_plan_page_valid: queriedValidatedPages.is_rollover_plan_page_valid,
+        is_investment_details_page_valid: queriedValidatedPages.is_investment_details_page_valid,
+        is_payment_information_page_valid: queriedValidatedPages.is_payment_information_page_valid,
+        is_new_contribution_page_valid: queriedValidatedPages.is_new_contribution_page_valid,
+        is_review_and_sign_page_valid: queriedValidatedPages.is_review_and_sign_page_valid
     }
     return validatedPages
 }
 
 export function upsertSFOnlineApp(serverConn: Partial<jsforce.Connection>, onlineApp : Partial<Online_Application__c>): Promise<Partial<postgresSchema.application_session>>{   
         return serverConn.sobject("Online_Application__c").upsert(onlineApp, 'HerokuToken__c').then((onlineAppUpsertResult: any)=>{
-            console.log('result: ')
-            console.log(onlineAppUpsertResult)
             let options :jsforce.ExecuteOptions ={}
             type FoundOnlineApp = {Id?:string}[] & Online_Application__c
             return serverConn.sobject("Online_Application__c").findOne({HerokuToken__c:onlineApp.HerokuToken__c}, ['Id','AccountNew__c','HerokuToken__c']).execute(options,(err, onlineAppQueryResult:FoundOnlineApp)=>{
@@ -359,7 +356,6 @@ export function generateOnlineAppJsonFromSingleRowTables(sessionId: string, pgCl
     }
 
     return pgClient.query(singleRowQuery).then((result:pg.QueryResult<singleRowFields>)=>{
-        console.log(result.rowCount)
         return result.rows[0]
     }).catch(err=>{
         console.log(err)
@@ -388,7 +384,6 @@ async function queryTables (queryList: multiRowTableQueryParams, pgClient: pg.Cl
         let response = await pgClient.query(value.table);
         queriedTables[value.tableName] = response.rows
     }))
-    console.log(queriedTables)
 
     return queriedTables;
 }
@@ -413,7 +408,6 @@ function generateQueryStringForSingleRow(singleRowTableList:Array<string>, rootT
         
     })
     let queryString = `SELECT ${selectList.join(',')} FROM salesforce.${rootTable} ${queryFieldList.join(' ')} WHERE salesforce.${rootTable}.${constraint}=$1`
-    console.log(queryString)
 
     return queryString;
 }
