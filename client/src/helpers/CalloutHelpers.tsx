@@ -226,3 +226,12 @@ export function updateValidationTable(page: string, isValid: boolean, sessionId:
 
 }
 
+export function saveApplication(sessionId: string){
+    let body ={sessionId: sessionId}
+    let options = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    return fetch('/saveApplication',options)
+}
