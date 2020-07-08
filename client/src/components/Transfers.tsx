@@ -146,9 +146,12 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     <Controller name={`instution_name__${i}`} control={control} defaultValue={formData[`institution_name__${i}`]} as={
                                         <Autocomplete value={formData[`institution_name__${i}`]} freeSolo={true} options={custodians} getOptionLabel={option => option} renderOption={option =>(
                                         <span> {option}</span>
-                                        )} renderInput={params => (
-                                            <TextField {...params} />
-                                        )} />} 
+                                        )} renderInput={params => {
+                                            let newInputProps = {...params.InputProps, disableUnderline: true};
+                                            let newParams = {...params, InputProps: newInputProps};
+                                            return (
+                                            <TextField {...newParams} />
+                                        )}} />} 
                                         onChange={([, data]) => {
                                             setFormData(prevState => {
                                                 let newState = {...prevState};
@@ -165,7 +168,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             });
                                             console.log(data);
                                             return data; 
-                                        }}/>
+                                        }} rules={{required: true}}/>
                                     
                                 </IonItem>
                             </IonCol>
