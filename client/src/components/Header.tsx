@@ -6,6 +6,7 @@ import { chevronBackCircleOutline, chevronForwardCircleOutline
 } from 'ionicons/icons';
 import midlandLogo from '../images/midlandCrest.jpg';
 import {MenuSection, MenuParameters, AppPage} from '../helpers/MenuGenerator'; 
+import {saveApplication} from '../helpers/CalloutHelpers'
 
 export interface userState {
     prevPage?:AppPage, 
@@ -26,7 +27,7 @@ export interface userState {
     setHasPrevBeenClicked: Function
   }
 
-const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasPrevBeenClicked}) => {
+const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasPrevBeenClicked, sessionId}) => {
       let appPages = menuSections.flatMap(e=>{
         return e.pages
       });
@@ -74,13 +75,13 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
               <IonIcon icon={chevronBackCircleOutline} slot='start'/>
               Prev
             </IonButton>
-            <IonButton slot='end'>
+            <IonButton slot='end' onClick={()=>{handleSave(sessionId)}}>
               Save & Return Later
             </IonButton>
-              <IonButton slot='end' onClick={goToNextPage} color='secondary'>
-                <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
-              Next
-              </IonButton>
+            <IonButton slot='end' onClick={goToNextPage} color='secondary'>
+              <IonIcon icon={chevronForwardCircleOutline} slot='end'/>
+            Next
+            </IonButton>
           </React.Fragment>)}
           <IonThumbnail slot='start'>
             <IonImg src={midlandLogo}/>
@@ -91,6 +92,13 @@ const Header: React.FC<session> = ({menuSections, setHasNextBeenClicked, setHasP
         </IonToolbar>    
       </IonHeader>
     )
+}
+
+function handleSave(sessionId: string){
+  console.log(`header sessionId: ${sessionId}`)
+  saveApplication(sessionId).then((result)=>{
+    console.log(`header save result: ${result.ok}`)
+  })
 }
 
 export default Header;
