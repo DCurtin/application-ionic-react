@@ -86,7 +86,7 @@ export type Beneficiary_City_3__c = string | null;
 
 export type Beneficiary_City_4__c = string | null;
 
-export type Beneficiary_Count__c = string | null;
+export type Beneficiary_Count__c = number | null;
 
 export type Beneficiary_DOB_1_Formatted__c = string | null;
 
@@ -184,13 +184,13 @@ export type Beneficiary_SSN_3__c = string | null;
 
 export type Beneficiary_SSN_4__c = string | null;
 
-export type Beneficiary_Share_1__c = string | null;
+export type Beneficiary_Share_1__c = number | null;
 
-export type Beneficiary_Share_2__c = string | null;
+export type Beneficiary_Share_2__c = number | null;
 
-export type Beneficiary_Share_3__c = string | null;
+export type Beneficiary_Share_3__c = number | null;
 
-export type Beneficiary_Share_4__c = string | null;
+export type Beneficiary_Share_4__c = number | null;
 
 export type Beneficiary_State_1__c = string | null;
 
@@ -330,7 +330,7 @@ export type Delivery_Method__c = string | null;
 
 export type Disclosures_Viewed__c = boolean | null;
 
-export type DiscountAmount__c = string | null;
+export type DiscountAmount__c = number | null;
 
 export type DocSign_Transfer__c = string | null;
 
@@ -372,9 +372,9 @@ export type Employer_Assigned_To_1__c = string | null;
 
 export type Employer_Assigned_To_2__c = string | null;
 
-export type Employer_Cash_Amount_1__c = string | null;
+export type Employer_Cash_Amount_1__c = number | null;
 
-export type Employer_Cash_Amount_2__c = string | null;
+export type Employer_Cash_Amount_2__c = number | null;
 
 export type Employer_Contact_Name_1__c = string | null;
 
@@ -426,7 +426,7 @@ export type Entity_Type__c = string | null;
 
 export type ExceptionReason__c = string | null;
 
-export type Existing_Employer_Plan_Roll_Overs__c = string | null;
+export type Existing_Employer_Plan_Roll_Overs__c = number | null;
 
 export type Existing_Employer_Plan_Rollover__c = boolean | null;
 
@@ -434,7 +434,7 @@ export type Existing_IRA_Transfer_DS__c = string | null;
 
 export type Existing_IRA_Transfer__c = boolean | null;
 
-export type Existing_IRA_Transfers__c = string | null;
+export type Existing_IRA_Transfers__c = number | null;
 
 export type Expiration_Date_Formatted__c = string | null;
 
@@ -452,7 +452,7 @@ export type First_Name__c = string | null;
 
 export type From_OnePath__c = string | null;
 
-export type FundingAmountTotal__c = string | null;
+export type FundingAmountTotal__c = number | null;
 
 export type HasHSA__c = boolean | null;
 
@@ -486,9 +486,9 @@ export type IRA_Assigned_To_1__c = string | null;
 
 export type IRA_Assigned_To_2__c = string | null;
 
-export type IRA_Cash_Amount_1__c = string | null;
+export type IRA_Cash_Amount_1__c = number | null;
 
-export type IRA_Cash_Amount_2__c = string | null;
+export type IRA_Cash_Amount_2__c = number | null;
 
 export type IRA_City_1__c = string | null;
 
@@ -588,7 +588,7 @@ export type Interested_Party_Lookup__c = string | null;
 
 export type Interested_Party_Middle_Name__c = string | null;
 
-export type Interested_Party_Online_Access__c = string | null;
+export type Interested_Party_Online_Access__c = boolean | null;
 
 export type Interested_Party_Phone__c = string | null;
 
@@ -604,7 +604,7 @@ export type Interested_Party_Zip__c = string | null;
 
 export type Interested_Party__c = string | null;
 
-export type Investment_Amount__c = string | null;
+export type Investment_Amount__c = number | null;
 
 export type Investment_Contact_Person_Phone__c = string | null;
 
@@ -670,7 +670,7 @@ export type Mother_s_Maiden_Name__c = string | null;
 
 export type Name = string | null;
 
-export type New_Contribution_Amount__c = string | null;
+export type New_Contribution_Amount__c = number | null;
 
 export type New_Contribution_Method__c = string | null;
 
@@ -688,7 +688,7 @@ export type Other_Type_of_ID__c = string | null;
 
 export type OwnerId = string | null;
 
-export type PaymentAmount__c = string | null;
+export type PaymentAmount__c = number | null;
 
 export type Payment_Method_Account_DS__c = string | null;
 
