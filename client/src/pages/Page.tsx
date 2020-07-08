@@ -179,28 +179,27 @@ const Page: React.FC<session> = ({sessionId, setSessionId, menuSections, setMenu
       case 'Welcome': 
         return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'Disclosures':
-        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} selectedAccountType={welcomePageFields.account_type} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setShowSpinner={setShowSpinner} />;
+        return <Disclosures welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setShowSpinner={setShowSpinner} setErrorMessage={setErrorMessage} />;
       case 'OwnerInformation':
-        return <OwnerInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast}
-        setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <OwnerInformation sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'Beneficiaries':
-        return <Beneficiaries sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <Beneficiaries sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'FeeArrangement':
-        return <FeeArrangement sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <FeeArrangement sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'AccountNotifications':
-        return <AccountNotifications sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <AccountNotifications sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'TransferIRA':
-        return <Transfers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <Transfers sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'RolloverPlan':
-        return <Rollovers sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <Rollovers sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'InvestmentDetails':
-        return <InitialInvestment sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <InitialInvestment  welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'NewContribution':
-        return <NewContribution sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <NewContribution sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'PaymentInformation':
-        return <PaymentInformation sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <PaymentInformation sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       case 'ReviewAndSign':
-        return <ReviewAndSign sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
+        return <ReviewAndSign sessionId={sessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
       default: 
         return <Welcome welcomePageFields={welcomePageFields} setWelcomePageFields={setWelcomePageFields} sessionId={sessionId} setSessionId={setSessionId} updateMenuSections={updateMenuSections} formRef={formRef} setShowErrorToast={setShowErrorToast} setErrorMessage={setErrorMessage} setShowSpinner={setShowSpinner}/>;
     }

@@ -1,11 +1,24 @@
 export interface SessionApp {
     sessionId : string,
-    setSessionId : Function, 
+    //setSessionId : Function, 
     updateMenuSections:Function,
     formRef: any, 
     setShowErrorToast: Function,
     setErrorMessage: Function,
     setShowSpinner: Function
+}
+
+export interface InitSessionApp extends SessionApp {
+    welcomePageFields: welcomePageParameters,
+    setWelcomePageFields: Function,
+    updateMenuSections: Function,
+    setSessionId: Function
+}
+
+export interface SesssionAppExtended extends SessionApp{
+    welcomePageFields: welcomePageParameters,
+    setWelcomePageFields: Function,
+    updateMenuSections: Function,
 }
 
 export interface welcomePageParameters {
