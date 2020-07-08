@@ -149,17 +149,7 @@ app.post('/chargeCreditCard', (req : express.Request, res : express.Response) =>
 
 app.post('/saveApplication', (req, res) =>{
   let sessionId : string = req.body.sessionId;
-  console.log(sessionId);
-  /*generateOnlineAppJsonFromSingleRowTables(sessionId, client).then((singleRowQuery)=>{
-    console.log(singleRowQuery)
-    queryMultiRowTables(sessionId, client).then((multiRowQuery)=>{
-      console.log(multiRowQuery)
-      res.send(multiRowQuery);
-    })
-  });*/
-
   saveCurrentStateOfApplication(sessionId, client, serverConn).then((result)=>{
-    console.log(result);
     res.send(result);
   })
 })
