@@ -3,6 +3,8 @@ import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
 import AutoSuggest from 'react-autosuggest';
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers';
@@ -31,7 +33,7 @@ const custodians: string[] = [
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {control, handleSubmit, errors, formState} = useForm({
+    const {register, control, handleSubmit, errors, formState} = useForm({
         mode: 'onChange'
     });
 
@@ -141,30 +143,19 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                     Institution Name
                                 </IonLabel>
                                 <IonItem className={showError(`institution_name__${i}`)}>
-                                    <Controller name={`institution_name__${i}`} defaultValue={formData[`institution_name__${i}`]} control={control} as={
-                                        <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`}/>
-                                    //     <AutoSuggest
-                                    //         suggestions={suggestions}
-                                    //         onSuggestionsClearRequested={() => setSuggestions([])}
-                                    //         onSuggestionsFetchRequested={({ value }) => {
-                                    //         setSuggestions(getSuggestions(value));
-                                    //         }}
-                                    //         onSuggestionSelected={(_, { suggestionValue }) =>
-                                    //             setFormData
-                                    //         }
-                                    //         getSuggestionValue={suggestion => suggestion}
-                                    //         renderSuggestion={suggestion => <span>{suggestion}</span>}
-                                    //         inputProps={{
-                                    //         value: value,
-                                    //         onChange: (_, { newValue, method }) => {
-                                    //             setValue(newValue);
-                                    //         }
-                                    //         }}
-                                    //         highlightFirstSuggestion={true}/>
-                                    } onChangeName="onIonChange" onChange={([selected]) => {
-                                        updateForm(selected);
-                                        return selected.detail.value;
-                                    }} rules={{required: true}}/>
+                                    <Controller name={`instution_name__${i}`} control={control} defaultValue={formData[`institution_name__${i}`]} as={
+                                        <Autocomplete options={custodians} getOptionLabel={option => option} renderOption={option =>(
+                                        <span> {option}</span>
+                                        )} renderInput={params => (
+                                            <TextField {...params} variant="outlined" label="Institution Name" />
+                                        )} />} onChange={([, data]) => {
+                                            setFormData(prevState => {
+                                                let newState = {...prevState};
+                                                newState[`institution_name__${i}`] = data;
+                                                return {...prevState, newState};
+                                            })
+                                            return data;}}/>
+                                    
                                 </IonItem>
                             </IonCol>
                         </IonRow>
