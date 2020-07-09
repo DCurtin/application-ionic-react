@@ -157,6 +157,9 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                             setFormData(prevState => {
                                                 let newState = {...prevState};
                                                 newState[`institution_name__${i}`] = data;
+                                                if (matchedOptions.length > 0) {
+                                                    newState[`institution_id__${i}`] = matchedOptions[0].salesforce_id;
+                                                }
                                                 return {...prevState, ...newState};
                                             })
                                             return data;

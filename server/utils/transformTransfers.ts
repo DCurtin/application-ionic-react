@@ -27,6 +27,7 @@ export function transformTransferClientToServer(transferFlattened: any): transfe
             mailing_city: transferFlattened[`mailing_city__${index}`],
             mailing_state: transferFlattened[`mailing_state__${index}`],
             mailing_zip: transferFlattened[`mailing_zip__${index}`],
+            institution_id: transferFlattened[`institution_id__${index}`],
             index: index
         }
         transferForm.transfers.push(castedTransfer);
