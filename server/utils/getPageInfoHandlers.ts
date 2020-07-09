@@ -3,7 +3,6 @@ import * as postgresSchema from './postgresSchema'
 import {transformBeneficiariesServerToClient} from '../utils/transformBeneficiaries'
 import {transformTransferServerToClient} from '../utils/transformTransfers'
 import {transformRolloverServerToClient} from '../utils/transformRollovers'
-import {generateOnlineAppJsonFromSingleRowTables} from './saveToSalesforce'
 import express from 'express';
 import pg from 'pg';
 
