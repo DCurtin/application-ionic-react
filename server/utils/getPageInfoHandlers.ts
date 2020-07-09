@@ -119,6 +119,25 @@ export function handleAccountNotificationPage(sessionId:string, res: express.Res
   })
 }
 
+export function getAllCustodians(res: express.Response, client: pg.Client, sessionId: string) {
+  if (sessionId && sessionId !== '') {
+    let custodiansQuery = {
+      text: 'SELECT * FROM salesforce.custodians'
+    }
+  
+    client.query(custodiansQuery).then(function(result: pg.QueryResult) {
+      let custodiansInfo : Array<postgresSchema.custodians> = result.rows;
+      res.json({data: custodiansInfo})
+  
+    }).catch(err => {
+      res.status(500).send('failed getting custodians data');
+    })
+  } else {
+    res.status(500).send('failed getting custodians data');
+  }
+
+}
+
 export function handleTransferPage(sessionId:string, res: express.Response, client: pg.Client){
   let transferQuery = {
     text: 'SELECT * FROM salesforce.transfer WHERE session_id = $1',
@@ -131,7 +150,7 @@ export function handleTransferPage(sessionId:string, res: express.Response, clie
   }
 
   client.query(bodyQuery).then(function(bodyResult : pg.QueryResult){
-    let accountType = bodyResult.rows[0].account_type
+    let accountType = bodyResult.rows[0].account_type;
 
     client.query(transferQuery).then(function(result: pg.QueryResult){
       let transferInfo : Array<postgresSchema.transfer> = result.rows

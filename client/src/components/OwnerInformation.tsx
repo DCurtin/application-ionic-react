@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom';
 import { SessionApp, states, applicantIdForm, showErrorToast, reValidateOnUnmmount} from '../helpers/Utils';
 import {getAppPage, saveAppPage} from '../helpers/CalloutHelpers';
 
-
 const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
     const [formData, setFormData] = useState<applicantIdForm>({
@@ -157,11 +156,11 @@ const OwnerInformation: React.FC<SessionApp> = ({sessionId, updateMenuSections, 
                             </IonLabel>
                             <IonItem className={showError('ssn')}>
                                 <Controller name='ssn' control={control} as={
-                                    <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" clearInput> </IonInput>
+                                    <IonInput class='item-input' name="ssn" value={formData.ssn} placeholder="Social" clearInput type='number'> </IonInput> 
                                 } onChangeName="onIonChange" onChange={([selected]) => {
                                     updateForm(selected);
                                     return selected.detail.value;
-                                  }} rules={{required:true}} />
+                                  }} rules={{required:true, maxLength: 9, minLength: 9}}/>
                             </IonItem>
                         </IonCol>
                         <IonCol size="6" sizeMd="6" sizeSm="12" sizeXs="12">

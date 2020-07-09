@@ -10,8 +10,6 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "fs": "0.0.1-security",
-    "ionic-input-mask": "^1.0.1",
-    "ionic-tooltips": "^3.1.0",
     "jsforce": "^1.9.3",
     "pg": "^8.2.1",
     "request": "^2.88.2",

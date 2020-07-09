@@ -7,11 +7,9 @@ ion-thumbnail {
     --size: 4rem;
 }
 
-
 .ios ion-toolbar {
     background-color: #1A1B3F;
 }
-
 
 form ion-item {
    border-radius: 10px;
@@ -84,4 +82,7 @@ ion-select {
     transform: scale(0.9);
     transition: opacity 500ms, transform 500ms;
   }
-  
+
+  .MuiAutocomplete-root {
+    min-width: 100%;
+  }
