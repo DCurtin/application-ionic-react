@@ -3,7 +3,8 @@ import { SesssionAppExtended, initialInvestmentTypes, initialInvestmentForm , in
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonItemDivider, IonText, IonLabel, IonSelect, IonSelectOption, IonInput, IonCheckbox } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {useForm, Controller} from 'react-hook-form';
-import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers';
+import {getInitialInvestmentPage, saveInitialInvestmentPage, saveWelcomePage} from '../helpers/CalloutHelpers';
+import { Console } from 'console';
 
 const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowErrorToast, setShowSpinner, updateMenuSections, formRef, welcomePageFields, setWelcomePageFields}) => {
     const history = useHistory();
@@ -23,29 +24,34 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
         {
             setShowSpinner(true);
             getInitialInvestmentPage(sessionId).then((data:any)=>{
-                if(!data.formData || !data.parameters)
-                {
-                    setShowSpinner(false)
-                    return
+                if(data.parameters){
+                    ImportParamters(data);
                 }
-                ImportForm(data);
+                if(data.formData){
+                   ImportForm(data)
+                }
+            }).finally(()=>{
                 setShowSpinner(false)
             })
         }
     },[sessionId])
 
+    function ImportParamters(data: any){
+        let conditionalParameters : initialInvestmentConditionalParameters = data.parameters;
+        setconditionalParameters(conditionalParameters);
+    }
     
     function ImportForm(data : any){
-        let conditionalParameters : initialInvestmentConditionalParameters = data.parameters;
         let formData : initialInvestmentForm = data.formData;
         setFormData(formData);
-        setconditionalParameters(conditionalParameters);
         setIsAfterGettingData(true);
     }
 
     useEffect(()=>{
       return history.listen(()=>{
-        saveInitialInvestmentPage(sessionId, formData);
+        saveInitialInvestmentPage(sessionId, formData).then(()=>{
+            saveWelcomePage(sessionId,welcomePageFields);
+        })
       })
     },[formData])
 
@@ -98,21 +104,20 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
         return showMinCashBalanceCheckbox;
     }
 
-    const showNotEnoughProjectedCashWarning = ( investmentAmount ?: number, formData?:initialInvestmentConditionalParameters) => {
+    const showNotEnoughProjectedCashWarning = ( investmentAmountArg ?: number, formParameters?:initialInvestmentConditionalParameters) => {
         let showNotEnoughProjectedCashWarning = false; 
-
-        if(formData === undefined || investmentAmount === undefined){
+        let investmentAmount = investmentAmountArg ? +investmentAmountArg : 0
+        if(formParameters === undefined){
             return showNotEnoughProjectedCashWarning;
         }
-        let transfer1Amount = formData.ira_cash_amount_1 ? +formData.ira_cash_amount_1 : 0;
-        let transfer2Amount = formData.ira_cash_amount_2 ? +formData.ira_cash_amount_2 : 0; 
-        let rollover1Amount = formData.employer_cash_amount_1 ? +formData.employer_cash_amount_1 : 0; 
-        let rollover2Amount = formData.employer_cash_amount_2 ? +formData.employer_cash_amount_2 : 0; 
-        let contributionAmount = formData.new_contribution_amount ? +formData.new_contribution_amount : 0; 
+        let transfer1Amount = formParameters.ira_cash_amount_1 ? +formParameters.ira_cash_amount_1 : 0;
+        let transfer2Amount = formParameters.ira_cash_amount_2 ? +formParameters.ira_cash_amount_2 : 0; 
+        let rollover1Amount = formParameters.employer_cash_amount_1 ? +formParameters.employer_cash_amount_1 : 0; 
+        let rollover2Amount = formParameters.employer_cash_amount_2 ? +formParameters.employer_cash_amount_2 : 0; 
+        let contributionAmount = formParameters.new_contribution_amount ? +formParameters.new_contribution_amount : 0; 
         
         let projectedAvailableCash = transfer1Amount + transfer2Amount + rollover1Amount + rollover2Amount + contributionAmount;
-
-        if (!showMinCashBalanceCheckbox(welcomePageFields.investment_type) && (projectedAvailableCash < (investmentAmount + 250))) {
+        if ((!showMinCashBalanceCheckbox(welcomePageFields.investment_type)) && (projectedAvailableCash < (+250 + +investmentAmount)) ) {
             showNotEnoughProjectedCashWarning = true; 
         }
         
@@ -124,7 +129,9 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
             setShowErrorToast(true); 
             return;
         }
-        saveInitialInvestmentPage(sessionId, formData);
+        saveInitialInvestmentPage(sessionId, formData).then(()=>{
+            saveWelcomePage(sessionId,welcomePageFields);
+        })
         updateMenuSections('is_investment_details_page_valid', true);
         setShowErrorToast(false);
     }
