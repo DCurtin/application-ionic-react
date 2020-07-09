@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import {useForm, Controller} from 'react-hook-form';
 import {getInitialInvestmentPage, saveInitialInvestmentPage} from '../helpers/CalloutHelpers';
 
-const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowErrorToast, setShowSpinner, updateMenuSections, formRef}) => {
+const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowErrorToast, setShowSpinner, updateMenuSections, formRef, welcomePageFields, setWelcomePageFields}) => {
     const history = useHistory();
     const {control, handleSubmit, errors, setValue, formState}  = useForm({
         mode: 'onChange'
@@ -13,9 +13,7 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
 
     let investmentTypesArr = initialInvestmentTypes.filter(investmentType => (investmentType !== `I'm Not Sure`));
 
-    const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({
-        initial_investment_type : 'Futures/Forex'
-    });
+    const [formData, setFormData] = useState<Partial<initialInvestmentForm>>({initial_investment_name:''});
     const [isAfterGettingData, setIsAfterGettingData] = useState(false);
 
     const [conditionalParameters, setconditionalParameters] = useState<initialInvestmentConditionalParameters>();
@@ -25,9 +23,10 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
         {
             setShowSpinner(true);
             getInitialInvestmentPage(sessionId).then((data:any)=>{
-                if(data.formData === undefined || data.parameters === undefined)
+                if(!data.formData || !data.parameters)
                 {
                     setShowSpinner(false)
+                    return
                 }
                 ImportForm(data);
                 setShowSpinner(false)
@@ -82,9 +81,9 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
         return entityNameLabel;
     }
 
-    const showMinCashBalanceCheckbox = (formData:any) => {
+    const showMinCashBalanceCheckbox = (initial_investment_type:string) => {
         let showMinCashBalanceCheckbox = false; 
-        if (formData.initial_investment_type == 'Futures/Forex'){
+        if (initial_investment_type == 'Futures/Forex'){
             showMinCashBalanceCheckbox = true;
         }
 
@@ -113,7 +112,7 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
         
         let projectedAvailableCash = transfer1Amount + transfer2Amount + rollover1Amount + rollover2Amount + contributionAmount;
 
-        if (!showMinCashBalanceCheckbox(formData) && (projectedAvailableCash < (investmentAmount + 250))) {
+        if (!showMinCashBalanceCheckbox(welcomePageFields.investment_type) && (projectedAvailableCash < (investmentAmount + 250))) {
             showNotEnoughProjectedCashWarning = true; 
         }
         
@@ -165,21 +164,23 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
                         <IonLabel>
                             What type of asset?
                         </IonLabel>
-                        <IonItem className={showError('initial_investment_type')}>
-                            <Controller name='initial_investment_type' control={control} as={
-                                <IonSelect value={formData.initial_investment_type} name='initial_investment_type' interface='action-sheet'>
+                        <IonItem className={showError('investment_type')}>
+                            <Controller name='investment_type' control={control} as={
+                                <IonSelect value={welcomePageFields.investment_type} name='investment_type' interface='action-sheet'>
                                     {investmentTypesArr.map((investmentType, index) => (
                                         <IonSelectOption key={index} value={investmentType}>{investmentType}</IonSelectOption>
                                     ))}
                                 </IonSelect>
                             } onChangeName="onIonChange" onChange={([selected]) => {
-                                updateForm(selected);
+                                setWelcomePageFields({ ...welcomePageFields,investment_type: selected.target.value})
+                                console.log(welcomePageFields)
+                                //updateForm(selected);
                                 return selected.detail.value;
-                              }} rules={{required:true}}/>
+                              }} rules={{required:true}} defaultValue={welcomePageFields.investment_type}/>
                         </IonItem>
                     </IonCol>
                     <IonCol>
-                            <IonLabel>{displayEntityNameLabel(formData.initial_investment_type)}</IonLabel>
+                            <IonLabel>{displayEntityNameLabel(welcomePageFields.investment_type)}</IonLabel>
                             <IonItem className={showError('initial_investment_name')}>
                                 <Controller name='initial_investment_name' control={control} as={
                                     <IonInput name='initial_investment_name' value={formData.initial_investment_name}/>
@@ -231,7 +232,7 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
                         </IonItem>
                     </IonCol>
                 </IonRow>
-                {showMinCashBalanceCheckbox(formData) && (
+                {showMinCashBalanceCheckbox(welcomePageFields.investment_type) && (
                     <IonRow>
                         <IonCol>
                             <Controller name='hasReadMinCashBal' control={control} as={
