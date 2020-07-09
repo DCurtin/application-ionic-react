@@ -285,6 +285,12 @@ app.get("*", function (req : Express.Response, res : express.Response) {
   res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
+app.post('/custodians', (req: express.Request, res: express.Response) => {
+  let sessionId = req.body.sessionId;
+  getPageInfoHandlers.getAllCustodians(res, client, sessionId);
+})
+
+
 app.post('/resume', (req: express.Request, res: express.Response)=>{
   resumeApplication(client, userInstances, serverConn, req.body, res)
 })

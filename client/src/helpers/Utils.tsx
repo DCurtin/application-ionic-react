@@ -157,7 +157,8 @@ export interface transfer{
     asset_name_3: string, //number mid
     full_or_partial_cash_transfer: string,
     cash_amount: number,
-    index: number
+    index: number,
+    institution_id: string
 }
 
 export interface contributionForm{

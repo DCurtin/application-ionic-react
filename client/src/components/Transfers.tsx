@@ -2,13 +2,18 @@ import React, {useState, useEffect} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import { SessionApp, states, FormData, showErrorToast, reValidateOnUnmmount } from '../helpers/Utils';
 import { IonItem, IonContent, IonGrid, IonRow, IonCol, IonButton, IonIcon, IonItemDivider, IonText, IonLabel, IonInput, IonSelectOption, IonSelect, IonRadioGroup, IonRadio, IonList } from '@ionic/react';
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import {getTransferPage, saveTransferPage} from '../helpers/CalloutHelpers'
+import {getTransferPage, saveTransferPage, getAllCustodians} from '../helpers/CalloutHelpers';
+
+let custodians: string[] = [];
+let custodianOptions: any[] = [];
 
 const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRef, setShowErrorToast, setShowSpinner}) => {
     const history = useHistory();
-    const {control, handleSubmit, errors, setValue, formState} = useForm({
+    const {control, handleSubmit, errors, formState, setValue} = useForm({
         mode: 'onChange'
     });
 
@@ -16,20 +21,31 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         account_type: 'Traditional IRA',
         existing_transfers: 0
     })
+
     useEffect(()=>{
-        if(sessionId !== '')
-        {
-            setShowSpinner(true);
-            getTransferPage(sessionId).then(data =>{
-                if(data === undefined)
-                {
+        setShowSpinner(true);
+        getAllCustodians(sessionId).then(response => response.json()).then(data => {
+            custodianOptions = [...data.data];
+            custodians = custodianOptions.map(custodian => custodian.name)
+            
+            if(sessionId !== '')
+            {
+                getTransferPage(sessionId).then(data =>{
+                    if(data === undefined)
+                    {
+                        setShowSpinner(false);
+                        return;
+                    }
+                    ImportForm(data);
                     setShowSpinner(false);
-                    return;
-                }
-                ImportForm(data);
-                setShowSpinner(false);
-            })
-        }
+                })
+            }
+            setShowSpinner(false);
+        }).catch(err => {
+            setShowSpinner(false);
+            console.log(err);
+            throw err; 
+        })
     },[sessionId])
     
     function ImportForm(data : any){
@@ -79,6 +95,24 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         return className;
     };
 
+    const uploadFile = (e : any) => {
+        const base64 = 'base64,';
+        let files = e.target.files;
+        let file = files[0];
+        console.log(file);
+        let reader = new FileReader(); 
+        reader.addEventListener('load', function() {
+            let fileName = file.name;
+            let fileContents = typeof reader.result === 'string' ? reader.result : '';
+            let dataStart = fileContents?.indexOf(base64) + base64.length;
+            let blob = fileContents?.substring(dataStart);
+            console.log(fileName);
+            console.log(blob);
+
+        })
+        reader.readAsDataURL(file);
+    }
+
     const displayTransferForm = (transferCount: number) => {
         if (transferCount > 0) {
             let formRows = [];
@@ -110,13 +144,46 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 <IonLabel>
                                     Institution Name
                                 </IonLabel>
-                                <IonItem className={showError(`institution_name__${i}`)}>
-                                    <Controller name={`institution_name__${i}`} defaultValue={formData[`institution_name__${i}`]} control={control} as={
-                                        <IonInput value={formData[`institution_name__${i}`]} name={`institution_name__${i}`}/>
-                                    } onChangeName="onIonChange" onChange={([selected]) => {
-                                        updateForm(selected);
-                                        return selected.detail.value;
-                                    }} rules={{required: true}}/>
+                                <IonItem className={showError(`instution_name__${i}`)}>
+                                    <Controller name={`instution_name__${i}`} control={control} defaultValue={formData[`institution_name__${i}`]} as={
+                                        <Autocomplete value={formData[`institution_name__${i}`]} freeSolo={true} options={custodians}  getOptionLabel={option => option} renderOption={option =>(
+                                        <span> {option}</span>
+                                        )} renderInput={params => {
+                                            let newInputProps = {...params.InputProps, disableUnderline: true};
+                                            let newParams = {...params, InputProps: newInputProps};
+                                            return (
+                                            <TextField {...newParams} />
+                                        )}} />} 
+                                        onChangeName='onInputChange'
+                                        onChange={([, data, method]) => {
+                                            let matchedOptions: any[] = [];
+                                            if(method === 'reset'){
+                                                let custodianOptionsArr  = [...custodianOptions];
+                                                matchedOptions = custodianOptionsArr.filter(custodian => custodian.name === data);
+                                            }
+                                            if (matchedOptions.length > 0) {
+                                                let matchedOption = matchedOptions[0];
+                                                
+                                                setValue(`contact_phone_number__${i}`, matchedOption.phone);
+                                                setValue(`mailing_street__${i}`, matchedOption.billing_street);
+                                                setValue(`mailing_city__${i}`, matchedOption.billing_city);
+                                                setValue(`mailing_state__${i}`, matchedOption.billing_state);
+                                                setValue(`mailing_zip__${i}`, matchedOption.billing_zip);
+                                            }
+                                            setFormData(prevState => {
+                                                let newState = {...prevState};
+                                                newState[`institution_name__${i}`] = data;
+                                                if (matchedOptions.length > 0) {
+                                                    newState[`institution_id__${i}`] = matchedOptions[0].salesforce_id;
+                                                } else {
+                                                    newState[`institution_id__${i}`] = '';
+                                                }
+                                                
+                                                return {...prevState, ...newState};
+                                            })
+                                            return data;
+                                        }} rules={{required:true}}
+                                     />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -392,7 +459,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 Upload Current Institution's Statement
                                 </IonLabel>
                                 <IonItem>
-                                    <input type='file' name={`file__${i}`}/>
+                                    <input type='file' name={`file__${i}`} onChange={uploadFile}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>
@@ -442,7 +509,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                 </IonRow>
                 
             </IonGrid> 
-            </form>           
+            </form>   
         </IonContent>
     )
 }

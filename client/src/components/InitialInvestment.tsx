@@ -117,7 +117,7 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
         let contributionAmount = formParameters.new_contribution_amount ? +formParameters.new_contribution_amount : 0; 
         
         let projectedAvailableCash = transfer1Amount + transfer2Amount + rollover1Amount + rollover2Amount + contributionAmount;
-        if ((!showMinCashBalanceCheckbox(welcomePageFields.investment_type)) && (projectedAvailableCash < (+250 + +investmentAmount)) ) {
+        if ((!showMinCashBalanceCheckbox(welcomePageFields.investment_type)) && (projectedAvailableCash < (250 + investmentAmount)) ) {
             showNotEnoughProjectedCashWarning = true; 
         }
         
