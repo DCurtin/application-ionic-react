@@ -7,7 +7,7 @@ import {useHistory} from 'react-router-dom';
 
 import {welcomePageParameters, InitSessionApp, saveWelcomeParameters, initialInvestmentTypes, showErrorToast} from "../helpers/Utils";
 
-import {updateValidationTable} from '../helpers/CalloutHelpers'
+import {updateValidationTable, startApp, saveWelcomePage} from '../helpers/CalloutHelpers'
 const Welcome: React.FC<InitSessionApp> = props => {
     const history = useHistory();
     const accountTypes = [
@@ -126,25 +126,11 @@ const Welcome: React.FC<InitSessionApp> = props => {
         return history.listen(()=>{
             //save initial data
             //return session id
-            var url = '/startApplication'
-            if(props.sessionId !== ''){
-                url = '/saveState'
+            if(props.sessionId === ''){
+                startApp(props.welcomePageFields, props.setSessionId);
+            }else{
+                saveWelcomePage(props.sessionId, props.welcomePageFields);
             }
-            let body : saveWelcomeParameters ={
-                session: {sessionId: props.sessionId, page: 'welcomePage'},
-                data: props.welcomePageFields
-            }
-            let options = {
-                method : 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(body)
-            }
-
-            fetch(url, options).then((response)=>{
-                response.json().then(function(data: any){
-                    props.setSessionId(data.sessionId);
-                  })
-            })
         })
     },[props.welcomePageFields]);
 
