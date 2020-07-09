@@ -1,4 +1,27 @@
-import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
+import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm, welcomePageParameters} from './Utils'
+import { response } from 'express';
+
+export function startApp(formData: welcomePageParameters, setSessionId: Function){
+    return makeStartApplicationCallout(formData).then((response)=>{
+        if(response.ok){
+            return response.json().then((responseBody)=>{
+                setSessionId(responseBody.sessionId);
+                return responseBody.sessionId
+            }).catch(err=>{
+                console.log('failed to start application');
+                console.log(err);
+                return undefined
+            })
+        }
+        console.log('start app callout responded with an error')
+        console.log(response.status);
+        return undefined
+    })
+}
+
+export function saveWelcomePage(sessionId: string, formData: welcomePageParameters){
+    return makeSaveStateCallout(sessionId, 'welcomePage',formData)
+}
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
     return makeSaveStateCallout(sessionId, 'appId', formData)
@@ -59,16 +82,30 @@ export function getRolloverPage(sessionId: string){
     return makeGetPageInfoCallout(sessionId, 'rollover')
 }
 
+function makeStartApplicationCallout(formData: FormData){
+    let url = '/startApplication'
+    let body : requestBody= {
+        session: {sessionId: '', page: 'welcomePage'},
+        data: formData
+    }
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    return fetch(url, options);
+}
+
 function makeSaveStateCallout(sessionId: string, page: string, formData: FormData){
     let url = '/saveState'
     let body : requestBody= {
-    session: {sessionId: sessionId, page: page},
-    data: formData
+        session: {sessionId: sessionId, page: page},
+        data: formData
     }
     let options = {
-    method : 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(body)
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
     }
     return fetch(url, options);
 }
