@@ -24,7 +24,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
 
     useEffect(()=>{
         setShowSpinner(true);
-        getAllCustodians().then(response => response.json()).then(data => {
+        getAllCustodians(sessionId).then(response => response.json()).then(data => {
             custodianOptions = [...data.data];
             custodians = custodianOptions.map(custodian => custodian.name)
             
@@ -95,6 +95,24 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
         return className;
     };
 
+    const uploadFile = (e : any) => {
+        const base64 = 'base64,';
+        let files = e.target.files;
+        let file = files[0];
+        console.log(file);
+        let reader = new FileReader(); 
+        reader.addEventListener('load', function() {
+            let fileName = file.name;
+            let fileContents = typeof reader.result === 'string' ? reader.result : '';
+            let dataStart = fileContents?.indexOf(base64) + base64.length;
+            let blob = fileContents?.substring(dataStart);
+            console.log(fileName);
+            console.log(blob);
+
+        })
+        reader.readAsDataURL(file);
+    }
+
     const displayTransferForm = (transferCount: number) => {
         if (transferCount > 0) {
             let formRows = [];
@@ -138,7 +156,6 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                         )}} />} 
                                         onChangeName='onInputChange'
                                         onChange={([, data, method]) => {
-                                            console.log(method);
                                             let matchedOptions: any[] = [];
                                             if(method === 'reset'){
                                                 let custodianOptionsArr  = [...custodianOptions];
@@ -158,7 +175,10 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                                 newState[`institution_name__${i}`] = data;
                                                 if (matchedOptions.length > 0) {
                                                     newState[`institution_id__${i}`] = matchedOptions[0].salesforce_id;
+                                                } else {
+                                                    newState[`institution_id__${i}`] = '';
                                                 }
+                                                
                                                 return {...prevState, ...newState};
                                             })
                                             return data;
@@ -439,7 +459,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                                 Upload Current Institution's Statement
                                 </IonLabel>
                                 <IonItem>
-                                    <input type='file' name={`file__${i}`}/>
+                                    <input type='file' name={`file__${i}`} onChange={uploadFile}/>
                                 </IonItem>
                             </IonCol>
                         </IonRow>

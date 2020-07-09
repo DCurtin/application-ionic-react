@@ -1,8 +1,14 @@
 import {requestBody, applicantIdForm, FormData, feeArrangementForm, accountNotificationsForm} from './Utils'
 
-export function getAllCustodians() {
+export function getAllCustodians(sessionId: string) {
     let url = '/custodians';
-    return fetch(url);
+    let body = {sessionId};
+    let options = {
+        method : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }
+    return fetch(url, options);
 }
 
 export function saveAppPage(sessionId: string, formData: applicantIdForm){
