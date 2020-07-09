@@ -178,7 +178,7 @@ export function handleInitialInvestmentPage(sessionId: string, res: express.Resp
   }
   let transferQuery = {
     text: 'SELECT * FROM salesforce.transfer WHERE session_id = $1 AND transfer_type= $2',
-    values: [sessionId, 'cash Transfer']
+    values: [sessionId, 'Cash Transfer']
   }
   let contributionQuery = {
     text: 'SELECT * FROM salesforce.contribution WHERE session_id = $1',
@@ -188,49 +188,54 @@ export function handleInitialInvestmentPage(sessionId: string, res: express.Resp
   
   //need to get other info
 
-  client.query(initialInvestmentQuery).then(function(result: pg.QueryResult){
-    if(result.rowCount == 0){
-      res.json({data : {formData: undefined, parameters : undefined}})
-    }
+  client.query(initialInvestmentQuery).then(function(initialInvestmentResult: pg.QueryResult<postgresSchema.initial_investment>){
+  
 
-    client.query(rolloverQuery).then((rolloverResult:pg.QueryResult)=>{
-      client.query(transferQuery).then((transferResult:pg.QueryResult)=>{
-        client.query(contributionQuery).then((contributionResult:pg.QueryResult)=>{
-          let initialInvestmentInfo : postgresSchema.initial_investment = result.rows[0];
-          res.json({data : {formData: initialInvestmentInfo, parameters : gatherInitialInvestmentParameters(rolloverResult, transferResult, contributionResult) }});
+    client.query(rolloverQuery).then((rolloverResult:pg.QueryResult<postgresSchema.rollover>)=>{
+      client.query(transferQuery).then((transferResult:pg.QueryResult<postgresSchema.transfer>)=>{
+        client.query(contributionQuery).then((contributionResult:pg.QueryResult<postgresSchema.contribution>)=>{
+          let parameters =  gatherInitialInvestmentParameters(rolloverResult, transferResult, contributionResult);
+          if(initialInvestmentResult.rowCount == 0){
+            res.json({data : {formData: undefined, parameters : parameters}})
+          }else{
+            let initialInvestmentInfo : postgresSchema.initial_investment = initialInvestmentResult.rows[0];
+            res.json({data : {formData: initialInvestmentInfo, parameters : parameters}});
+          }
         })
       })
     })
   })
 }
 
-function gatherInitialInvestmentParameters(rolloverResult:pg.QueryResult, transferResult:pg.QueryResult, contributionResult:pg.QueryResult){
+function gatherInitialInvestmentParameters(rolloverResult:pg.QueryResult<postgresSchema.rollover>, transferResult:pg.QueryResult<postgresSchema.transfer>, contributionResult:pg.QueryResult<postgresSchema.contribution>){
   let initialInvestmentParams : Partial<initialInvestmentConditionalParameters> = {}
   if(rolloverResult.rowCount > 0){
     let rollovers : Array<rollover> = rolloverResult.rows;
     initialInvestmentParams.existing_employer_plan_rollover = true;
-    initialInvestmentParams.employer_cash_amount_1 = rollovers[0].cash_amount;
+    initialInvestmentParams.employer_cash_amount_1 = rollovers[0]?.cash_amount;
     initialInvestmentParams.employer_cash_amount_2 = rollovers[1]?.cash_amount;
   }
 
   if(transferResult.rowCount > 0){
     let transfers : Array<transfer> = transferResult.rows
     initialInvestmentParams.existing_ira_transfer = true
-    initialInvestmentParams.ira_full_or_partial_cash_transfer_1 = transfers[0].full_or_partial_cash_transfer
+    initialInvestmentParams.ira_full_or_partial_cash_transfer_1 = transfers[0]?.full_or_partial_cash_transfer
     initialInvestmentParams.ira_full_or_partial_cash_transfer_2 = transfers[1]?.full_or_partial_cash_transfer
     
-    initialInvestmentParams.transfer_type_1 = transfers[0].transfer_type;
+    initialInvestmentParams.transfer_type_1 = transfers[0]?.transfer_type;
     initialInvestmentParams.transfer_type_2 = transfers[1]?.transfer_type;
     
-    initialInvestmentParams.ira_cash_amount_1 = transfers[0].cash_amount;
+    initialInvestmentParams.ira_cash_amount_1 = transfers[0]?.cash_amount;
     initialInvestmentParams.ira_cash_amount_2 = transfers[1]?.cash_amount;
+
+    console.log(initialInvestmentParams)
   }
 
   if(contributionResult.rowCount > 0)
   {
-    let contribution : contributionForm = contributionResult.rows[0]
+    let contribution : postgresSchema.contribution = contributionResult.rows[0]
     initialInvestmentParams.new_ira_contribution = true;
-    initialInvestmentParams.new_contribution_amount = contribution.new_contribution_amount
+    initialInvestmentParams.new_contribution_amount = contribution?.new_contribution_amount
   }
 
   return initialInvestmentParams
