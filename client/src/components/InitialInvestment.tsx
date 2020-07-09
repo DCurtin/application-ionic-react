@@ -27,7 +27,7 @@ const InitialInvestment : React.FC<SesssionAppExtended> = ({sessionId, setShowEr
             getInitialInvestmentPage(sessionId).then((data:any)=>{
                 if(data.formData === undefined || data.parameters === undefined)
                 {
-                    setShowSpinner?(false)
+                    setShowSpinner(false)
                 }
                 ImportForm(data);
                 setShowSpinner(false)
