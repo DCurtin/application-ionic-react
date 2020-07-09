@@ -7,7 +7,6 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { addOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import {getTransferPage, saveTransferPage, getAllCustodians} from '../helpers/CalloutHelpers';
-import {DevTool} from '@hookform/devtools';
 
 let custodians: string[] = [];
 let custodianOptions: any[] = [];
@@ -490,8 +489,7 @@ const Transfers : React.FC<SessionApp> = ({sessionId, updateMenuSections, formRe
                 </IonRow>
                 
             </IonGrid> 
-            </form>  
-            <DevTool control={control} />      
+            </form>   
         </IonContent>
     )
 }
