@@ -1,0 +1,8 @@
+Identifier,Type,Unique,Required
+name,text,"",""
+phone,text,"",""
+billing_street,text,"",""
+billing_city,text,"",""
+billing_state,text,"",""
+billing_zip,text,"",""
+salesforce_id,text,yes,yes
