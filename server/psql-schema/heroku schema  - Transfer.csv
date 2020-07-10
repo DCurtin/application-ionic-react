@@ -1,12 +1,13 @@
 Identifier,Type,Unique,Required
 account_number,text,,
 institution_name,text,,
+institution_id,text,"",""
 contact_name,text,,
 contact_phone_number,text,,
-mailing_street,text,"",""
-mailing_city,text,"",""
-mailing_state,text,"",""
-mailing_zip,text,"",""
+mailing_street,text,,
+mailing_city,text,,
+mailing_state,text,,
+mailing_zip,text,,
 account_type,text,,
 transfer_type,text,,
 delivery_method,text,,
